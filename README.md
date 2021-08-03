@@ -15,7 +15,7 @@ A very basic manga reader made using flutter and mangadex API.
 
 ## Compiling the App
 - Add the /bin directory of your flutter installation to your system PATH
-- Next you will have to (enable desktop support)[https://flutter.dev/desktop]
+- Next you will have to (enable desktop support) [https://flutter.dev/desktop]
 - Install both the [Dart](https://marketplace.visualstudio.com/items?itemName=Dart-Code.dart-code) and the [Flutter](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter) plugin installed in your IDE. Visual Studio Code was used for this project.
 
 ## Running the App
