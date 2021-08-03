@@ -22,4 +22,4 @@ A very basic manga reader made using flutter and mangadex API.
 
 Open up the **main.dart** file in the /lib directory and press F5. It should say 'building windows application', in that case the app should launch in around 60 seconds.
 
-![](https://i.imgur.com/rgBrEkJ.gifv)
+![](https://i.imgur.com/rgBrEkJ.gif)
