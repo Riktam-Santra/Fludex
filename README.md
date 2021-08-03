@@ -1,5 +1,5 @@
 # Fludex
-A very basic manga reader made using flutter and mangadex.
+A very basic manga reader made using flutter and mangadex API.
 
 
 ## A few things to remember
