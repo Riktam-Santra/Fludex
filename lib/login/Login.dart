@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_app/homepage.dart';
+import 'package:fludex/homepage.dart';
 
 class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
