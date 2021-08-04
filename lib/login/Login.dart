@@ -9,6 +9,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   late String password;
   late String username;
+  String loginText = '';
   bool hasPressedLogIn = false;
   Widget build(BuildContext context) {
     return Container(
@@ -55,6 +56,10 @@ class _LoginState extends State<Login> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Text(
+                            '$loginText',
+                            style: TextStyle(color: Colors.red),
+                          ),
                           Container(
                             width: 280,
                             decoration: BoxDecoration(
@@ -120,26 +125,36 @@ class _LoginState extends State<Login> {
                             ),
                             onTap: () async {
                               hasPressedLogIn = true;
-                              var loginData =
-                                  await lib.login(username, password);
-                              setState(() {
-                                // print('Username: ' + username);
-                                // print('Password: ' + password);
-                                if (password == '' && username == '' ||
-                                    password == '' ||
-                                    username == '') {
-                                  print('username or password empty');
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => HomePage(
-                                        token: loginData.token.session,
+                              var loginResponse =
+                                  await lib.loginResponse(username, password);
+                              if (loginResponse.statusCode == 200) {
+                                var loginData =
+                                    await lib.login(username, password);
+                                setState(() {
+                                  // print('Username: ' + username);
+                                  // print('Password: ' + password);
+                                  if (password == '' && username == '' ||
+                                      password == '' ||
+                                      username == '') {
+                                    print('username or password empty');
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => HomePage(
+                                          token: loginData.token.session,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }
-                              });
+                                    );
+                                  }
+                                });
+                              } else {
+                                setState(() {
+                                  hasPressedLogIn = false;
+                                  loginText =
+                                      'Username or password is incorrect';
+                                });
+                              }
                             },
                           )
                         ],

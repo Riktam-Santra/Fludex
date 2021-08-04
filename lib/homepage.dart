@@ -12,6 +12,7 @@ class _HomePageState extends State<HomePage> {
   _HomePageState(this.token);
   bool hasTyped = false;
   String searchValue = '';
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
