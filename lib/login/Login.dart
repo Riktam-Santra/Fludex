@@ -119,6 +119,7 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                             onTap: () async {
+                              hasPressedLogIn = true;
                               var loginData =
                                   await lib.login(username, password);
                               setState(() {
@@ -129,7 +130,6 @@ class _LoginState extends State<Login> {
                                     username == '') {
                                   print('username or password empty');
                                 } else {
-                                  hasPressedLogIn = true;
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
