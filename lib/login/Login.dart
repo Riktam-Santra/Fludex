@@ -55,29 +55,28 @@ class _LoginState extends State<Login> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (hasPressedLogIn == true)
-                            Container(
-                              width: 280,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: TextField(
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  fillColor: Color.fromARGB(255, 255, 103, 64),
-                                  hintText: 'Username',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    username = value;
-                                  });
-                                },
-                              ),
+                          Container(
+                            width: 280,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
                             ),
+                            child: TextField(
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                fillColor: Color.fromARGB(255, 255, 103, 64),
+                                hintText: 'Username',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  username = value;
+                                });
+                              },
+                            ),
+                          ),
                           SizedBox(
                             height: 10,
                           ),
