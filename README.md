@@ -32,3 +32,6 @@ Search bar
 Manga Reader
  - Unnessary space between pages
  - Sometimes, while scrolling back up, all the pages will reload causing the current position of the view to get disoriented.
+
+## Things coming next
+ - Read chapters other than only the first chapter
