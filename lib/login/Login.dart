@@ -9,6 +9,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   late String password;
   late String username;
+  bool hasPressedLogIn = false;
   Widget build(BuildContext context) {
     return Container(
       child: Center(
@@ -42,96 +43,108 @@ class _LoginState extends State<Login> {
                 height: 100,
               ),
               Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 280,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: TextField(
-                        obscureText: false,
-                        decoration: InputDecoration(
-                          fillColor: Color.fromARGB(255, 255, 103, 64),
-                          hintText: 'Username',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
+                child: hasPressedLogIn
+                    ? Container(
+                        height: 100,
+                        width: 100,
+                        child: CircularProgressIndicator(
+                          color: Color.fromARGB(255, 255, 103, 64),
+                        ),
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (hasPressedLogIn == true)
+                            Container(
+                              width: 280,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: TextField(
+                                obscureText: false,
+                                decoration: InputDecoration(
+                                  fillColor: Color.fromARGB(255, 255, 103, 64),
+                                  hintText: 'Username',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    username = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            username = value;
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      width: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: TextField(
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          fillColor: Color.fromARGB(255, 255, 103, 64),
-                          hintText: 'Password',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            password = value;
-                          });
-                        },
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    InkWell(
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            left: 20, right: 20, top: 10, bottom: 10),
-                        decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 103, 64),
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Text(
-                          'Login',
-                          style: TextStyle(color: Colors.white, fontSize: 28),
-                        ),
-                      ),
-                      onTap: () async {
-                        var loginData = await lib.login(username, password);
-                        setState(() {
-                          // print('Username: ' + username);
-                          // print('Password: ' + password);
-                          if (password == '' && username == '' ||
-                              password == '' ||
-                              username == '') {
-                            print('username or password empty');
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(
-                                  token: loginData.token.session,
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 10),
+                            width: 300,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                            ),
+                            child: TextField(
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                fillColor: Color.fromARGB(255, 255, 103, 64),
+                                hintText: 'Password',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50),
                                 ),
                               ),
-                            );
-                          }
-                        });
-                      },
-                    )
-                  ],
-                ),
+                              onChanged: (value) {
+                                setState(() {
+                                  password = value;
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          InkWell(
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: 20, right: 20, top: 10, bottom: 10),
+                              decoration: BoxDecoration(
+                                  color: Color.fromARGB(255, 255, 103, 64),
+                                  borderRadius: BorderRadius.circular(50)),
+                              child: Text(
+                                'Login',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 28),
+                              ),
+                            ),
+                            onTap: () async {
+                              var loginData =
+                                  await lib.login(username, password);
+                              setState(() {
+                                // print('Username: ' + username);
+                                // print('Password: ' + password);
+                                if (password == '' && username == '' ||
+                                    password == '' ||
+                                    username == '') {
+                                  print('username or password empty');
+                                } else {
+                                  hasPressedLogIn = true;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HomePage(
+                                        token: loginData.token.session,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              });
+                            },
+                          )
+                        ],
+                      ),
               ),
             ],
           ),
