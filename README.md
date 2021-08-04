@@ -23,3 +23,12 @@ A very basic manga reader made using flutter and mangadex API.
 Open up the **main.dart** file in the /lib directory and press F5. It should say 'building windows application', in that case the app should launch in around 60 seconds.
 
 ![](https://i.imgur.com/rgBrEkJ.gif)
+
+## Known bugs
+
+Search bar
+ - after searching for a title, you must clear the search box then press enter so that the search bar is not selected anymore.
+
+Manga Reader
+ - Unnessary space between pages
+ - Sometimes, while scrolling back up, all the pages will reload causing the current position of the view to get disoriented.
