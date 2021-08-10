@@ -1,5 +1,5 @@
 # Fludex
-A very basic manga reader made using flutter and mangadex API.
+A very basic manga reader made using flutter and mangadex API. It uses the [mangadex_library package](https://pub.dev/packages/mangadex_library).
 
 
 ## A few things to remember
@@ -15,7 +15,7 @@ A very basic manga reader made using flutter and mangadex API.
 
 ## Compiling the App
 - Add the /bin directory of your flutter installation to your system PATH
-- Next you will have to (enable desktop support) [https://flutter.dev/desktop]
+- Next you will have to [enable desktop support](https://flutter.dev/desktop)
 - Install both the [Dart](https://marketplace.visualstudio.com/items?itemName=Dart-Code.dart-code) and the [Flutter](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter) plugin installed in your IDE. Visual Studio Code was used for this project.
 
 ## Running the App
@@ -27,11 +27,12 @@ Open up the **main.dart** file in the /lib directory and press F5. It should say
 ## Known bugs
 
 Search bar
- - after searching for a title, you must clear the search box then press enter so that the search bar is not selected anymore.
+ - after searching for a title, you must clear the search box then press enter so that the search bar is not selected anymore to search for another title.
 
 Manga Reader
- - Unnessary space between pages
+ - Unnessary space between pages.
  - Sometimes, while scrolling back up, all the pages will reload causing the current position of the view to get disoriented.
 
 ## Things coming next
- - Read chapters other than only the first chapter
+ - Read chapters other than only the first chapter.
+ - A better search function.

@@ -45,11 +45,13 @@ class _LoginState extends State<Login> {
               ),
               Center(
                 child: hasPressedLogIn
-                    ? Container(
-                        height: 100,
-                        width: 100,
-                        child: CircularProgressIndicator(
-                          color: Color.fromARGB(255, 255, 103, 64),
+                    ? Center(
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          child: CircularProgressIndicator(
+                            color: Color.fromARGB(255, 255, 103, 64),
+                          ),
                         ),
                       )
                     : Column(
@@ -131,8 +133,6 @@ class _LoginState extends State<Login> {
                                 var loginData =
                                     await lib.login(username, password);
                                 setState(() {
-                                  // print('Username: ' + username);
-                                  // print('Password: ' + password);
                                   if (password == '' && username == '' ||
                                       password == '' ||
                                       username == '') {
