@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:fludex/homepage.dart';
@@ -78,9 +80,11 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                               onChanged: (value) {
-                                setState(() {
-                                  username = value;
-                                });
+                                setState(
+                                  () {
+                                    username = value;
+                                  },
+                                );
                               },
                             ),
                           ),
@@ -103,9 +107,11 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                               onChanged: (value) {
-                                setState(() {
-                                  password = value;
-                                });
+                                setState(
+                                  () {
+                                    password = value;
+                                  },
+                                );
                               },
                             ),
                           ),
@@ -126,33 +132,49 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                             onTap: () async {
-                              hasPressedLogIn = true;
-                              var loginResponse =
-                                  await lib.loginResponse(username, password);
-                              if (loginResponse.statusCode == 200) {
-                                var loginData =
-                                    await lib.login(username, password);
-                                setState(() {
-                                  if (password == '' && username == '' ||
-                                      password == '' ||
-                                      username == '') {
-                                    print('username or password empty');
-                                  } else {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomePage(
-                                          token: loginData.token.session,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                });
-                              } else {
+                              setState(() {
+                                hasPressedLogIn = true;
+                              });
+                              try {
+                                var loginResponse =
+                                    await lib.loginResponse(username, password);
+
+                                if (loginResponse.statusCode == 200) {
+                                  var loginData =
+                                      await lib.login(username, password);
+                                  setState(
+                                    () {
+                                      if (password == '' && username == '' ||
+                                          password == '' ||
+                                          username == '') {
+                                        loginText =
+                                            'username or password empty';
+                                      } else {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => HomePage(
+                                              token: loginData.token.session,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  );
+                                } else {
+                                  setState(
+                                    () {
+                                      hasPressedLogIn = false;
+                                      loginText =
+                                          'Username or password is incorrect';
+                                    },
+                                  );
+                                }
+                              } on TimeoutException {
                                 setState(() {
                                   hasPressedLogIn = false;
                                   loginText =
-                                      'Username or password is incorrect';
+                                      'Request timed out. Please try again.';
                                 });
                               }
                             },

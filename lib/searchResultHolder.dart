@@ -120,6 +120,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => MangaReader(
+                              chapterData: chapterData,
                               token: token,
                               chapterId: chapterId,
                               mangaId: mangaId,

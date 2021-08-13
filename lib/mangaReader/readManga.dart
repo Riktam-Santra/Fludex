@@ -1,75 +1,128 @@
 import 'package:flutter/material.dart';
+import 'package:mangadex_library/chapter/ChapterData.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/jsonSearchCommands.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class MangaReader extends StatefulWidget {
+  final ChapterData chapterData;
   final String mangaId;
   final String token;
   final String chapterId;
+
   MangaReader(
-      {required this.token, required this.chapterId, required this.mangaId});
+      {required this.token,
+      required this.chapterId,
+      required this.mangaId,
+      required this.chapterData});
   _MangaReaderState createState() => _MangaReaderState(
-      globalToken: token, chapterId: chapterId, mangaId: mangaId);
+      globalToken: token,
+      chapterId: chapterId,
+      mangaId: mangaId,
+      chapterData: chapterData);
 }
 
 class _MangaReaderState extends State<MangaReader> {
   final String globalToken;
-  final String chapterId;
-  final String mangaId;
+  late String chapterId;
+  final ChapterData chapterData;
+  late String mangaId;
+
   _MangaReaderState(
       {required this.globalToken,
       required this.chapterId,
-      required this.mangaId});
+      required this.mangaId,
+      required this.chapterData});
   JsonSearch jsonsearch = new JsonSearch();
-  bool isLoading = false;
-
   Widget build(BuildContext context) {
+    int chapterNumberTracker = 0;
     return new FutureBuilder(
-      future: getAllFilePaths(chapterId, true),
+      future: getAllFilePaths(chapterId, false),
       builder: (context, AsyncSnapshot<List<String>?> data) {
         if (data.hasData) {
           return Scaffold(
-            body: Stack(
-              children: [
-                Container(
-                  color: Colors.black87,
-                  child: ListView.builder(
-                    itemCount: data.data!.length,
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, index) {
-                      return Container(
-                        child: CachedNetworkImage(
-                          imageUrl: data.data![index],
-                          placeholder: (context, url) => Container(
-                            child: Center(child: CircularProgressIndicator()),
-                            height: 100,
-                            width: 100,
+            appBar: AppBar(),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    height: 75,
+                    width: double.infinity,
+                    color: Colors.black54,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: Center(
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: IconButton(
+                                    color: Colors.white,
+                                    icon: Icon(Icons.skip_previous),
+                                    onPressed: () {
+                                      if (chapterNumberTracker != 0) {
+                                        setState(() {
+                                          chapterId = chapterData
+                                              .result[chapterNumberTracker - 1]
+                                              .data
+                                              .id;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  color: Colors.white,
+                                  child: Text('Chapter ' +
+                                      (chapterNumberTracker + 1).toString()),
+                                ),
+                                Container(
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.skip_next,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        chapterId = chapterData
+                                            .result[chapterNumberTracker + 1]
+                                            .data
+                                            .id;
+                                      });
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  height: 75,
-                  width: double.infinity,
-                  color: Colors.black54,
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: BackButton(
-                          color: Colors.white,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    ],
+                  Container(
+                    color: Colors.black87,
+                    child: ListView.builder(
+                      itemCount: data.data!.length,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, index) {
+                        return Container(
+                          child: CachedNetworkImage(
+                            fit: BoxFit.contain,
+                            imageUrl: data.data![index],
+                            placeholder: (context, url) => Container(
+                              child: Center(child: CircularProgressIndicator()),
+                              height: 100,
+                              width: 100,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         } else {
@@ -78,7 +131,7 @@ class _MangaReaderState extends State<MangaReader> {
               height: 100,
               width: 100,
               child: CircularProgressIndicator(
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
           );
@@ -109,7 +162,7 @@ class _MangaReaderState extends State<MangaReader> {
         (v) {
           isDataSaverMode
               ? urls.add('$baseUrl/$token/data-saver/$chapterHash/$v')
-              : urls.add('$baseUrl/$token/data-saver/$chapterHash/$v');
+              : urls.add('$baseUrl/$token/data/$chapterHash/$v');
         },
       );
       return urls;
