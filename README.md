@@ -12,7 +12,7 @@ A very basic manga reader made using flutter and mangadex API. It uses the [mang
 - I might not be able to always be there to keep adding features to this one, however everyone's welcome to contribute to the project.
 
 ## Releases
-The first realse version has been finally uploaded and can be found on the [releases](https://github.com/Riktam-Santra/Fludex/releases) page, if you are looking ahead to try the app.
+The first release version has been finally uploaded and can be found on the [releases](https://github.com/Riktam-Santra/Fludex/releases) page, if you are looking ahead to try the app.
 
 ## Compiling the App
 - Add the /bin directory of your flutter installation to your system PATH
