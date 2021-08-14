@@ -38,8 +38,8 @@ Manga Reader
   The app crashes under the following circumstances
   - If there is no internet
   - On request timeouts
-  - If rate limit is exceeded
-  I'll try to fix these soon.
+  - If rate limit is exceeded <br><br>
+I'll try to fix these soon.
 
 ## Things coming next
  - Read chapters other than only the first chapter.
