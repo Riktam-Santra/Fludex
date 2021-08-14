@@ -36,6 +36,7 @@ class _MangaReaderState extends State<MangaReader> {
   JsonSearch jsonsearch = new JsonSearch();
   Widget build(BuildContext context) {
     int chapterNumberTracker = 0;
+    chapterId = chapterData.result[chapterNumberTracker].data.id;
     return new FutureBuilder(
       future: getAllFilePaths(chapterId, false),
       builder: (context, AsyncSnapshot<List<String>?> data) {
@@ -64,10 +65,7 @@ class _MangaReaderState extends State<MangaReader> {
                                     onPressed: () {
                                       if (chapterNumberTracker != 0) {
                                         setState(() {
-                                          chapterId = chapterData
-                                              .result[chapterNumberTracker - 1]
-                                              .data
-                                              .id;
+                                          chapterNumberTracker--;
                                         });
                                       }
                                     },
@@ -86,10 +84,7 @@ class _MangaReaderState extends State<MangaReader> {
                                     ),
                                     onPressed: () {
                                       setState(() {
-                                        chapterId = chapterData
-                                            .result[chapterNumberTracker + 1]
-                                            .data
-                                            .id;
+                                        chapterNumberTracker++;
                                       });
                                     },
                                   ),

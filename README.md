@@ -34,6 +34,13 @@ Manga Reader
  - Unnessary space between pages.
  - Sometimes, while scrolling back up, all the pages will reload causing the current position of the view to get disoriented.
 
+## Crashes
+  The app crashes under the following circumstances
+  - If there is no internet
+  - On request timeouts
+  - If rate limit is exceeded
+  I'll try to fix these soon.
+
 ## Things coming next
  - Read chapters other than only the first chapter.
  - A better search function.
