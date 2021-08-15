@@ -42,5 +42,4 @@ Manga Reader
 I'll try to fix these soon.
 
 ## Things coming next
- - Read chapters other than only the first chapter.
- - A better search function.
+ - Better image handling to stop exceeding rate limits for no reason at all
