@@ -14,6 +14,9 @@ A very basic manga reader made using flutter and mangadex API. It uses the [mang
 ## Releases
 The first release version has been finally uploaded and can be found on the [releases](https://github.com/Riktam-Santra/Fludex/releases) page, if you are looking ahead to try the app.
 
+## App Controls
+When reading the manga, click once on a page to go to the next page and click twice on a page to go the previous page.
+
 ## Compiling the App
 - Add the /bin directory of your flutter installation to your system PATH
 - Next you will have to [enable desktop support](https://flutter.dev/desktop)
@@ -30,10 +33,6 @@ Open up the **main.dart** file in the /lib directory and press F5. It should say
 Search bar
  - after searching for a title, you must clear the search box then press enter so that the search bar is not selected anymore to search for another title.
 
-Manga Reader
- - Unnessary space between pages.
- - Sometimes, while scrolling back up, all the pages will reload causing the current position of the view to get disoriented.
-
 ## Crashes
   The app crashes under the following circumstances
   - If there is no internet
@@ -42,4 +41,4 @@ Manga Reader
 I'll try to fix these soon.
 
 ## Things coming next
- - Better image handling to stop exceeding rate limits for no reason at all
+ - A library to add mangas.

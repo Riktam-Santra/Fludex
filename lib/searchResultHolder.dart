@@ -115,14 +115,12 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                     onTap: () async {
                       var chapterData = await lib.getChapters(mangaId);
                       if (chapterData != null) {
-                        var chapterId = chapterData.result[0].data.id;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => MangaReader(
                               chapterData: chapterData,
                               token: token,
-                              chapterId: chapterId,
                               mangaId: mangaId,
                             ),
                           ),

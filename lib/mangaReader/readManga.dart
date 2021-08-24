@@ -8,37 +8,34 @@ class MangaReader extends StatefulWidget {
   final ChapterData chapterData;
   final String mangaId;
   final String token;
-  final String chapterId;
 
   MangaReader(
-      {required this.token,
-      required this.chapterId,
-      required this.mangaId,
-      required this.chapterData});
+      {required this.token, required this.mangaId, required this.chapterData});
   _MangaReaderState createState() => _MangaReaderState(
-      globalToken: token,
-      chapterId: chapterId,
-      mangaId: mangaId,
-      chapterData: chapterData);
+      globalToken: token, mangaId: mangaId, chapterData: chapterData);
 }
 
 class _MangaReaderState extends State<MangaReader> {
   final String globalToken;
-  late String chapterId;
-  final ChapterData chapterData;
+  late ChapterData chapterData;
   late String mangaId;
 
   _MangaReaderState(
       {required this.globalToken,
-      required this.chapterId,
       required this.mangaId,
       required this.chapterData});
+  bool imgLoading = false;
+  int chapterNumberTracker = 0;
+  int pageIndex = 0;
+  String getChapterID() {
+    var chapterId = chapterData.result[chapterNumberTracker].data.id;
+    return chapterId;
+  }
+
   JsonSearch jsonsearch = new JsonSearch();
   Widget build(BuildContext context) {
-    int chapterNumberTracker = 0;
-    chapterId = chapterData.result[chapterNumberTracker].data.id;
     return new FutureBuilder(
-      future: getAllFilePaths(chapterId, false),
+      future: getAllFilePaths(getChapterID(), false),
       builder: (context, AsyncSnapshot<List<String>?> data) {
         if (data.hasData) {
           return Scaffold(
@@ -64,9 +61,11 @@ class _MangaReaderState extends State<MangaReader> {
                                     icon: Icon(Icons.skip_previous),
                                     onPressed: () {
                                       if (chapterNumberTracker != 0) {
-                                        setState(() {
-                                          chapterNumberTracker--;
-                                        });
+                                        setState(
+                                          () {
+                                            chapterNumberTracker--;
+                                          },
+                                        );
                                       }
                                     },
                                   ),
@@ -83,9 +82,11 @@ class _MangaReaderState extends State<MangaReader> {
                                       color: Colors.white,
                                     ),
                                     onPressed: () {
-                                      setState(() {
-                                        chapterNumberTracker++;
-                                      });
+                                      setState(
+                                        () {
+                                          chapterNumberTracker++;
+                                        },
+                                      );
                                     },
                                   ),
                                 )
@@ -98,20 +99,39 @@ class _MangaReaderState extends State<MangaReader> {
                   ),
                   Container(
                     color: Colors.black87,
-                    child: ListView.builder(
-                      itemCount: data.data!.length,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, index) {
-                        return Container(
-                          child: CachedNetworkImage(
-                            fit: BoxFit.contain,
-                            imageUrl: data.data![index],
-                            placeholder: (context, url) => Container(
-                              child: Center(child: CircularProgressIndicator()),
-                              height: 100,
-                              width: 100,
+                    child: InkWell(
+                      child: CachedNetworkImage(
+                        imageUrl: data.data![pageIndex],
+                        placeholder: (BuildContext context, value) {
+                          return Container(
+                            child: Center(
+                              child: SizedBox(
+                                child: CircularProgressIndicator(),
+                              ),
                             ),
-                          ),
+                          );
+                        },
+                      ),
+                      onDoubleTap: () {
+                        setState(
+                          () {
+                            if (pageIndex != 0) {
+                              imgLoading = true;
+                              pageIndex--;
+                              imgLoading = false;
+                            }
+                          },
+                        );
+                      },
+                      onTap: () {
+                        setState(
+                          () {
+                            if (data.data!.length != pageIndex + 1) {
+                              imgLoading = true;
+                              pageIndex++;
+                              imgLoading = false;
+                            }
+                          },
                         );
                       },
                     ),
@@ -143,12 +163,10 @@ class _MangaReaderState extends State<MangaReader> {
       if (token.isEmpty) {
         print('THERE IS NO TOKEN!');
       }
-      var baseUrlClassInstance = await lib.getBaseUrl(chapterId);
-      var baseUrl = baseUrlClassInstance!.baseUrl;
+      var baseUrl = 'https://uploads.mangadex.org';
       var filenames =
           jsonsearch.getChapterFilenames(chapterId, chapter, isDataSaverMode);
       var urls = <String>[];
-
       var chapterData =
           jsonsearch.getChapterDataByChapterId(chapterId, chapter);
       var chapterHash = chapterData.data.attributes.hash;

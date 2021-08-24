@@ -12,3 +12,8 @@
 
 ## 0.0.4
 - added options to change chapters
+
+## 0.0.5
+- major bug fixes
+- pages are no longer in a list, images are changed when clicked or double clicked.
+- the baseurl for all manga has been hardcoded to https://uploads.mangadex.org since it has a very strict rate limit when requesting for the baseurl for each chapter.
