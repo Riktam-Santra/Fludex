@@ -165,10 +165,9 @@ class _MangaReaderState extends State<MangaReader> {
       }
       var baseUrl = 'https://uploads.mangadex.org';
       var filenames =
-          jsonsearch.getChapterFilenames(chapterId, chapter, isDataSaverMode);
+          await jsonsearch.getChapterFilenames(chapterId, isDataSaverMode);
       var urls = <String>[];
-      var chapterData =
-          jsonsearch.getChapterDataByChapterId(chapterId, chapter);
+      var chapterData = await jsonsearch.getChapterDataByChapterId(chapterId);
       var chapterHash = chapterData.data.attributes.hash;
 
       filenames.forEach(

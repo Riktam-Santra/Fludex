@@ -154,7 +154,7 @@ class _LoginState extends State<Login> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => HomePage(
-                                              token: loginData.token.session,
+                                              token: loginData!.token.session,
                                             ),
                                           ),
                                         );
