@@ -24,7 +24,7 @@ When reading the manga, click once on a page to go to the next page and click tw
 
 ## Running the App
 
-Open up the **main.dart** file in the /lib directory and press F5. It should say 'building windows application', in that case the app should launch in around 60 seconds.
+Extract your release zip archive and open mangadex_app.exe (make sure that all the files and extracted and not only the exe.)
 
 <img src="demo.gif" width="600px">
 
