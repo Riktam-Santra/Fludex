@@ -26,7 +26,7 @@ When reading the manga, click once on a page to go to the next page and click tw
 
 Open up the **main.dart** file in the /lib directory and press F5. It should say 'building windows application', in that case the app should launch in around 60 seconds.
 
-![App Demo](https://imgur.com/ZMNdtif.gif)
+<img src="/art/sample.gif?raw=true" width="200px">
 
 ## Crashes
   The app crashes under the following circumstances
