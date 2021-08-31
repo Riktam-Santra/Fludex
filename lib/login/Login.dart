@@ -1,8 +1,9 @@
-import 'dart:async';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:fludex/homepage.dart';
+
+import '../utils.dart';
 
 class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
@@ -11,8 +12,14 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   late String password;
   late String username;
+  late File dataFile;
+
   String loginText = '';
   bool hasPressedLogIn = false;
+  var loginData;
+
+  FludexUtils utils = FludexUtils();
+
   Widget build(BuildContext context) {
     return Container(
       child: Center(
@@ -20,7 +27,7 @@ class _LoginState extends State<Login> {
           height: 500,
           width: 500,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Color.fromARGB(255, 25, 25, 25),
             boxShadow: [
               BoxShadow(blurRadius: 5, spreadRadius: 0.2, offset: Offset(1, 1))
             ],
@@ -30,7 +37,7 @@ class _LoginState extends State<Login> {
             children: [
               Container(
                   decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 255, 103, 64),
+                      color: Colors.redAccent,
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(10),
                           topRight: Radius.circular(10))),
@@ -52,7 +59,7 @@ class _LoginState extends State<Login> {
                           height: 100,
                           width: 100,
                           child: CircularProgressIndicator(
-                            color: Color.fromARGB(255, 255, 103, 64),
+                            color: Colors.white,
                           ),
                         ),
                       )
@@ -62,20 +69,27 @@ class _LoginState extends State<Login> {
                         children: [
                           Text(
                             '$loginText',
-                            style: TextStyle(color: Colors.red),
+                            style: TextStyle(color: Colors.white),
                           ),
                           Container(
                             width: 280,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
                             child: TextField(
+                              style: TextStyle(color: Colors.white),
+                              cursorColor: Colors.white,
                               obscureText: false,
                               decoration: InputDecoration(
-                                fillColor: Color.fromARGB(255, 255, 103, 64),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
                                 hintText: 'Username',
+                                hintStyle: TextStyle(color: Colors.white),
                                 border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.white, width: 1),
                                   borderRadius: BorderRadius.circular(50),
                                 ),
                               ),
@@ -92,17 +106,24 @@ class _LoginState extends State<Login> {
                             height: 10,
                           ),
                           Container(
-                            padding: EdgeInsets.only(left: 10, right: 10),
-                            width: 300,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                            ),
+                            width: 280,
                             child: TextField(
+                              style: TextStyle(color: Colors.white),
+                              cursorColor: Colors.white,
                               obscureText: true,
                               decoration: InputDecoration(
-                                fillColor: Color.fromARGB(255, 255, 103, 64),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
                                 hintText: 'Password',
+                                hintStyle: TextStyle(color: Colors.white),
                                 border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.white, width: 1),
                                   borderRadius: BorderRadius.circular(50),
                                 ),
                               ),
@@ -123,8 +144,9 @@ class _LoginState extends State<Login> {
                               padding: EdgeInsets.only(
                                   left: 20, right: 20, top: 10, bottom: 10),
                               decoration: BoxDecoration(
-                                  color: Color.fromARGB(255, 255, 103, 64),
-                                  borderRadius: BorderRadius.circular(50)),
+                                color: Colors.redAccent,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
                               child: Text(
                                 'Login',
                                 style: TextStyle(
@@ -132,50 +154,41 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                             onTap: () async {
-                              setState(() {
-                                hasPressedLogIn = true;
-                              });
-                              try {
-                                var loginResponse =
-                                    await lib.loginResponse(username, password);
-
-                                if (loginResponse.statusCode == 200) {
-                                  var loginData =
-                                      await lib.login(username, password);
-                                  setState(
-                                    () {
-                                      if (password == '' && username == '' ||
-                                          password == '' ||
-                                          username == '') {
-                                        loginText =
-                                            'username or password empty';
-                                      } else {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => HomePage(
-                                              token: loginData!.token.session,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    },
+                              if (password == '' && username == '' ||
+                                  password == '' ||
+                                  username == '') {
+                                setState(() {
+                                  loginText = 'username or password empty';
+                                });
+                              } else {
+                                setState(() {
+                                  hasPressedLogIn = true;
+                                });
+                                var loginData =
+                                    await lib.login(username, password);
+                                if (loginData!.result == 'ok') {
+                                  print(hasPressedLogIn);
+                                  print('got loginData');
+                                  utils.saveLoginData(
+                                      username,
+                                      password,
+                                      loginData.token.session,
+                                      loginData.token.refresh);
+                                  print('saved login data');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HomePage(
+                                        token: loginData.token.session,
+                                      ),
+                                    ),
                                   );
                                 } else {
-                                  setState(
-                                    () {
-                                      hasPressedLogIn = false;
-                                      loginText =
-                                          'Username or password is incorrect';
-                                    },
-                                  );
+                                  setState(() {
+                                    loginText =
+                                        'Username or Password incorrect.';
+                                  });
                                 }
-                              } on TimeoutException {
-                                setState(() {
-                                  hasPressedLogIn = false;
-                                  loginText =
-                                      'Request timed out. Please try again.';
-                                });
                               }
                             },
                           )

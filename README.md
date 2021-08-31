@@ -28,11 +28,6 @@ Open up the **main.dart** file in the /lib directory and press F5. It should say
 
 ![App Demo](https://i.imgur.com/77G58qc.gif)
 
-## Known bugs
-
-Search bar
- - after searching for a title, you must clear the search box then press enter so that the search bar is not selected anymore to search for another title.
-
 ## Crashes
   The app crashes under the following circumstances
   - If there is no internet
@@ -42,3 +37,6 @@ I'll try to fix these soon.
 
 ## Things coming next
  - A library to add mangas.
+
+## Reach me
+ - Need to get in touch for something? I might not be always active on my github but im always there on Discord, if you need to ask for something (or maybe just talk) just dm me on Rick~#9387

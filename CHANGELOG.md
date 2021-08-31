@@ -17,3 +17,11 @@
 - major bug fixes
 - pages are no longer in a list, images are changed when clicked or double clicked.
 - the baseurl for all manga has been hardcoded to https://uploads.mangadex.org since it has a very strict rate limit when requesting for the baseurl for each chapter.
+
+## 0.0.6
+ - Majory Feature updates and bug fixes
+ - Added auto login function.
+ - Changed the UI theme to dark, a light mode will be added later on.
+ - added an about manga page.
+ - mangaReader no longer bound to the index of the ChapterData it's supplied to.
+ - Fixed bug with the search bar

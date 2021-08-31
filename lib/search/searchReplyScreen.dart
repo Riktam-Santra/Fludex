@@ -19,13 +19,21 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
       future: lib.search(searchQuery),
       builder: (context, AsyncSnapshot<Search?> searchData) {
         if (searchData.connectionState == ConnectionState.done) {
-          if (searchData.data == null) {
-            print(searchData.data);
+          if (searchData.hasError) {
+            return Container(
+              child: Center(
+                child: Text(
+                  'Something went wrong :\'(',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+            );
+          } else if (searchData.data == null) {
             return Container(
               child: Center(
                 child: Text(
                   'Manga not found :(',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
               ),
             );
@@ -61,10 +69,17 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
                     }));
           }
         } else {
-          return Container(
-            child: LinearProgressIndicator(),
-            height: 100,
-            width: 100,
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 100),
+              child: Container(
+                child: LinearProgressIndicator(
+                  backgroundColor: Color.fromARGB(255, 18, 18, 18),
+                  color: Colors.white,
+                ),
+                height: 30,
+              ),
+            ),
           );
         }
       },

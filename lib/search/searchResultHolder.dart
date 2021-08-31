@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fludex/mangaReader/aboutManga.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'mangaReader/readManga.dart';
 import 'package:mangadex_library/cover/Cover.dart';
 
 class SearchResultHolder extends StatefulWidget {
@@ -43,7 +43,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
             for (int i = 0; i < tags.length; i++) {
               tagWidgets.add(Container(
                 padding: EdgeInsets.only(left: 10, right: 10),
-                color: Colors.grey[400],
+                color: Color.fromARGB(150, 18, 18, 18),
                 child: Text(
                   tags[i],
                   style: TextStyle(color: Colors.white),
@@ -54,11 +54,11 @@ class _SearchResultHolder extends State<SearchResultHolder> {
               padding: const EdgeInsets.all(20.0),
               child: Container(
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 18, 18, 18),
                       boxShadow: [BoxShadow(color: Colors.grey)]),
                   child: InkWell(
                     child: Container(
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 18, 18, 18),
                       child: Row(
                         children: [
                           Container(
@@ -78,35 +78,50 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  title,
-                                  style: TextStyle(fontSize: 17),
-                                ),
-                                Container(
-                                  child: LimitedBox(
-                                    maxWidth: 500,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: tagWidgets,
+                          Expanded(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Text(
+                                      title,
+                                      overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                          fontSize: 17, color: Colors.white),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 5, bottom: 5),
+                                    child: Container(
+                                      child: LimitedBox(
+                                        maxWidth: 500,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: tagWidgets,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                ClipRect(
-                                  child: LimitedBox(
-                                    maxWidth: 500,
-                                    child: Text(
-                                      description,
-                                      style: TextStyle(color: Colors.grey[400]),
+                                  Expanded(
+                                    child: Container(
+                                      child: Text(
+                                        description,
+                                        style:
+                                            TextStyle(color: Colors.grey[400]),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 6,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -118,11 +133,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MangaReader(
-                              chapterData: chapterData,
-                              token: token,
-                              mangaId: mangaId,
-                            ),
+                            builder: (context) =>
+                                AboutManga(mangaId: mangaId, token: token),
                           ),
                         );
                       }
@@ -134,7 +146,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
               child: Center(
                 child: Text(
                   'Couldn\'t load data :(',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 18),
+                  style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
             );

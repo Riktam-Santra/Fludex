@@ -1,575 +1,63 @@
 {
-    "results": [
-        {
-            "result": "ok",
-            "data": {
-                "id": "016b5b03-c8b7-4eef-80e7-9c7a96f8bf2a",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "7",
-                    "title": "One More Time",
-                    "translatedLanguage": "en",
-                    "hash": "26a678e5c21d745e52e718f61a3c1e75",
-                    "data": [
-                        "x1-24538ff1f6cb03f4f7862c808dc452d9956390ec17125882550977ffe6f69b46.png",
-                        "x2-3ebee2c13349ea1b1ab31b4fe694a274c0d5df71128174df3a6ca52b75ac6144.png",
-                        "x3-86ba29750e3de27b96d730dfe1151fefea4f859cf8c724153337476b395ff6f7.png",
-                        "x4-3a0637910c256ae32d16b979b68094ebbc66f6901b687120385f176edebf2aa4.png",
-                        "x5-cb1cb0939cc2bc2e14911a742e45c22b3abd1b21d4efe8050185a72d19bfc0b8.png",
-                        "x6-4d11991d205249265d08f03ab3f83824bb4a80415e990f317f822459ac18a5e6.jpg"
-                    ],
-                    "dataSaver": [
-                        "x1-5dbc4bdb5f029c6c1dc7b99306e9e84692bdbb99fe855694d98e5299712c32f4.jpg",
-                        "x2-0a4eacc31f217da66d6ecb54367119109ca031be51f9951e85468d26c6b20676.jpg",
-                        "x3-528c406ce2b6c95b629b6d461a0427b0c23ac72b29b16901c5859917db817803.jpg",
-                        "x4-4d327fddb680d3bc36d22085dd293587a6b3cb9d38eecf4d9ed73883a53e3455.jpg",
-                        "x5-fd22d58b2780cfc2eba901bdbd4575536442464fa51a6bf644fd6fc346ca0ba9.jpg",
-                        "x6-264fecb55c6548b726aff9013595674dffdef93ce4c8602ddb735f0fe7d9c4bd.jpg"
-                    ],
-                    "publishAt": "2018-01-18T06:00:13+00:00",
-                    "createdAt": "2018-01-18T06:00:13+00:00",
-                    "updatedAt": "2018-01-18T06:00:13+00:00",
-                    "version": 1
-                }
+    "result": "ok",
+    "data": {
+        "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+        "type": "manga",
+        "attributes": {
+            "title": {
+                "en": "This is a localized string",
+                "fr": "C'est une chaine traduite"
             },
-            "relationships": [
+            "altTitles": [
                 {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "38705d1d-9ec8-482c-89b4-c5338ed8b4ee",
-                    "type": "user"
+                    "en": "This is a localized string",
+                    "fr": "C'est une chaine traduite"
                 }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "4a60d760-478d-4d22-9fa4-abad05eb67e0",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "8",
-                    "title": "I'm Scared",
-                    "translatedLanguage": "en",
-                    "hash": "d203ffb492fd853db7f8a97ea840e5c6",
-                    "data": [
-                        "x1-41e701351a4941b5d2bfa2c0a698c57dfd1568998dadff6a061bd17749738d16.png",
-                        "x2-8818c9440d87249a7e2e7f4902ed17db4202029744217ff86dbb806bcf9af868.png",
-                        "x3-1978c3cba17198829f8563b6bf180a6b38bad04b706cba778658dde1ea9592af.png"
-                    ],
-                    "dataSaver": [
-                        "x1-8eaf06341f7a80d5606493405517ecf0d8a9bd8b1eb1d6b50180fd1f8063be32.jpg",
-                        "x2-de0f18a28625a138bd6165f1d8687e82a83794b3c2504c563d3a4c116ea95463.jpg",
-                        "x3-892f38e26ab10e07cd2fc243aba9824480560c280a0971a1798bd8593fc69b29.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:34:09+00:00",
-                    "createdAt": "2018-01-20T04:34:09+00:00",
-                    "updatedAt": "2018-01-20T04:34:09+00:00",
-                    "version": 1
-                }
+            ],
+            "description": {
+                "en": "This is a localized string",
+                "fr": "C'est une chaine traduite"
             },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "f044c6ef-50fc-4237-bd0b-13c534f6bd3d",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "9",
-                    "title": "Childhood Friend",
-                    "translatedLanguage": "en",
-                    "hash": "283658c174d4e386ca94fc9cb31fd74d",
-                    "data": [
-                        "x1-523d1ce059616fdbc282c1a54ce2142c1a0a2cf9561a7b053022917ca8687dca.png",
-                        "x2-fec00a5633c75ef63329b7a09104aab7ced3ba1a72e73988950e0ff0bb0f0f48.png",
-                        "x3-117daad85a5f6d41973bb7c4225f1fd5b3f37d972893a4259dd707512950c2ee.png",
-                        "x4-f0cf2c77e546617182f9368a711b42cf8b9b2c20990ebdbfc63d0e8fd78573a4.png",
-                        "x5-de8dad0b1185941652d98bd485dc30aff6348b4d8fd4e6b8421fa0af26cb0f77.png",
-                        "x6-4fc40f470ad3a3b8effbd6827240d4a98af0db92d1158147dcf646ebad524f48.png",
-                        "x7-f2e83c3839d1641ced464f769b52db2749877f994ecc3638c566dee91835be50.png",
-                        "x8-9c6193315fa5a6cd4c6a38763fad413f3508a4ca91041cc19639d6370828901e.png",
-                        "x9-4205390db3407b81aa6ab7336864636e621213f8a3a9cb4db41ab0d41cc8fc43.png",
-                        "x10-eebecd822a116b1745d98ca009426958af124c0602d207c8f6447e882da1d5d5.png",
-                        "x11-3fff916f752b42e9fa51550ae635d13216798abcb841a221f7630afd6a45a334.png"
-                    ],
-                    "dataSaver": [
-                        "x1-187c14ac99f47c2dda041033f31a7b276f60adbbcc0b99ba8dff98c861a7777a.jpg",
-                        "x2-7f60586d12aee0a95971744fb55ee5ab3dd6d070a5284f8d3c2f78bed964f1fd.jpg",
-                        "x3-8322265c0f823a8691f72ad1eec76c7c0b1b2f6a77106a85d2f5e79686f25419.jpg",
-                        "x4-182914e5667c7600b825650ab76cf15ed1f1a1ee86dab849271ab887a6097fc4.jpg",
-                        "x5-d7b1c2973aed4854051cbbb5741fa5ca425eeec0b79751177c12503c7569f09d.jpg",
-                        "x6-67cfd13620898bc92b128288b49f3852cbcdadddb509d134871c428a02c15db9.jpg",
-                        "x7-381768ae76b0f168b3f5601217e047ef5456ee9b7ba2f1bb9b68bb9da198671e.jpg",
-                        "x8-e886333048bcd0f5b86e872127c1a004f4227ede4452714145eb53c25bd20447.jpg",
-                        "x9-0ec4c0ef06823b03cd9f7425385293fe8aa80220e91c2eaeebc056f4135f043d.jpg",
-                        "x10-fa6019e99eae724c8dcbb969223efa347e9ce66a424ed0ad8329f650c4e7b408.jpg",
-                        "x11-e11249c54df18561a4ae6c0026df54e1a678815f4267b84d2e9c807ac202b417.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:34:43+00:00",
-                    "createdAt": "2018-01-20T04:34:43+00:00",
-                    "updatedAt": "2018-01-20T04:34:43+00:00",
-                    "version": 1
-                }
+            "isLocked": true,
+            "links": {
+                "property1": "string",
+                "property2": "string"
             },
-            "relationships": [
+            "originalLanguage": "string",
+            "lastVolume": "string",
+            "lastChapter": "string",
+            "publicationDemographic": "shounen",
+            "status": "string",
+            "year": 0,
+            "contentRating": "safe",
+            "tags": [
                 {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
+                    "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+                    "type": "tag",
+                    "attributes": {
+                        "name": {
+                            "en": "This is a localized string",
+                            "fr": "C'est une chaine traduite"
+                        },
+                        "description": {
+                            "en": "This is a localized string",
+                            "fr": "C'est une chaine traduite"
+                        },
+                        "group": "string",
+                        "version": 1
+                    }
                 }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "5097b63c-e5e1-447f-ae32-f73300ca7ee3",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "10",
-                    "title": "Dark History",
-                    "translatedLanguage": "en",
-                    "hash": "baeac060bfbb4ce8b14a8e6030e74939",
-                    "data": [
-                        "x1-a563cd748adb0361457dac55cdaec8c7e4e82c335fac4ac12d1ce3a0824ab3e6.png",
-                        "x2-738cf0105092b50cac79e9b174b9e63177e742a0d7870df0472d0d53c1fd3066.png",
-                        "x3-9513e5352b309f167f81e8ff54cef4723cda30396aa9d6502d3a4baf10b7e497.png",
-                        "x4-8cb214b48a3300d46efbc04860eab0d510e726e0456a2b5ddccf8793b80ef70c.png",
-                        "x5-1256017a73e0bfb85ad88227ae9c760c8b9def7a0c35223854a1fe93d8802ac9.png",
-                        "x6-745bc2fef60f383a92f3d281215c7500647126de8a97dd28b0cbc8dcb3a1182a.png"
-                    ],
-                    "dataSaver": [
-                        "x1-19e0cfe0499115537bf39c27d9075db1cbe49e123d2dfa1ad815e2f4713f90c2.jpg",
-                        "x2-464c679f10a0d926e92e42173b7dafef8d9d1b8051f062c729900bec7eda7329.jpg",
-                        "x3-789473b09e8939851232edc6e4a2aa8b122df2c166eebc0e680b4c57242b91f7.jpg",
-                        "x4-326bfa0ce0304ba21d1380c9c91a3760ab1c0d779075182cc31e7bf798368356.jpg",
-                        "x5-ea0e00adfbc6236c698c67200f0da5b474e8ea5b2cfc132c6e2f3c211f29a80a.jpg",
-                        "x6-6dddba20fbf6ccce0a58634b52b43b255fa55f57f212da9b82efb2beb8bf8621.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:42:15+00:00",
-                    "createdAt": "2018-01-20T04:42:15+00:00",
-                    "updatedAt": "2018-01-20T04:42:15+00:00",
-                    "version": 1
-                }
-            },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "1dcad7f3-066e-43d4-92f8-29bc920d07e6",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "11",
-                    "title": "I'm not an Assassin!",
-                    "translatedLanguage": "en",
-                    "hash": "1d8fe84e128621e7b554f96e1597549a",
-                    "data": [
-                        "x1-41f15dfb36ce2f44b33566c4907ebbf19fb2aa945b2c1b0bc0e4979c7243f2f9.png",
-                        "x2-82ec86b0652197815a12d18775dea721800a772f537f44f3b4569a411109b6c4.png",
-                        "x3-75299a8c4a53ffb832e493b64ea9300eaa6961f54ec35373c7faf309dbfeb26c.png",
-                        "x4-14f959c2d74f57f01ddf1489e9bf4084dc8f232441f5bf1c5de12832516d6065.png",
-                        "x5-5c412171b4f2a6f8d1c69b11e258025f303c57c532eaf2ebfba319f410af48a6.png",
-                        "x6-60ab51159fca64c4afb139e807574cab4803e131235fd38c4d27a8c75875f8ff.png",
-                        "x7-84b35e69d3b305cdaa71ab67a34f75de237ca85c31ca260aba2f6254b1da0e86.png",
-                        "x8-b14fb5e6a19768b2005a32644122736e544454182d1213f54b10bf1bf833798c.png",
-                        "x9-f9fc8bf52f36c3f46f5a646f2eab48d32c42bc0272496c1c6e1dfd1199f583a1.png",
-                        "x10-b4af03f6138198b09c21a81743846ed53cf96fb9c52d00bde05a919fba084ce0.png",
-                        "x11-2fcc8191d6bc456f2ddc4bde86d7717cf7c3ff8c87918cb78984a1418d069fe1.png",
-                        "x12-8389d59ebda42562d0156ca74431bba96621eff48a602468b6be78f39faaba2c.png",
-                        "x13-7c281e9f3d62d7eac89599dfd019fc6200302c5fac2641620d0f3ff3b7377266.png",
-                        "x14-793ab5b643094c168d107554dd821f25a2477b345a659146b8f5322ca457ddc8.png",
-                        "x15-1f7f511636bdbc5ed6483f017fb353913932f1c9f138e710b88506a19dfd05d0.png",
-                        "x16-0451e883deccc47a854b4dd2288519a7416f55a3b641b314e29ab4ccdc8bcfcc.jpg"
-                    ],
-                    "dataSaver": [
-                        "x1-93bab8cf7bda3c34aa5369848f8d3a6c9bcb03be24d2d039c2d7611b7567e074.jpg",
-                        "x2-50a57ca898250499c5673fcff652e4c7c6c0526c94cbb9e94a392420d07900d1.jpg",
-                        "x3-4f01010c448fb16f3a4945533ce6a6ff4f1a694e50e46925f23c6eb5b2566783.jpg",
-                        "x4-e6f65c7505c8cc41cee056b7bdd7f66e70c4c95bb399ede8940df028ba986caa.jpg",
-                        "x5-c441cfb809c6ad32098ef2a4455e4f4cf614efe0be023ff20f149da4a88bc4fa.jpg",
-                        "x6-5e1ca1559e7f9af54e3567cf1cec026c7c65331690abe80c5dd508d9d726af3d.jpg",
-                        "x7-ae4f188eb3c1b3f8f53e87fe3f7f599124e45426733ceaaf27208f6b1ea73dd2.jpg",
-                        "x8-4d2a8af4642ecd5cf9e73922c25b9ff2461f69232123ad8a2348402d907df60e.jpg",
-                        "x9-d008c801763e5c456759daab10c4bf641fd0c2945780a2a1b2fa97eb1f82f0cb.jpg",
-                        "x10-b239c4a8d6bccc17bb3e3dce61112fea880b581a1ae2e3f94c6b0645c1bad11f.jpg",
-                        "x11-2f8a1e869b149d303dfb5160b7e294ee3bb8192d924c032d9b110ba9359ea791.jpg",
-                        "x12-1db7366bd7f7d474227a6984f9ff7cf161dac52fbdf8fb425b805c108b1cd107.jpg",
-                        "x13-eafe97c9d3604df5aa1e0068d947a245baeeeafce89825ed7a954ad81d944d20.jpg",
-                        "x14-71f3e6ab78a9502d865b161c73f551bf2c9ddb4e45a72c3dd7fd023a641dfeec.jpg",
-                        "x15-85d2fb2cdf054ff6c0df178d3e73a2ff5a117f5485eaf4ee1903f120ede6317d.jpg",
-                        "x16-264fecb55c6548b726aff9013595674dffdef93ce4c8602ddb735f0fe7d9c4bd.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:43:07+00:00",
-                    "createdAt": "2018-01-20T04:43:07+00:00",
-                    "updatedAt": "2018-01-20T04:43:07+00:00",
-                    "version": 1
-                }
-            },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "e3a345dc-3b82-4dbd-9d92-a5ec9d7266da",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "12",
-                    "title": "Gofer",
-                    "translatedLanguage": "en",
-                    "hash": "fe2563ce3525ce3aa3ddd452f5dcebe6",
-                    "data": [
-                        "x1-e12a48ebeae289470b778e9728eb04cc66db101a0deef17e7c4931c26e882d79.png",
-                        "x2-e3b359818b4ab5420c56b75d62f6b3279304b52f931680be25a52ee9bdb7694c.png",
-                        "x3-63f06d0573994378c3776bcf063755da8746a13c1cca6358b10b8033e829a040.png",
-                        "x4-5e4752f066847f16abb124079cbf7e463ef868f27e695a0e0a7ef5bc3f1e01ca.png",
-                        "x5-2c1619a1bd8eadb2a3acac24bdba48704a3e135ed0264c79e62e140ab5910c26.png",
-                        "x6-9305a039eefea91540e1b6ca1131ead91f3ced71c69eb7e2120bc7891edb66ac.png",
-                        "x7-cb1ffc8139f4d5d4dc371c6742aa1a81660855f77203dad95d1ff067d3af321c.png",
-                        "x8-07bf7cbe8d4c779b47be4c4c323f9cdc0451e31e0d4a51e3ce68e3a7e165a733.png",
-                        "x9-a1fdbf6114f0c921d542e30384445ab7b78ef5879b4a4e8986a7f194c424fdd1.png",
-                        "x10-9956b2fd29fd68e794fc8735a073e66c459d0e243bcc4f692e667a3e54825a40.png"
-                    ],
-                    "dataSaver": [
-                        "x1-a26246a0b591b1ba21ab37efedddeaba9caa7e2388e8bd38e09111b934234ebd.jpg",
-                        "x2-10dc3848757d092cd3434e1b8be310b0865845fa1b95d4e5633a2236e813605c.jpg",
-                        "x3-6d2e0cc2fa2560c9d04429583f6bddfcb7010acfe2f92c27d4410f1f3252ab03.jpg",
-                        "x4-9557cbfc3ab9dd86f5d8510c2c3c5dec79053a5fd18c02f693000f50530209b0.jpg",
-                        "x5-af85bb438ca1593c0b0642cf110e5339d6c59aef53fa9fdee9929551e3e2ba21.jpg",
-                        "x6-a548b53cad486559cbd3b450c756b98b84fd2a8451daaa5684bd56666b445654.jpg",
-                        "x7-9fb3074bb6e4a1095d1a3effe69c1135b2f81b0ac20a94223e908f3b0ebe8815.jpg",
-                        "x8-1a03e586005fe2b61069e829f01f1a7ef66e57a599417449c8637020773e315b.jpg",
-                        "x9-32673ea71bc1413e17ffc6e48ef54023e300e13017c6045726788a3dda715263.jpg",
-                        "x10-8d1946b60cebc46533db85fac36e34a495b7efb880e2a66cdbdfcbcccc270cf2.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:43:33+00:00",
-                    "createdAt": "2018-01-20T04:43:33+00:00",
-                    "updatedAt": "2018-01-20T04:43:33+00:00",
-                    "version": 1
-                }
-            },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "caff28aa-bbf1-4378-9dd0-f8b2d9f7341a",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "13",
-                    "title": "My First Errand",
-                    "translatedLanguage": "en",
-                    "hash": "f85f03a983b3d042506ee9e1bd5cb31f",
-                    "data": [
-                        "x1-7350f027910c8087ddc24c66b3e53f151f8d282c2b14d9adebcecd77a6fbeb48.png",
-                        "x2-d0753d12e946b506530338d19807db51ca0d02e8dfc280c5d297cc5df162ebcd.png",
-                        "x3-9b127ef7f8988a182f91ab14fab29bd1cf2611d5f92a2658d61be797041028f7.png",
-                        "x4-5bef437a1a0c19d8599ca08b16de2361efbc3bba963b7d7ad2aa29e2d125c0dd.png",
-                        "x5-cee7039e16f97d0480b0acff4bc3e83d58cd9233e674d991cfda9cf71bb01dde.png",
-                        "x6-db2393d51f977abbc73a151a1d83e5650561f1e84bb46eb776f94869c568677e.png",
-                        "x7-d5acf646a82a22d750734aba43c51a0c8bd97bf6ebe23ebaf3fb38ca9182fc72.png",
-                        "x8-8b7ee536cbb64f589ae30da5138930fb54e68b83eb7115a4c895282bbd1380c7.png",
-                        "x9-39ce44f3bff80912137e2d0d17757483c2b897f50dc6ac1566e93bcd6937588d.png",
-                        "x10-24da3e3e7e4d20c80188e70ebf3bbeca01528dddd86cebe8603579c5f361642c.png",
-                        "x11-dfbea003b8352189ad23f87580e6c925ee06cffde784b7c4ebc8b6f1d52d90f6.png",
-                        "x12-9ba0fae59cf021824921f92caef5f899528236b8bb860664a00fdcbcc01cdec6.png"
-                    ],
-                    "dataSaver": [
-                        "x1-a25a70d63cf1e718152de5f8a948c22ab332c1db175808e7f3d3dd56a2d31b3e.jpg",
-                        "x2-dc3403fa59eb4be955c933d83799937e94b0c3c9bc9d65420989fec824330ebc.jpg",
-                        "x3-3d4e8a68c1d0a8f73458c67758b04d815b97a0a342f8b0494074dc5b0f7f74bd.jpg",
-                        "x4-02917e00a36b198e9ae3b195f5c544aad4814dd489c434a011d66e030b5cf9d4.jpg",
-                        "x5-42c7bb8247e7be21376c600e06fcab975be9722da25033d0be9c3cf212114e0a.jpg",
-                        "x6-1567aab71f337220bd1f5d23c4ad3890748e5cfbfb2794f0fb43bcab2bc49cde.jpg",
-                        "x7-5ce01a48c3073c23628de0cffd3f5e4b292d469114a3ac27ba2731027f818587.jpg",
-                        "x8-5788643634e1dc7cb1585e5dbbc30ee6510e67f7231858958b65e66a97afaca8.jpg",
-                        "x9-240b9b94c9fabec10935f3f2ecc8fd4fc2a27c105a562605c17f8de71810e351.jpg",
-                        "x10-873c4e940b045e9db6b38adaa6ee815521c7a09d8c0405f291989e6b30003c87.jpg",
-                        "x11-8ca6e0c04438f9d679d5f6eb17761bed2070981d3aa6208e70708c8f0795b801.jpg",
-                        "x12-6f0311301d6455fc1345e83a6aba4ca41ca6f87df44201043174351db2793928.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:43:55+00:00",
-                    "createdAt": "2018-01-20T04:43:55+00:00",
-                    "updatedAt": "2018-01-20T04:43:55+00:00",
-                    "version": 1
-                }
-            },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "44c16e32-fda2-422c-bde2-c245615b3461",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "14",
-                    "title": "Stage Fright",
-                    "translatedLanguage": "en",
-                    "hash": "45c2e45447687bc598e7d63d798d5924",
-                    "data": [
-                        "x1-5300b16efa146caa8fa1ec671f6ff420469a3fd541c36a7ad1657d96bc0fbe61.png",
-                        "x2-4ecf89f62d57126df8770455595b9facb0131d1330bbc2ec7e5631606ccbbd46.png",
-                        "x3-7fb5082e645ae89eb90d31d043c74c56c307045c36e3685861fbcb17fb4c9d6a.png",
-                        "x4-fbc02255ecef6e6cd71c453e99f162d526ed785bff8bbfffad643a79d0ca2a31.png",
-                        "x5-63c937a003588ceeae6b52a9ef522dd975dbc1d86b1e5d4eb4b2e43f74ac5bac.png",
-                        "x6-c020766ec7a115218ff9d1f46f5401df301f0deb5ed3ef0d652cd26b1c2f478e.png",
-                        "x7-f95dbc27aedfa38d67088b4839a5892b1d51bb1adcb91337f4024506c3552993.png",
-                        "x8-a7259e42fbabb52eb8d423147cc2ad6c497942512887aab13511562439e54665.png",
-                        "x9-6fd7f72e8b82c837722e05d1bdc90287556c6f4eaa701c5ea242ddf2288ce555.png",
-                        "x10-66efd669128987ce8f9a6a16ddc37b27ce47db54b6857eaa6935c4f63411adb5.png",
-                        "x11-425ec9549a4570dd7db2284557e7701b249fbd0ea52c09809860608814b6db02.png",
-                        "x12-45029501218ccce3e9849b953d3da039cb247b82186d58197e947e1786e3e499.png",
-                        "x13-30201fc2ac106a21feb4ae71ec93c428bab1b6620cb729af1ceb869e3626d090.png",
-                        "x14-1a9f9fca3071d65b318db12495d2ee62bd57701a860a0c87cb1ed557a115470a.png",
-                        "x15-a4677710ef99b7a8f5237be24e28267e2726247fb5926b0fb2093896e62f1524.png",
-                        "x16-2bd129e021e88e36c5845e854ab935bbfee6157f2e5296dc811b0c0afe589c2d.png",
-                        "x17-c492ed6cb082c0df884aba1d71e709113d115e577b483a7a9500716dea4b5e84.png",
-                        "x18-b68d691a76b216b4781eaca6e1aa6675d45511a56d5714d499a0ef061dc771c5.png",
-                        "x19-134e12092960549cafa0aea17f313bde5c85bbd4cad66157951986d98f8f05a0.png"
-                    ],
-                    "dataSaver": [
-                        "x1-efea03a1490b40ef42a2be7d3ee1c18e9d7de8456ee3dccf4abf5bc772393df9.jpg",
-                        "x2-510eae0225fba6388800caa2b0637b1623b5c7ef768aba5ee331e293d721a00e.jpg",
-                        "x3-9ca11b7542748fae86ee9117ce09a83d83444f855de50269697812f1099e09fc.jpg",
-                        "x4-528e6f1a5aff6ea294c8c48f67792f907538e95c7d3ad14904f5448ebde6b6b3.jpg",
-                        "x5-0012a5ddc63bef28d6fd93d6a17ec15b562aeea8cab59cea4429683356bad7a1.jpg",
-                        "x6-122d196bc681164c326c2bc7dd8b10118c0947e0bd34a2b1d7532f8b8025ae73.jpg",
-                        "x7-04b932e94d6b81d6812f354d7a0095e79d4cec3c7a8baf3df13192f529096672.jpg",
-                        "x8-ae086b3ca099f9b3e77fb67fecc2fad0d057579a7a5384ca990e6f1755b992e9.jpg",
-                        "x9-e429e874b8f412f313bda1574b20eb985ddd9e54cb691f4df2bffc0583dae36b.jpg",
-                        "x10-1d58ad55f521d9cd36747b5eeb543fb4375bad682d652038c5de9b1ff7a8d0af.jpg",
-                        "x11-3d29eb92a31728d91080d8b90a8c5d0ccf1c250038d940acf756dacb86d29674.jpg",
-                        "x12-2e5042a6bcdc75d60b56d3eae30a9fc62d3e74cbd13dcb04fbfd240b1ca7a3a3.jpg",
-                        "x13-0f03561ca4dab96015b50a6b0e797436fdefa73771a22a03cfeed663551784e4.jpg",
-                        "x14-5545b9a5742c70f2499ac965910054739f5b13e8ddf37c3ea03e5290362c1785.jpg",
-                        "x15-21f8bb3fceba6e9bec88ef6c2a1b4e7afe441b8b1194562c4bc29095df886aa5.jpg",
-                        "x16-40be8519ffbbe1872f497fa09856edafc24d02ca15d71232f9e33a84e12ca585.jpg",
-                        "x17-cf6daa1757766babca33dbd045459f444bf68c1f503f539750ceae22d62fa8bd.jpg",
-                        "x18-9c7df1198200a92018cb62dfaa97d8d7815ca54b1addef3f3ae40fccc8390ab7.jpg",
-                        "x19-67f435d25787a218f50cbc3cb5d61a12b80816e76f796075b43cd8dd51f994cb.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:44:20+00:00",
-                    "createdAt": "2018-01-20T04:44:20+00:00",
-                    "updatedAt": "2018-01-20T04:44:20+00:00",
-                    "version": 1
-                }
-            },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "8764c249-3516-41ad-860b-c77bebe6c875",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "15",
-                    "title": "Going to School",
-                    "translatedLanguage": "en",
-                    "hash": "9966725e308bb6150a75aa8f848d254c",
-                    "data": [
-                        "x1-cdf1049eb6de46db6848aae3efae3744aa488516313344a39245e8cd42433cd8.png",
-                        "x2-1431716d25be82f5e95d03bbab36d44d44099be2f1c9da61b57000abbd7e6a85.jpg",
-                        "x3-fc4f6dbc2f3e4d1b9ec92f1dc7522316a77167b4845c31d212a03365ce8d0289.png",
-                        "x4-ec24e29502965cc5e07736f8b0b385aec4e21f8fb70949729da60c2dfbce8489.png",
-                        "x5-462a8f2971a549d2b11cfe9a0ceedff9ba3c60dbc98fbb314203fc7e40bf66fa.png",
-                        "x6-e8136b4fdd78c6dde27aea5b914869f895c3d078e8fb8e087ff31fab15f92906.png",
-                        "x7-f7d27ef0caff9edba05a7077c4123425ba3234b2732bd376c1afe2f5f3c39c71.png",
-                        "x8-1bea6fb7a1be113d6a0533ef0408d2697fc32d90b6a63663404fe25f0550c6bd.png",
-                        "x9-16220a5ed7458fd12e440fa1d14a12d69e3f579355f0ff56c14c760f99b6996d.jpg"
-                    ],
-                    "dataSaver": [
-                        "x1-069dc2670934d3eab3afbca097c259a90abfd9b1e9f1b9ac8817779c4da3cdae.jpg",
-                        "x2-b9d7d5dde592c53867c49f09909365ec40f436e796d178d153e255285034d714.jpg",
-                        "x3-eb4e4984c86cccd99a3ffc4ff8884a911c1eff2b66b01ac2fc356451285989de.jpg",
-                        "x4-08b8a2f23fdba6b315355d3cfba52229a7713e34d05dc22fc67e3b14057d525c.jpg",
-                        "x5-12f9b87e44f6c0cc73947872322b12423e31e25d5a9a3a53794f404f2bfd18da.jpg",
-                        "x6-16b51d8146929696acec8de6a8444b360f059df840840aead249af94c8ddfc32.jpg",
-                        "x7-5e1d42a5cfdb019ee7bce51cca4f56c53c25fb386bf87608e38f76e2ceb5ea97.jpg",
-                        "x8-19cc4de43b2116a6ae03d2447382a86b757635c91774bb588b17ae32217cb49d.jpg",
-                        "x9-b51b99d9c1885ec319575b8e6590ac12135539f58cd86488271c1eaad78667e5.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:45:35+00:00",
-                    "createdAt": "2018-01-20T04:45:35+00:00",
-                    "updatedAt": "2018-01-20T04:45:35+00:00",
-                    "version": 1
-                }
-            },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
-        },
-        {
-            "result": "ok",
-            "data": {
-                "id": "502481c1-789a-4452-89b6-0216871d6d42",
-                "type": "chapter",
-                "attributes": {
-                    "volume": "1",
-                    "chapter": "16",
-                    "title": "A Cellphone",
-                    "translatedLanguage": "en",
-                    "hash": "3e51b232d00a8136151382d51738be78",
-                    "data": [
-                        "x1-3308a8ea0f256c45e08b3a25ab93431f36ba19daa86259d7b614971a41cf13ac.png",
-                        "x2-f128225e5bf7892bb25375cc8b74cc8050502f52a6ce6f97696e7b818bc25bd1.png",
-                        "x3-2549a84753e95d26711f7e00fe2d086ee9043b4acf7107d21d7551fa318f6b41.png",
-                        "x4-0c95fc1710b327653c0a2989817a666ca5ff1a29716d0337cef991d107a6a8c5.png",
-                        "x5-a85efe5096de2fa53c4ea574c1ea752b77d4a8830562007185df4c29bcb7ffef.png",
-                        "x6-4731dc74c20b57931060dc19e802bb5087b8c4180cd16059156506883d0356a3.png",
-                        "x7-2b15d15ce875d08260be31e57ca514fd74fc9067ddd25f743c414c0616884c35.png",
-                        "x8-17e5fe4ebe358668213f1559b8e986e9cf997d28592bc0d12c25ca825f329489.png",
-                        "x9-e8d30eff50a49b9e4633b540b5d72dbfcdc2a580ab43c3e54759cf4d42166c08.png",
-                        "x10-9f1559d9fe4f29e8d47893494001811b33e705e1be2479453484373aebad9a16.png",
-                        "x11-9168ab5663c0d57770bd211a64933c639a612228658fe28f39e910043bf4d46c.png",
-                        "x12-b3da220678c9a21b815de1f4c38c16ba8c96910ca7f61e9c1f8de550e3167abb.png"
-                    ],
-                    "dataSaver": [
-                        "x1-ff217bd842a1dcb4e966c665226ae11c1746d99c6828115be33521084731417c.jpg",
-                        "x2-51948b09d1c7a3f8cfefb60d2dd42e479dc93328e7bfa26ae26c178417278744.jpg",
-                        "x3-8c8cccdc0402edc30007e104fedb53ecfc243acd1e865f424057c7cdf5114fd7.jpg",
-                        "x4-c89deac62b4a8473c8bf7c7d2c91c3109ee0a72b080a4a10d7ce090cbb90a21f.jpg",
-                        "x5-d8bcc8e34e35ee34271af212fdfe44ad9c2e5fd76e77f387e7e3242fae2bac88.jpg",
-                        "x6-9fd0b07e3b43cee5867ee14e8f9db63fe56c46bcca52f3dcf9f5260f9c5f49c4.jpg",
-                        "x7-a3f55be1bf387f7ac9c15f62642028601ab1f395490a86539d0878f2ad3b7d39.jpg",
-                        "x8-fb8528f7e29158a26d6f2414656e853e6b5f18ab57b11ec4125e7e805490fbd7.jpg",
-                        "x9-57a8c06c84c48dac0e383226eeaab0a6593b0f081d13ed50f283a81301308c38.jpg",
-                        "x10-6d49a6e3419ddcdba8da54c5505ae52bba5736b1f29248d57429ad9c84a9cfac.jpg",
-                        "x11-a569ee478d63f9ae25130e4e3afa4c62961aece24148c3b7b8842d45c24f72ed.jpg",
-                        "x12-b66a4451d0d98bf61a3cc54ca5ca70af12d34aeeae4b504d7a4717b0be0c4a2a.jpg"
-                    ],
-                    "publishAt": "2018-01-20T04:47:04+00:00",
-                    "createdAt": "2018-01-20T04:47:04+00:00",
-                    "updatedAt": "2018-01-20T04:47:04+00:00",
-                    "version": 1
-                }
-            },
-            "relationships": [
-                {
-                    "id": "df075688-f7da-4cd0-9805-90ec13b48b3f",
-                    "type": "scanlation_group"
-                },
-                {
-                    "id": "a96676e5-8ae2-425e-b549-7f15dd34a6d8",
-                    "type": "manga"
-                },
-                {
-                    "id": "b83d2cc3-55d1-4574-a114-d2d04bf485a8",
-                    "type": "user"
-                }
-            ]
+            ],
+            "version": 1,
+            "createdAt": "string",
+            "updatedAt": "string"
         }
-    ],
-    "limit": 10,
-    "offset": 0,
-    "total": 1583
+    },
+    "relationships": [
+        {
+            "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+            "type": "string",
+            "attributes": {}
+        }
+    ]
 }
