@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'search/searchReplyScreen.dart';
+import 'searchReplyScreen.dart';
 
-class HomePage extends StatefulWidget {
+class SearchPage extends StatefulWidget {
   final String token;
-  HomePage({required this.token});
-  _HomePageState createState() => _HomePageState(token);
+  SearchPage({required this.token});
+  _SearchPageState createState() => _SearchPageState(token);
 }
 
-class _HomePageState extends State<HomePage> {
+class _SearchPageState extends State<SearchPage> {
   final String token;
-  _HomePageState(this.token);
+  _SearchPageState(this.token);
   bool hasTyped = false;
   String searchValue = '';
   bool dataPresent = false;
@@ -28,6 +28,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.redAccent,
+        title: Text('Search for a manga'),
+      ),
       backgroundColor: Color.fromARGB(255, 18, 18, 18),
       body: Container(
         child: SingleChildScrollView(

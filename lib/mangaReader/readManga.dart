@@ -94,7 +94,7 @@ class _MangaReaderState extends State<MangaReader> {
                                         try {
                                           chapterNumber++;
                                         } catch (e) {
-                                          Navigator.pop(context);
+                                          print(e);
                                         }
                                       });
                                     },

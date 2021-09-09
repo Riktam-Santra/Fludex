@@ -1,15 +1,16 @@
 import 'dart:io';
+import 'package:fludex/library/library.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:fludex/homepage.dart';
+import 'package:fludex/search/searchScreen.dart';
 
 import '../utils.dart';
 
-class Login extends StatefulWidget {
-  _LoginState createState() => _LoginState();
+class UserLogin extends StatefulWidget {
+  _UserLoginState createState() => _UserLoginState();
 }
 
-class _LoginState extends State<Login> {
+class _UserLoginState extends State<UserLogin> {
   late String password;
   late String username;
   late File dataFile;
@@ -134,6 +135,44 @@ class _LoginState extends State<Login> {
                                   },
                                 );
                               },
+                              onEditingComplete: () async {
+                                if (password == '' && username == '' ||
+                                    password == '' ||
+                                    username == '') {
+                                  setState(() {
+                                    loginText = 'username or password empty';
+                                  });
+                                } else {
+                                  setState(() {
+                                    hasPressedLogIn = true;
+                                  });
+                                  var loginData =
+                                      await lib.login(username, password);
+                                  if (loginData!.result == 'ok') {
+                                    print(hasPressedLogIn);
+                                    print('got loginData');
+                                    utils.saveLoginData(
+                                        username,
+                                        password,
+                                        loginData.token.session,
+                                        loginData.token.refresh);
+                                    print('saved login data');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Library(
+                                          token: loginData.token.session,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    setState(() {
+                                      loginText =
+                                          'Username or Password incorrect.';
+                                    });
+                                  }
+                                }
+                              },
                             ),
                           ),
                           SizedBox(
@@ -178,7 +217,7 @@ class _LoginState extends State<Login> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => HomePage(
+                                      builder: (context) => Library(
                                         token: loginData.token.session,
                                       ),
                                     ),

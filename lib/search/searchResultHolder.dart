@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fludex/mangaReader/aboutManga.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
   final String description;
   final List<String> tags;
 
+  bool hasPressed = false;
+
   _SearchResultHolder(this.mangaId, this.title, this.baseUrl, this.token,
       this.description, this.tags);
   Widget build(BuildContext context) {
@@ -50,9 +54,10 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                 ),
               ));
             }
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Container(
+            if (hasPressed == false) {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Container(
                   decoration: BoxDecoration(
                       color: Color.fromARGB(255, 18, 18, 18),
                       boxShadow: [BoxShadow(color: Colors.grey)]),
@@ -128,6 +133,9 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                       ),
                     ),
                     onTap: () async {
+                      setState(() {
+                        hasPressed = true;
+                      });
                       var chapterData = await lib.getChapters(mangaId);
                       if (chapterData != null) {
                         Navigator.push(
@@ -138,9 +146,20 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                           ),
                         );
                       }
+                      setState(() {
+                        hasPressed = false;
+                      });
                     },
-                  )),
-            );
+                  ),
+                ),
+              );
+            } else {
+              return Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              );
+            }
           } else {
             return Container(
               child: Center(
