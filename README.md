@@ -36,7 +36,7 @@ Extract your release zip archive and open mangadex_app.exe (make sure that all t
 I'll try to fix these soon.
 
 ## Things coming next
- - A library to add mangas.
+ - Download manga and view library offline
 
 ## Reach me
  - Need to get in touch for something? I might not be always active on my github but im always there on Discord, if you need to ask for something (or maybe just talk) just dm me on Rick~#9387
