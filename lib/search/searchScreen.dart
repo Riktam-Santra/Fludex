@@ -75,7 +75,6 @@ class _SearchPageState extends State<SearchPage> {
                               if (v.isEmpty || v == '') {
                                 hasTyped = false;
                               } else {
-                                print(hasTyped);
                                 searchValue = v;
                               }
                             },

@@ -228,6 +228,9 @@ class _UserLoginState extends State<UserLogin> {
                                         'Username or Password incorrect.';
                                   });
                                 }
+                                setState(() {
+                                  hasPressedLogIn = false;
+                                });
                               }
                             },
                           )

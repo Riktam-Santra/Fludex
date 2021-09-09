@@ -30,3 +30,4 @@
  - User is now greeted with his library on login
  - Fixed issues where the app would just not respond if it's processing a network request
  - Added 'Add to library' button on the about manga page, the button maybe be buggy due to poorly implemented code, it will be fixed soon.
+ - Temporarily removed auto login feature.
