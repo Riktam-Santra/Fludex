@@ -1,10 +1,8 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fludex/mangaReader/aboutManga.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/cover/Cover.dart';
+import 'package:mangadex_library/models/cover/Cover.dart';
 
 class SearchResultHolder extends StatefulWidget {
   final String token;
@@ -42,7 +40,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
       builder: (context, AsyncSnapshot<Cover?> cover) {
         if (cover.connectionState == ConnectionState.done) {
           if (cover.data != null) {
-            var coverFileName = cover.data!.results[0].data.attributes.fileName;
+            var coverFileName = cover.data!.data[0].attributes.fileName;
             List<Widget> tagWidgets = <Widget>[];
             for (int i = 0; i < tags.length; i++) {
               tagWidgets.add(Container(

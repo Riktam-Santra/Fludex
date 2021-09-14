@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/search/Search.dart';
+import 'package:mangadex_library/models/search/Search.dart';
 import 'searchResultHolder.dart';
 
 class SearchReplyScreen extends StatefulWidget {
@@ -46,23 +46,22 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
                       mainAxisExtent: 300,
                       crossAxisCount: 2,
                     ),
-                    itemCount: searchData.data!.results.length,
+                    itemCount: searchData.data!.data.length,
                     itemBuilder: (BuildContext context, index) {
                       for (int i = 0;
                           i <
-                              searchData.data!.results[index].data.attributes
-                                  .tags.length;
+                              searchData
+                                  .data!.data[index].attributes.tags.length;
                           i++) {
-                        tags.add(searchData.data!.results[index].data.attributes
-                            .tags[i].attributes.name.en);
+                        tags.add(searchData.data!.data[index].attributes.tags[i]
+                            .attributes.name.en);
                       }
                       return SearchResultHolder(
                         token: token,
-                        description: searchData.data!.results[index].data
-                            .attributes.description.en,
-                        title: searchData
-                            .data!.results[index].data.attributes.title.en,
-                        mangaID: searchData.data!.results[index].data.id,
+                        description: searchData
+                            .data!.data[index].attributes.description.en,
+                        title: searchData.data!.data[index].attributes.title.en,
+                        mangaID: searchData.data!.data[index].id,
                         baseUrl: 'https://uploads.mangadex.org',
                         tags: tags,
                       );

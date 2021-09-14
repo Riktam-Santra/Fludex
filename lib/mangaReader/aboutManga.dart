@@ -4,10 +4,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fludex/mangaReader/readManga.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mangadex_library/chapter/ChapterData.dart';
+import 'package:mangadex_library/models/chapter/ChapterData.dart' as ch;
 import 'package:mangadex_library/jsonSearchCommands.dart';
 import 'package:mangadex_library/mangadex_library.dart';
-import 'package:mangadex_library/search/Search.dart';
+import 'package:mangadex_library/models/common/singleMangaData.dart';
 
 class AboutManga extends StatefulWidget {
   final String token;
@@ -25,16 +25,15 @@ class _AboutMangaState extends State<AboutManga> {
   int _chapterPageOffset = 0;
   int _totalChapters = 0;
   int _desiredInputChapterNumber = 0;
-  JsonSearch search = JsonSearch();
+  JsonSearch _jsearch = JsonSearch();
 
-  Future<Results> _getMangaData(String mangaId) async {
+  Future<SingleMangaData> _getMangaData(String mangaId) async {
     try {
-      return await search.getMangaDataByMangaId(mangaId);
+      var _data = await _jsearch.getMangaDataByMangaId(mangaId);
+      return _data;
     } catch (e) {
       print(e.toString());
-      var _login = await refresh(token);
-      token = _login.token.session;
-      return await search.getMangaDataByMangaId(mangaId);
+      return await _jsearch.getMangaDataByMangaId(mangaId);
     }
   }
 
@@ -42,7 +41,7 @@ class _AboutMangaState extends State<AboutManga> {
     return await getCoverArtUrl(mangaId);
   }
 
-  Future<ChapterData?> _getChapterData(String mangaId, {int? offset}) async {
+  Future<ch.ChapterData?> _getChapterData(String mangaId, {int? offset}) async {
     var _offset = offset ?? 0;
     print(_offset.toString());
     var chapters = await getChapters(mangaId, offset: _offset);
@@ -98,7 +97,7 @@ class _AboutMangaState extends State<AboutManga> {
             )
           : FutureBuilder(
               future: _getMangaData(mangaId),
-              builder: (context, AsyncSnapshot<Results> mangaData) {
+              builder: (context, AsyncSnapshot<SingleMangaData> mangaData) {
                 if (mangaData.connectionState == ConnectionState.done) {
                   return SingleChildScrollView(
                     child: Padding(
@@ -308,7 +307,7 @@ class _AboutMangaState extends State<AboutManga> {
                                       future: _getChapterData(mangaId,
                                           offset: _chapterPageOffset * 10),
                                       builder: (BuildContext context,
-                                          AsyncSnapshot<ChapterData?>
+                                          AsyncSnapshot<ch.ChapterData?>
                                               chapterData) {
                                         if (chapterData.connectionState ==
                                             ConnectionState.done) {
@@ -406,7 +405,7 @@ class _AboutMangaState extends State<AboutManga> {
                                               ListView.builder(
                                                   shrinkWrap: true,
                                                   itemCount: chapterData
-                                                      .data!.result.length,
+                                                      .data!.data.length,
                                                   itemBuilder:
                                                       (context, index) {
                                                     return Padding(
@@ -438,9 +437,8 @@ class _AboutMangaState extends State<AboutManga> {
                                                               'Chapter ' +
                                                                   chapterData
                                                                       .data!
-                                                                      .result[
+                                                                      .data[
                                                                           index]
-                                                                      .data
                                                                       .attributes
                                                                       .chapter,
                                                               style: TextStyle(

@@ -35,7 +35,7 @@ class _MangaReaderState extends State<MangaReader> {
   Future<String> getChapterID(int? chapterNum, int? limit) async {
     var _chapterId =
         await lib.getChapters(mangaId, offset: (chapterNum! - 1), limit: limit);
-    return _chapterId!.result[0].data.id;
+    return _chapterId!.data[0].id;
   }
 
   JsonSearch jsonsearch = new JsonSearch();

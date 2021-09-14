@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:mangadex_library/login/Login.dart' as l;
+import 'package:mangadex_library/models/login/Login.dart' as l;
 import 'package:mangadex_library/mangadex_library.dart';
 import 'package:fludex/saveDataModels/loginData.dart';
 import 'package:http/http.dart' as http;

@@ -1,13 +1,20 @@
+import 'dart:convert';
+
 import 'package:fludex/search/searchScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/user/user_followed_manga/user_followed_manga.dart';
+import 'package:mangadex_library/models/user/user_followed_manga/user_followed_manga.dart';
 import '/search/searchResultHolder.dart';
 
 class Library extends StatefulWidget {
   final String token;
   Library({required this.token});
   _Library createState() => _Library(token);
+}
+
+Future<UserFollowedManga> _getUserLibrary(String token) async {
+  var response = await lib.getUserFollowedMangaResponse(token);
+  return UserFollowedManga.fromJson(jsonDecode(response.body));
 }
 
 class _Library extends State<Library> {
@@ -77,10 +84,10 @@ class _Library extends State<Library> {
       backgroundColor: Color.fromARGB(255, 18, 18, 18),
       body: Container(
         child: FutureBuilder(
-          future: lib.getUserFollowedManga(token),
-          builder: (context, AsyncSnapshot<UserFollowedManga> searchData) {
-            if (searchData.connectionState == ConnectionState.done) {
-              if (searchData.hasError) {
+          future: _getUserLibrary(token),
+          builder: (context, AsyncSnapshot<UserFollowedManga> followedManga) {
+            if (followedManga.connectionState == ConnectionState.done) {
+              if (followedManga.hasError) {
                 return Container(
                   child: Center(
                     child: Text(
@@ -89,8 +96,7 @@ class _Library extends State<Library> {
                     ),
                   ),
                 );
-              } else if (searchData.data!.results.length == 0) {
-                print(searchData.data!.results.length);
+              } else if (followedManga.data!.data.length == 0) {
                 return Container(
                   child: Center(
                     child: Text(
@@ -102,33 +108,35 @@ class _Library extends State<Library> {
               } else {
                 var tags = <String>[];
                 return Container(
-                    child: GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          mainAxisExtent: 300,
-                          crossAxisCount: 2,
-                        ),
-                        itemCount: searchData.data!.results.length,
-                        itemBuilder: (BuildContext context, index) {
-                          for (int i = 0;
-                              i <
-                                  searchData.data!.results[index].data
-                                      .attributes.tags.length;
-                              i++) {
-                            tags.add(searchData.data!.results[index].data
-                                .attributes.tags[i].attributes.name.en);
-                          }
-                          return SearchResultHolder(
-                            token: token,
-                            description: searchData.data!.results[index].data
-                                .attributes.description.en,
-                            title: searchData
-                                .data!.results[index].data.attributes.title.en,
-                            mangaID: searchData.data!.results[index].data.id,
-                            baseUrl: 'https://uploads.mangadex.org',
-                            tags: tags,
-                          );
-                        }));
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      mainAxisExtent: 300,
+                      crossAxisCount: 2,
+                    ),
+                    itemCount: followedManga.data!.data.length,
+                    itemBuilder: (BuildContext context, index) {
+                      for (int i = 0;
+                          i <
+                              followedManga
+                                  .data!.data[index].attributes.tags.length;
+                          i++) {
+                        tags.add(followedManga.data!.data[index].attributes
+                            .tags[i].attributes.name.en);
+                      }
+                      return SearchResultHolder(
+                        token: token,
+                        description: followedManga
+                            .data!.data[index].attributes.description.en,
+                        title:
+                            followedManga.data!.data[index].attributes.title.en,
+                        mangaID: followedManga.data!.data[index].id,
+                        baseUrl: 'https://uploads.mangadex.org',
+                        tags: tags,
+                      );
+                    },
+                  ),
+                );
               }
             } else {
               return Center(

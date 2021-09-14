@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:fludex/library/library.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:fludex/search/searchScreen.dart';
 
 import '../utils.dart';
 
@@ -151,12 +150,8 @@ class _UserLoginState extends State<UserLogin> {
                                   if (loginData!.result == 'ok') {
                                     print(hasPressedLogIn);
                                     print('got loginData');
-                                    utils.saveLoginData(
-                                        username,
-                                        password,
-                                        loginData.token.session,
-                                        loginData.token.refresh);
-                                    print('saved login data');
+
+                                    print(loginData.token.session);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -218,7 +213,7 @@ class _UserLoginState extends State<UserLogin> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => Library(
-                                        token: loginData.token.session,
+                                        token: loginData.token.refresh,
                                       ),
                                     ),
                                   );
