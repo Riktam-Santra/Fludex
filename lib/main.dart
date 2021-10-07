@@ -1,4 +1,5 @@
-import 'utils.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'login/login.dart';
 
@@ -15,7 +16,6 @@ class _MainPageState extends State<MainPage> {
     super.initState();
   }
 
-  FludexUtils utils = FludexUtils();
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Fludex",

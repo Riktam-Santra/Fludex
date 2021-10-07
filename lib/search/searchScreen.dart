@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 import 'searchReplyScreen.dart';
 
 class SearchPage extends StatefulWidget {
+  final bool lightMode;
   final String token;
-  SearchPage({required this.token});
+  final bool dataSaver;
+  SearchPage(
+      {required this.token, required this.lightMode, required this.dataSaver});
   _SearchPageState createState() => _SearchPageState(token);
 }
 
@@ -32,7 +35,8 @@ class _SearchPageState extends State<SearchPage> {
         backgroundColor: Colors.redAccent,
         title: Text('Search for a manga'),
       ),
-      backgroundColor: Color.fromARGB(255, 18, 18, 18),
+      backgroundColor:
+          widget.lightMode ? Colors.white : Color.fromARGB(255, 18, 18, 18),
       body: Container(
         child: SingleChildScrollView(
           child: Align(
@@ -50,7 +54,9 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(200, 18, 18, 18),
+                        color: widget.lightMode
+                            ? Colors.white
+                            : Color.fromARGB(200, 18, 18, 18),
                         boxShadow: [
                           BoxShadow(blurRadius: 0.1, spreadRadius: 0.1)
                         ],
@@ -58,14 +64,22 @@ class _SearchPageState extends State<SearchPage> {
                       width: 500,
                       height: 50,
                       child: TextField(
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                            color:
+                                widget.lightMode ? Colors.black : Colors.white),
                         cursorColor: Colors.white,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                             focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
+                                borderSide: BorderSide(
+                                    color: widget.lightMode
+                                        ? Colors.black
+                                        : Colors.white)),
                             hintText: 'Search for some manga...',
-                            hintStyle: TextStyle(color: Colors.white)),
+                            hintStyle: TextStyle(
+                                color: widget.lightMode
+                                    ? Colors.black
+                                    : Colors.white)),
                         onChanged: ((v) async {
                           setState(
                             () {
@@ -93,7 +107,7 @@ class _SearchPageState extends State<SearchPage> {
                           );
                         },
                         icon: Icon(Icons.search),
-                        color: Colors.white,
+                        color: widget.lightMode ? Colors.black : Colors.white,
                       ),
                     ),
                   ],
@@ -103,8 +117,10 @@ class _SearchPageState extends State<SearchPage> {
                   margin: EdgeInsets.all(20),
                   child: hasTyped
                       ? SearchReplyScreen(
+                          lightMode: widget.lightMode,
                           searchQuery: searchValue,
                           token: token,
+                          dataSaver: widget.dataSaver,
                         )
                       : Container(),
                 ),
