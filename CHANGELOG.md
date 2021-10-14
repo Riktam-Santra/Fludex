@@ -34,3 +34,16 @@
 
 ## 0.0.8
  - Update all components according to the mangadex_library ver 1.2.9+7 and Mangadex API Update 5.2.35
+
+## 0.0.9
+ - Added a settings page, can be accessed from the user library
+ - Added options to switch between light mode and dark mode to settings page
+ - Added options to switch datasaver on and off to settings page
+ - User's username is now shown in the navigation drawer
+ - Added option to logout of fludex in navigation menu
+ - Added about fludex page in the navigation menu
+ - Updated to mangadex_library ver 1.2.14
+ - Chapter are now auto marked as read when going to the next chapter
+ - If next page is triggered when user is on the last page of a chapter, chapter is auto changed.
+ - Fixed problems with token refresh which caused the app to crash, if it still happens relaunching the app will fix it.
+ - 'Added to Library' button remains buggy and unaligned, the style for the button is to be changed along with a proper fix for it
