@@ -4,7 +4,8 @@ import 'searchReplyScreen.dart';
 
 class SearchPage extends StatefulWidget {
   final String token;
-  SearchPage({required this.token});
+  final bool dataSaver;
+  SearchPage({required this.token, required this.dataSaver});
   _SearchPageState createState() => _SearchPageState(token);
 }
 
@@ -29,10 +30,8 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.redAccent,
         title: Text('Search for a manga'),
       ),
-      backgroundColor: Color.fromARGB(255, 18, 18, 18),
       body: Container(
         child: SingleChildScrollView(
           child: Align(
@@ -49,23 +48,13 @@ class _SearchPageState extends State<SearchPage> {
                       width: 50,
                     ),
                     Container(
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(200, 18, 18, 18),
-                        boxShadow: [
-                          BoxShadow(blurRadius: 0.1, spreadRadius: 0.1)
-                        ],
-                      ),
+                      decoration: BoxDecoration(),
                       width: 500,
                       height: 50,
                       child: TextField(
-                        style: TextStyle(color: Colors.white),
-                        cursorColor: Colors.white,
+                        decoration:
+                            InputDecoration(hintText: "Search for a manga..."),
                         textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            hintText: 'Search for some manga...',
-                            hintStyle: TextStyle(color: Colors.white)),
                         onChanged: ((v) async {
                           setState(
                             () {
@@ -80,6 +69,13 @@ class _SearchPageState extends State<SearchPage> {
                             },
                           );
                         }),
+                        onEditingComplete: () {
+                          setState(
+                            () {
+                              hasTyped = true;
+                            },
+                          );
+                        },
                       ),
                     ),
                     Container(
@@ -93,7 +89,6 @@ class _SearchPageState extends State<SearchPage> {
                           );
                         },
                         icon: Icon(Icons.search),
-                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -105,6 +100,7 @@ class _SearchPageState extends State<SearchPage> {
                       ? SearchReplyScreen(
                           searchQuery: searchValue,
                           token: token,
+                          dataSaver: widget.dataSaver,
                         )
                       : Container(),
                 ),

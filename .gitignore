@@ -46,5 +46,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# manually added
-data/
+# Manually added
+data/appData/
+sampleAppData/

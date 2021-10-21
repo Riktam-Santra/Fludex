@@ -47,3 +47,9 @@
  - If next page is triggered when user is on the last page of a chapter, chapter is auto changed.
  - Fixed problems with token refresh which caused the app to crash, if it still happens relaunching the app will fix it.
  - 'Added to Library' button remains buggy and unaligned, the style for the button is to be changed along with a proper fix for it
+
+## 0.1.0
+ - Finally added an App Theme, it should look much better now.
+ - Replaced colored containers with cards.
+ - Added 'mark chapter as read' options to all chapter mark tiles
+ - **'Add to library' and 'Mark chapter as read' are both not currently working due to issues from Mangadex's side, they will fix it someday so gotta wait.**

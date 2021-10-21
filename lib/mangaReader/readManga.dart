@@ -1,54 +1,61 @@
+import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/jsonSearchCommands.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mangadex_library/mangadex_library.dart';
 
 class MangaReader extends StatefulWidget {
+  final String mangaTitle;
   final String mangaId;
   final String token;
   final int chapterNumber;
+  final bool dataSaver;
 
-  MangaReader({
-    required this.token,
-    required this.mangaId,
-    required this.chapterNumber,
-  });
-  _MangaReaderState createState() => _MangaReaderState(
-        globalToken: token,
-        mangaId: mangaId,
-        chapterNumber: chapterNumber,
-      );
+  MangaReader(
+      {required this.mangaTitle,
+      required this.token,
+      required this.mangaId,
+      required this.chapterNumber,
+      required this.dataSaver});
+  _MangaReaderState createState() => _MangaReaderState();
 }
 
 class _MangaReaderState extends State<MangaReader> {
-  final String globalToken;
-  late String mangaId;
+  late bool dataSaver;
   late int chapterNumber;
 
-  _MangaReaderState(
-      {required this.globalToken,
-      required this.mangaId,
-      required this.chapterNumber});
-  bool imgLoading = false;
-  int pageIndex = 0;
-
-  Future<String> getChapterID(int? chapterNum, int? limit) async {
-    var _chapterId =
-        await lib.getChapters(mangaId, offset: (chapterNum! - 1), limit: limit);
-    return _chapterId!.data[0].id;
+  void initState() {
+    super.initState();
+    chapterNumber = widget.chapterNumber;
+    dataSaver = widget.dataSaver;
   }
 
-  JsonSearch jsonsearch = new JsonSearch();
+  bool imgLoading = false;
+  int pageIndex = 0;
+  bool hasChangedChapter = false;
+
+  Future<List<String>?> _getAllFilePaths(
+      Future<String> chapterId, bool isDataSaverMode) async {
+    return await FludexUtils().getAllFilePaths(
+        widget.token, chapterId, widget.mangaId, isDataSaverMode);
+  }
+
   Widget build(BuildContext context) {
     return new FutureBuilder(
-      future: getAllFilePaths(getChapterID(chapterNumber, 1), false),
+      future: _getAllFilePaths(
+          FludexUtils().getChapterID(widget.mangaId, chapterNumber, 1),
+          widget.dataSaver),
       builder: (context, AsyncSnapshot<List<String>?> data) {
         if (data.hasData) {
           return Scaffold(
             appBar: AppBar(
-              backgroundColor: Color.fromARGB(18, 255, 255, 255),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              title: Text(widget.mangaTitle),
             ),
-            backgroundColor: Color.fromARGB(255, 18, 18, 18),
             body: SingleChildScrollView(
               child: Column(
                 children: [
@@ -65,7 +72,6 @@ class _MangaReaderState extends State<MangaReader> {
                               children: [
                                 Container(
                                   child: IconButton(
-                                    color: Colors.white,
                                     icon: Icon(Icons.skip_previous),
                                     onPressed: () {
                                       if (chapterNumber != 0) {
@@ -79,23 +85,37 @@ class _MangaReaderState extends State<MangaReader> {
                                   ),
                                 ),
                                 Container(
+                                  padding:
+                                      EdgeInsets.only(left: 8.0, right: 8.0),
                                   color: Colors.white,
                                   child: Text(
-                                      'Chapter ' + (chapterNumber).toString()),
+                                    'Chapter ' + (chapterNumber).toString(),
+                                    style: TextStyle(color: Colors.black),
+                                  ),
                                 ),
                                 Container(
                                   child: IconButton(
                                     icon: Icon(
                                       Icons.skip_next,
-                                      color: Colors.white,
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async {
                                       setState(() {
                                         try {
                                           chapterNumber++;
                                         } catch (e) {
                                           print(e);
                                         }
+
+                                        hasChangedChapter = true;
+                                      });
+                                      await markChapterRead(
+                                        widget.token,
+                                        await FludexUtils().getChapterID(
+                                            widget.mangaId, chapterNumber, 1),
+                                      );
+                                      print('Marked chapter as read');
+                                      setState(() {
+                                        hasChangedChapter = false;
                                       });
                                     },
                                   ),
@@ -108,51 +128,71 @@ class _MangaReaderState extends State<MangaReader> {
                     ),
                   ),
                   Container(
-                    color: Color.fromARGB(255, 18, 18, 18),
-                    child: InkWell(
-                      child: CachedNetworkImage(
-                        imageUrl: data.data![pageIndex],
-                        placeholder: (BuildContext context, value) {
-                          return Container(
-                            child: Center(
-                              child: SizedBox(
-                                height: 1000,
-                                child: Center(
-                                  child: SizedBox(
-                                    height: 200,
-                                    width: 200,
-                                    child: CircularProgressIndicator(
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              ),
+                    child: hasChangedChapter
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
                             ),
-                          );
-                        },
-                      ),
-                      onDoubleTap: () {
-                        setState(
-                          () {
-                            if (pageIndex != 0) {
-                              imgLoading = true;
-                              pageIndex--;
-                              imgLoading = false;
-                            }
-                          },
-                        );
-                      },
-                      onTap: () {
-                        setState(
-                          () {
-                            if (data.data!.length != pageIndex + 1) {
-                              imgLoading = true;
-                              pageIndex++;
-                              imgLoading = false;
-                            }
-                          },
-                        );
-                      },
-                    ),
+                          )
+                        : Container(
+                            child: InkWell(
+                              child: CachedNetworkImage(
+                                imageUrl: data.data![pageIndex],
+                                placeholder: (BuildContext context, value) {
+                                  return Container(
+                                    child: Center(
+                                      child: SizedBox(
+                                        height: 1000,
+                                        child: Center(
+                                          child: SizedBox(
+                                            height: 200,
+                                            width: 200,
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              onDoubleTap: () {
+                                setState(
+                                  () {
+                                    if (pageIndex != 0) {
+                                      imgLoading = true;
+                                      pageIndex--;
+                                      imgLoading = false;
+                                    } else if (chapterNumber != 1 &&
+                                        pageIndex == 0) {
+                                      chapterNumber--;
+                                    }
+                                  },
+                                );
+                              },
+                              onTap: () async {
+                                if (data.data!.length != pageIndex + 1) {
+                                  setState(() {
+                                    imgLoading = true;
+                                    pageIndex++;
+                                    imgLoading = false;
+                                  });
+                                } else if (data.data!.length == pageIndex + 1) {
+                                  setState(() {
+                                    hasChangedChapter = true;
+                                    chapterNumber++;
+                                  });
+                                  markChapterRead(
+                                      widget.token,
+                                      await FludexUtils().getChapterID(
+                                          widget.mangaId, chapterNumber, 1));
+                                  setState(() {
+                                    pageIndex = 0;
+                                    hasChangedChapter = false;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
@@ -160,7 +200,7 @@ class _MangaReaderState extends State<MangaReader> {
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
                         'Page ${(pageIndex + 1).toString()}/${data.data!.length}',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(),
                       ),
                     ),
                   )
@@ -173,40 +213,11 @@ class _MangaReaderState extends State<MangaReader> {
             child: Container(
               height: 100,
               width: 100,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
+              child: CircularProgressIndicator(),
             ),
           );
         }
       },
     );
-  }
-
-  Future<List<String>?> getAllFilePaths(
-      Future<String> chapterId, bool isDataSaverMode) async {
-    var chapter = await lib.getChapters(mangaId);
-    if (chapter != null) {
-      var token = globalToken;
-      if (token.isEmpty) {
-        print('THERE IS NO TOKEN!');
-      }
-      var baseUrl = 'https://uploads.mangadex.org';
-      var filenames = await jsonsearch.getChapterFilenames(
-          await chapterId, isDataSaverMode);
-      var urls = <String>[];
-      var chapterData =
-          await jsonsearch.getChapterDataByChapterId(await chapterId);
-      var chapterHash = chapterData.data.attributes.hash;
-
-      filenames.forEach(
-        (v) {
-          isDataSaverMode
-              ? urls.add('$baseUrl/$token/data-saver/$chapterHash/$v')
-              : urls.add('$baseUrl/$token/data/$chapterHash/$v');
-        },
-      );
-      return urls;
-    }
   }
 }

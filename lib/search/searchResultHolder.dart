@@ -1,82 +1,92 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fludex/mangaReader/aboutManga.dart';
+import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/models/cover/Cover.dart';
+import 'package:mangadex_library/src/models/cover/Cover.dart';
 
 class SearchResultHolder extends StatefulWidget {
+  final bool dataSaver;
   final String token;
-  final String mangaID;
-  final String baseUrl;
-  final String title;
-  final String description;
-  final List<String> tags;
-  SearchResultHolder(
-      {required this.baseUrl,
-      required this.mangaID,
-      required this.title,
-      required this.token,
-      required this.description,
-      required this.tags});
-  _SearchResultHolder createState() =>
-      _SearchResultHolder(mangaID, title, baseUrl, token, description, tags);
-}
-
-class _SearchResultHolder extends State<SearchResultHolder> {
   final String mangaId;
   final String baseUrl;
   final String title;
-  final String token;
+  final String status;
   final String description;
   final List<String> tags;
+  final String demographic;
+  final String rating;
+  SearchResultHolder(
+      {required this.baseUrl,
+      required this.mangaId,
+      required this.title,
+      required this.status,
+      required this.token,
+      required this.description,
+      required this.tags,
+      required this.demographic,
+      required this.rating,
+      required this.dataSaver});
+  _SearchResultHolder createState() => _SearchResultHolder();
+}
 
+class _SearchResultHolder extends State<SearchResultHolder> {
   bool hasPressed = false;
-
-  _SearchResultHolder(this.mangaId, this.title, this.baseUrl, this.token,
-      this.description, this.tags);
+  late bool lightMode;
   Widget build(BuildContext context) {
+    lightMode = Theme.of(context).brightness == Brightness.light;
     return FutureBuilder(
-      future: lib.getCoverArt(mangaId),
+      future: lib.getCoverArt(widget.mangaId),
       builder: (context, AsyncSnapshot<Cover?> cover) {
         if (cover.connectionState == ConnectionState.done) {
           if (cover.data != null) {
             var coverFileName = cover.data!.data[0].attributes.fileName;
             List<Widget> tagWidgets = <Widget>[];
-            for (int i = 0; i < tags.length; i++) {
-              tagWidgets.add(Container(
-                padding: EdgeInsets.only(left: 10, right: 10),
-                color: Color.fromARGB(150, 18, 18, 18),
-                child: Text(
-                  tags[i],
-                  style: TextStyle(color: Colors.white),
+            var requiredTagList = widget.tags.take(4);
+            for (int i = 0; i < requiredTagList.length; i++) {
+              tagWidgets.add(
+                Container(
+                  decoration: BoxDecoration(
+                    color: lightMode
+                        ? Colors.white
+                        : Color.fromARGB(150, 18, 18, 18),
+                    border: lightMode ? Border.all(color: Colors.black) : null,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  margin: EdgeInsets.all(5),
+                  padding: EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                  ),
+                  child: Text(
+                    widget.tags[i],
+                    style: TextStyle(
+                      color: lightMode ? Colors.black : Colors.white,
+                    ),
+                  ),
                 ),
-              ));
+              );
             }
             if (hasPressed == false) {
               return Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Container(
-                  decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 18, 18, 18),
-                      boxShadow: [BoxShadow(color: Colors.grey)]),
                   child: InkWell(
-                    child: Container(
-                      color: Color.fromARGB(255, 18, 18, 18),
+                    child: Card(
+                      elevation: 1,
                       child: Row(
                         children: [
                           Container(
                             alignment: Alignment.centerLeft,
                             child: CachedNetworkImage(
                               imageUrl:
-                                  '$baseUrl/covers/$mangaId/$coverFileName',
+                                  '${widget.baseUrl}/covers/${widget.mangaId}/$coverFileName',
                               placeholder: (BuildContext context, url) =>
                                   Center(
                                 child: Container(
                                   height: 100,
                                   width: 100,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.grey[400],
-                                  ),
+                                  child: CircularProgressIndicator(),
                                 ),
                               ),
                             ),
@@ -91,10 +101,12 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                   Padding(
                                     padding: const EdgeInsets.all(5.0),
                                     child: Text(
-                                      title,
-                                      overflow: TextOverflow.clip,
+                                      widget.title,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
                                       style: TextStyle(
-                                          fontSize: 17, color: Colors.white),
+                                        fontSize: 21,
+                                      ),
                                     ),
                                   ),
                                   Padding(
@@ -112,17 +124,26 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                       ),
                                     ),
                                   ),
-                                  Expanded(
-                                    child: Container(
-                                      child: Text(
-                                        description,
-                                        style:
-                                            TextStyle(color: Colors.grey[400]),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 6,
-                                      ),
+                                  Container(
+                                    child: Text(
+                                      widget.description,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 4,
                                     ),
                                   ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      FludexUtils.statusContainer(
+                                          widget.status, lightMode),
+                                      FludexUtils.demographicContainer(
+                                          widget.demographic, lightMode),
+                                      FludexUtils.ratingContainer(
+                                          widget.rating, lightMode),
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
@@ -134,13 +155,16 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                       setState(() {
                         hasPressed = true;
                       });
-                      var chapterData = await lib.getChapters(mangaId);
+                      var chapterData = await lib.getChapters(widget.mangaId);
                       if (chapterData != null) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                AboutManga(mangaId: mangaId, token: token),
+                            builder: (context) => AboutManga(
+                              mangaId: widget.mangaId,
+                              token: widget.token,
+                              dataSaver: widget.dataSaver,
+                            ),
                           ),
                         );
                       }
@@ -153,9 +177,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
               );
             } else {
               return Center(
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
+                child: CircularProgressIndicator(),
               );
             }
           } else {
@@ -163,7 +185,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
               child: Center(
                 child: Text(
                   'Couldn\'t load data :(',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+                  style: TextStyle(fontSize: 18),
                 ),
               ),
             );
