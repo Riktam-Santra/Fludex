@@ -14,6 +14,20 @@ A very basic manga reader made using flutter and mangadex API. It uses the [mang
 ## Releases
 The latest releases can akways be found on the [releases](https://github.com/Riktam-Santra/Fludex/releases) page, if you are looking ahead to try the app.
 
+## Preview
+Light mode:
+
+
+https://user-images.githubusercontent.com/32616925/138225651-f074b09e-3ca3-4329-b965-c9b85d40a787.mp4
+
+https://user-images.githubusercontent.com/32616925/138225707-89b45b46-cec1-4b4f-ac12-9c9516edf132.mp4
+
+Dark Mode:
+
+https://user-images.githubusercontent.com/32616925/138225754-279eb626-79c5-44d4-9e44-fcf8b3e3f93b.mp4
+
+https://user-images.githubusercontent.com/32616925/138225827-edbbbc36-20a7-4e1b-b781-c19adb4f53ec.mp4
+
 ## App Controls
 When reading the manga, click once on a page to go to the next page and click twice on a page to go the previous page.
 
@@ -26,14 +40,6 @@ When reading the manga, click once on a page to go to the next page and click tw
 
 Extract your release zip archive and open mangadex_app.exe (make sure that all the files and extracted and not only the exe.)
 
-<img src="demo.gif" width="600px">
-
-## Crashes
-  The app crashes under the following circumstances
-  - If there is no internet
-  - On request timeouts
-  - If rate limit is exceeded <br><br>
-I'll try to fix these soon.
 
 ## Things coming next
  - Download manga and view library offline
