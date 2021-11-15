@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/src/models/search/Search.dart';
+import 'package:mangadex_library/models/search/Search.dart';
 import 'searchResultHolder.dart';
 
 class SearchReplyScreen extends StatefulWidget {

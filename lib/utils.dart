@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fludex/saveDataModels/settings.dart';
-import 'package:mangadex_library/src/models/login/Login.dart' as l;
+import 'package:mangadex_library/models/login/Login.dart' as l;
 import 'package:mangadex_library/mangadex_library.dart';
 import 'package:fludex/saveDataModels/loginData.dart';
 import 'package:mangadex_library/jsonSearchCommands.dart';

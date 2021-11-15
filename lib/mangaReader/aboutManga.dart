@@ -8,13 +8,13 @@ import 'package:fludex/mangaReader/readManga.dart';
 import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mangadex_library/src/models/chapter/ChapterData.dart' as ch;
+import 'package:mangadex_library/models/chapter/ChapterData.dart' as ch;
 import 'package:mangadex_library/jsonSearchCommands.dart';
 import 'package:mangadex_library/mangadex_library.dart';
-import 'package:mangadex_library/src/models/chapter/readChapters.dart';
-import 'package:mangadex_library/src/models/common/singleMangaData.dart';
-import 'package:mangadex_library/src/models/common/tags.dart';
-import 'package:mangadex_library/src/models/user/user_followed_manga/manga_check.dart';
+import 'package:mangadex_library/models/chapter/readChapters.dart';
+import 'package:mangadex_library/models/common/singleMangaData.dart';
+import 'package:mangadex_library/models/common/tags.dart';
+import 'package:mangadex_library/models/user/user_followed_manga/manga_check.dart';
 
 class AboutManga extends StatefulWidget {
   final bool dataSaver;
@@ -149,21 +149,6 @@ class _AboutMangaState extends State<AboutManga> {
             Navigator.pop(context);
           },
         ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {
-        //       Navigator.push(
-        //         context,
-        //         MaterialPageRoute(
-        //           builder: (context) => DownloadManager(
-        //             mangaId: mangaId,
-        //           ),
-        //         ),
-        //       );
-        //     },
-        //     icon: Icon(Icons.download),
-        //   ),
-        // ],
       ),
       body: hasPressed
           ? Center(
@@ -367,6 +352,11 @@ class _AboutMangaState extends State<AboutManga> {
                                                                         mangaId);
                                                                     print(
                                                                         'Unfollowed manga $mangaId');
+                                                                    setState(
+                                                                        () {
+                                                                      isFollowed =
+                                                                          false;
+                                                                    });
                                                                   },
                                                                   child:
                                                                       Container(
@@ -400,6 +390,11 @@ class _AboutMangaState extends State<AboutManga> {
                                                                         mangaId);
                                                                     print(
                                                                         'Followed manga $mangaId');
+                                                                    setState(
+                                                                        () {
+                                                                      isFollowed =
+                                                                          true;
+                                                                    });
                                                                   },
                                                                   child:
                                                                       Container(
@@ -822,23 +817,10 @@ class _AboutMangaState extends State<AboutManga> {
 }
 
 Future<MangaCheck> _followManga(String token, String mangaId) async {
-  var unencodedPath = '/manga/$mangaId/follow';
-  final uri = 'https://$authority$unencodedPath';
-  var response = await http.delete(Uri.parse(uri), headers: {
-    HttpHeaders.contentTypeHeader: 'application/json',
-    HttpHeaders.authorizationHeader: 'Bearer $token'
-  });
-  print(response.body);
-  return MangaCheck.fromJson(jsonDecode(response.body));
+  return followManga(token, mangaId);
 }
 
 Future<MangaCheck> _unFollowManga(String token, String mangaId) async {
-  var unencodedPath = '/manga/$mangaId/unfollow';
-  final uri = 'https://$authority$unencodedPath';
-  var response = await http.delete(Uri.parse(uri), headers: {
-    HttpHeaders.contentTypeHeader: 'application/json',
-    HttpHeaders.authorizationHeader: 'Bearer $token'
-  });
-  print(response.body);
-  return MangaCheck.fromJson(jsonDecode(response.body));
+  var response = await unfollowManga(token, mangaId);
+  return response;
 }

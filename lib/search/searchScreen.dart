@@ -41,57 +41,59 @@ class _SearchPageState extends State<SearchPage> {
                 SizedBox(
                   height: 50,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 50,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(),
-                      width: 500,
-                      height: 50,
-                      child: TextField(
-                        decoration:
-                            InputDecoration(hintText: "Search for a manga..."),
-                        textAlign: TextAlign.center,
-                        onChanged: ((v) async {
-                          setState(
-                            () {
-                              hasTyped = false;
-                              _controller.value = TextEditingValue(text: v);
-                              searchValue = v;
-                              if (v.isEmpty || v == '') {
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 50,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(),
+                        width: 500,
+                        height: 50,
+                        child: TextField(
+                          decoration: InputDecoration(
+                              hintText: "Search for a manga..."),
+                          textAlign: TextAlign.center,
+                          onChanged: ((v) async {
+                            setState(
+                              () {
                                 hasTyped = false;
-                              } else {
+                                _controller.value = TextEditingValue(text: v);
                                 searchValue = v;
-                              }
-                            },
-                          );
-                        }),
-                        onEditingComplete: () {
-                          setState(
-                            () {
-                              hasTyped = true;
-                            },
-                          );
-                        },
+                                if (v.isEmpty || v == '') {
+                                  hasTyped = false;
+                                } else {
+                                  searchValue = v;
+                                }
+                              },
+                            );
+                          }),
+                          onEditingComplete: () {
+                            setState(
+                              () {
+                                hasTyped = true;
+                              },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 50,
-                      child: IconButton(
-                        onPressed: () {
-                          setState(
-                            () {
-                              hasTyped = true;
-                            },
-                          );
-                        },
-                        icon: Icon(Icons.search),
+                      Container(
+                        height: 50,
+                        child: IconButton(
+                          onPressed: () {
+                            setState(
+                              () {
+                                hasTyped = true;
+                              },
+                            );
+                          },
+                          icon: Icon(Icons.search),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 Container(
                   width: double.infinity,

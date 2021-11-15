@@ -49,3 +49,4 @@ app.*.map.json
 # Manually added
 data/appData/
 sampleAppData/
+data/loginData.json

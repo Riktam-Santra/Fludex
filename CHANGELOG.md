@@ -52,4 +52,9 @@
  - Finally added an App Theme, it should look much better now.
  - Replaced colored containers with cards.
  - Added 'mark chapter as read' options to all chapter mark tiles
- - **'Add to library' and 'Mark chapter as read' are both not currently working due to issues from Mangadex's side, they will fix it someday so gotta wait.**
+   **'Add to library' and 'Mark chapter as read' are both not currently working due to issues from Mangadex's side, they will fix it someday so gotta wait.**
+
+## 0.1.1
+ - adding to library button now works, however removing from library **does not work**. You will have to manually remove mangas from the  website.
+ - fixed a bug where the login page would be stuck at the animation if the login timed out.
+ - search results now use 256px manga covers arts rather than the original, as a result the thumbnails should look less distorted.

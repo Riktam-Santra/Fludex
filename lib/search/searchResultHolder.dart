@@ -3,7 +3,7 @@ import 'package:fludex/mangaReader/aboutManga.dart';
 import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/src/models/cover/Cover.dart';
+import 'package:mangadex_library/models/cover/Cover.dart';
 
 class SearchResultHolder extends StatefulWidget {
   final bool dataSaver;
@@ -36,11 +36,10 @@ class _SearchResultHolder extends State<SearchResultHolder> {
   Widget build(BuildContext context) {
     lightMode = Theme.of(context).brightness == Brightness.light;
     return FutureBuilder(
-      future: lib.getCoverArt(widget.mangaId),
-      builder: (context, AsyncSnapshot<Cover?> cover) {
-        if (cover.connectionState == ConnectionState.done) {
-          if (cover.data != null) {
-            var coverFileName = cover.data!.data[0].attributes.fileName;
+      future: lib.getCoverArtUrl(widget.mangaId, res: 256),
+      builder: (context, AsyncSnapshot<String?> coverUrl) {
+        if (coverUrl.connectionState == ConnectionState.done) {
+          if (coverUrl.data != null) {
             List<Widget> tagWidgets = <Widget>[];
             var requiredTagList = widget.tags.take(4);
             for (int i = 0; i < requiredTagList.length; i++) {
@@ -79,8 +78,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                           Container(
                             alignment: Alignment.centerLeft,
                             child: CachedNetworkImage(
-                              imageUrl:
-                                  '${widget.baseUrl}/covers/${widget.mangaId}/$coverFileName',
+                              imageUrl: coverUrl.data!,
                               placeholder: (BuildContext context, url) =>
                                   Center(
                                 child: Container(

@@ -177,35 +177,45 @@ class _HomePageState extends State<HomePage> {
                                                                   .controller
                                                                   .reverse();
                                                             });
-                                                            var loginData =
-                                                                await lib.login(
-                                                                    username,
-                                                                    password);
-                                                            if (loginData!
-                                                                    .result ==
-                                                                'ok') {
-                                                              animation
-                                                                  .controller
-                                                                  .reverse()
-                                                                  .whenComplete(
-                                                                      () => {
-                                                                            Navigator.push(
-                                                                              context,
-                                                                              MaterialPageRoute(
-                                                                                builder: (context) => Library(
-                                                                                  token: loginData.token,
-                                                                                  dataSaver: true,
+                                                            try {
+                                                              var loginData =
+                                                                  await lib.login(
+                                                                      username,
+                                                                      password);
+                                                              if (loginData!
+                                                                      .result ==
+                                                                  'ok') {
+                                                                animation
+                                                                    .controller
+                                                                    .reverse()
+                                                                    .whenComplete(
+                                                                        () => {
+                                                                              Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                  builder: (context) => Library(
+                                                                                    token: loginData.token,
+                                                                                    dataSaver: true,
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                            )
-                                                                          });
-                                                            } else {
+                                                                              )
+                                                                            });
+                                                              } else {
+                                                                setState(() {
+                                                                  animation
+                                                                      .controller
+                                                                      .forward();
+                                                                  loginText =
+                                                                      'Username or Password incorrect.';
+                                                                });
+                                                              }
+                                                            } catch (e) {
                                                               setState(() {
+                                                                loginText =
+                                                                    "Something went wrong while connecting :(";
                                                                 animation
                                                                     .controller
                                                                     .forward();
-                                                                loginText =
-                                                                    'Username or Password incorrect.';
                                                               });
                                                             }
                                                           }
