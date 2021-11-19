@@ -154,21 +154,28 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                         hasPressed = true;
                       });
                       var chapterData = await lib.getChapters(widget.mangaId);
-                      if (chapterData != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AboutManga(
-                              mangaId: widget.mangaId,
-                              token: widget.token,
-                              dataSaver: widget.dataSaver,
+                      try {
+                        if (chapterData != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AboutManga(
+                                mangaId: widget.mangaId,
+                                token: widget.token,
+                                dataSaver: widget.dataSaver,
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        }
+                        setState(() {
+                          hasPressed = false;
+                        });
+                      } catch (e) {
+                        setState(() {
+                          hasPressed = false;
+                        });
+                        showBanner();
                       }
-                      setState(() {
-                        hasPressed = false;
-                      });
                     },
                   ),
                 ),
@@ -197,4 +204,20 @@ class _SearchResultHolder extends State<SearchResultHolder> {
       },
     );
   }
+
+  void showBanner() => ScaffoldMessenger.of(context).showMaterialBanner(
+        MaterialBanner(
+          content: Text(
+              'Something went wrong, make sure you are connected to the internet.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              },
+              child: Text('Dismiss'),
+              style: TextButton.styleFrom(),
+            )
+          ],
+        ),
+      );
 }

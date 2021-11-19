@@ -20,6 +20,7 @@ class MainPage extends StatelessWidget {
         future: getLightModeSetting(),
         builder: (context, AsyncSnapshot<bool> lightMode) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: (lightMode.data ?? true)
                 ? ThemeData(
                     primaryColor: Color.fromARGB(255, 255, 103, 64),
@@ -33,9 +34,12 @@ class MainPage extends StatelessWidget {
                       extendedTextStyle: TextStyle(color: Colors.white),
                     ),
                     elevatedButtonTheme: ElevatedButtonThemeData(
-                        style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.all(10),
-                            primary: Color.fromARGB(255, 255, 103, 64)))),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.all(10),
+                        primary: Color.fromARGB(255, 255, 103, 64),
+                      ),
+                    ),
+                  ),
             home: Scaffold(
               body: HomePageAnimator(),
             ),

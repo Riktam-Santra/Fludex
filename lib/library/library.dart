@@ -25,12 +25,12 @@ class _Library extends State<Library> {
   late Token token;
   int resultOffset = 0;
 
-  bool value_reading = true;
-  bool value_on_hold = true;
-  bool value_plan_to_read = true;
-  bool value_dropped = true;
-  bool value_re_reading = true;
-  bool value_completed = true;
+  bool valueReading = true;
+  bool valueOnHold = true;
+  bool valuePlanToRead = true;
+  bool valueDropped = true;
+  bool valueReReading = true;
+  bool valueCompleted = true;
 
   @override
   void initState() {
@@ -68,118 +68,118 @@ class _Library extends State<Library> {
     return _data();
   }
 
-  Widget _buildPopupDialog(BuildContext context) {
-    //default filter values
+  // Widget _buildPopupDialog(BuildContext context) {
+  //   //default filter values
 
-    return new AlertDialog(
-      title: const Text('Filters'),
-      content: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return CheckboxListTile(
-              value: value_reading,
-              onChanged: (value) {
-                print(value);
-                setState(() {
-                  value_reading = value!;
-                });
-                print(value_reading);
-              },
-              title: Text("Reading"),
-            );
-          }),
-          StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return CheckboxListTile(
-              value: value_reading,
-              onChanged: (value) {
-                print(value);
-                setState(() {
-                  value_reading = value!;
-                });
-                print(value_reading);
-              },
-              title: Text("On hold"),
-            );
-          }),
-          StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return CheckboxListTile(
-              value: value_reading,
-              onChanged: (value) {
-                print(value);
-                setState(() {
-                  value_reading = value!;
-                });
-                print(value_reading);
-              },
-              title: Text("Plan to Read"),
-            );
-          }),
-          StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return CheckboxListTile(
-              value: value_reading,
-              onChanged: (value) {
-                print(value);
-                setState(() {
-                  value_reading = value!;
-                });
-                print(value_reading);
-              },
-              title: Text("Dropped"),
-            );
-          }),
-          StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return CheckboxListTile(
-              value: value_reading,
-              onChanged: (value) {
-                print(value);
-                setState(() {
-                  value_reading = value!;
-                });
-                print(value_reading);
-              },
-              title: Text("Re-reading"),
-            );
-          }),
-          StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return CheckboxListTile(
-              value: value_reading,
-              onChanged: (value) {
-                print(value);
-                setState(() {
-                  value_reading = value!;
-                });
-                print(value_reading);
-              },
-              title: Text("Completed"),
-            );
-          }),
-        ],
-      ),
-      actions: <Widget>[
-        new TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            setState(() {});
-          },
-          child: const Text('Apply'),
-        ),
-        new TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Close'),
-        ),
-      ],
-    );
-  }
+  //   return new AlertDialog(
+  //     title: const Text('Filters'),
+  //     content: new Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: <Widget>[
+  //         StatefulBuilder(
+  //             builder: (BuildContext context, StateSetter setState) {
+  //           return CheckboxListTile(
+  //             value: valueReading,
+  //             onChanged: (value) {
+  //               print(value);
+  //               setState(() {
+  //                 valueReading = value!;
+  //               });
+  //               print(valueReading);
+  //             },
+  //             title: Text("Reading"),
+  //           );
+  //         }),
+  //         StatefulBuilder(
+  //             builder: (BuildContext context, StateSetter setState) {
+  //           return CheckboxListTile(
+  //             value: valueReading,
+  //             onChanged: (value) {
+  //               print(value);
+  //               setState(() {
+  //                 valueReading = value!;
+  //               });
+  //               print(valueReading);
+  //             },
+  //             title: Text("On hold"),
+  //           );
+  //         }),
+  //         StatefulBuilder(
+  //             builder: (BuildContext context, StateSetter setState) {
+  //           return CheckboxListTile(
+  //             value: valueReading,
+  //             onChanged: (value) {
+  //               print(value);
+  //               setState(() {
+  //                 valueReading = value!;
+  //               });
+  //               print(valueReading);
+  //             },
+  //             title: Text("Plan to Read"),
+  //           );
+  //         }),
+  //         StatefulBuilder(
+  //             builder: (BuildContext context, StateSetter setState) {
+  //           return CheckboxListTile(
+  //             value: valueReading,
+  //             onChanged: (value) {
+  //               print(value);
+  //               setState(() {
+  //                 valueReading = value!;
+  //               });
+  //               print(valueReading);
+  //             },
+  //             title: Text("Dropped"),
+  //           );
+  //         }),
+  //         StatefulBuilder(
+  //             builder: (BuildContext context, StateSetter setState) {
+  //           return CheckboxListTile(
+  //             value: valueReading,
+  //             onChanged: (value) {
+  //               print(value);
+  //               setState(() {
+  //                 valueReading = value!;
+  //               });
+  //               print(valueReading);
+  //             },
+  //             title: Text("Re-reading"),
+  //           );
+  //         }),
+  //         StatefulBuilder(
+  //             builder: (BuildContext context, StateSetter setState) {
+  //           return CheckboxListTile(
+  //             value: valueReading,
+  //             onChanged: (value) {
+  //               print(value);
+  //               setState(() {
+  //                 valueReading = value!;
+  //               });
+  //               print(valueReading);
+  //             },
+  //             title: Text("Completed"),
+  //           );
+  //         }),
+  //       ],
+  //     ),
+  //     actions: <Widget>[
+  //       new TextButton(
+  //         onPressed: () {
+  //           Navigator.of(context).pop();
+  //           setState(() {});
+  //         },
+  //         child: const Text('Apply'),
+  //       ),
+  //       new TextButton(
+  //         onPressed: () {
+  //           Navigator.of(context).pop();
+  //         },
+  //         child: const Text('Close'),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -198,13 +198,13 @@ class _Library extends State<Library> {
           },
         ),
         actions: [
-          IconButton(
-            tooltip: "Filters",
-            onPressed: () {
-              showDialog(context: context, builder: _buildPopupDialog);
-            },
-            icon: Icon(Icons.filter_alt),
-          ),
+          // IconButton(
+          //   tooltip: "Filters",
+          //   onPressed: () {
+          //     showDialog(context: context, builder: _buildPopupDialog);
+          //   },
+          //   icon: Icon(Icons.filter_alt),
+          // ),
           IconButton(
             tooltip: "Settings",
             onPressed: () async {

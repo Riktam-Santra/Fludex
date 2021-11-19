@@ -58,3 +58,6 @@
  - adding to library button now works, however removing from library **does not work**. You will have to manually remove mangas from the  website.
  - fixed a bug where the login page would be stuck at the animation if the login timed out.
  - search results now use 256px manga covers arts rather than the original, as a result the thumbnails should look less distorted.
+
+## 0.1.2
+ - added a color filter option to the manga reader for adjusting the brightness of the pages.
