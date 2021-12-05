@@ -17,22 +17,21 @@ The latest releases can always be found on the [releases](https://github.com/Rik
 ## Preview
 Light mode:
 
+https://user-images.githubusercontent.com/32616925/144753046-f9d8acac-01a2-4af8-bdd2-eae449657c5e.mp4
 
-https://user-images.githubusercontent.com/32616925/138225651-f074b09e-3ca3-4329-b965-c9b85d40a787.mp4
-
-https://user-images.githubusercontent.com/32616925/138225707-89b45b46-cec1-4b4f-ac12-9c9516edf132.mp4
+https://user-images.githubusercontent.com/32616925/144753063-35047b18-299d-48b9-b8ac-398e3e61cdf0.mp4
 
 Dark Mode:
 
-https://user-images.githubusercontent.com/32616925/138225754-279eb626-79c5-44d4-9e44-fcf8b3e3f93b.mp4
+https://user-images.githubusercontent.com/32616925/144753087-0a06bcbf-d56f-4fd8-8a24-2db03ad85355.mp4
 
-https://user-images.githubusercontent.com/32616925/138225827-edbbbc36-20a7-4e1b-b781-c19adb4f53ec.mp4
+https://user-images.githubusercontent.com/32616925/144753198-1b6fce9b-9941-415b-a306-c6d25683b17e.mp4
 
 ## App Controls
 When reading the manga, click once on a page to go to the next page and click twice on a page to go the previous page.
 
 ## Things that aren't working
-- **You can't remove mangas from library or mark a chapter as read, this seems to be a mangadex issue.** However, you can still view your mangadex library and change it through the site itself.
+- **You can't remove mangas from library or mark a chapter as read.** However, you can still view your mangadex library and change it through the site itself.
 
 ## Running the App
 
@@ -53,7 +52,7 @@ Extract your release zip archive and open mangadex_app.exe (make sure that all t
 
 ## Things coming next
  - ~~Download manga and view library offline~~ This seems to be involving the application of isolates which is a bit complicated to handle at the moment and so has been postponed.
- - Organize manga as Reading, On hold, Plan to Read, Dropped, Re-reading, Completed.
+ - Option to change the reading status of manga in the library.
  - Change the view of the list tiles.
 
 ## Reach me
