@@ -126,19 +126,33 @@ class _MangaReaderState extends State<MangaReader> {
                                       ),
                                       onPressed: () async {
                                         setState(() {
-                                          try {
-                                            chapterNumber++;
-                                          } catch (e) {
-                                            print(e);
-                                          }
-
                                           hasChangedChapter = true;
                                         });
-                                        await markChapterRead(
-                                          widget.token,
-                                          await FludexUtils().getChapterID(
-                                              widget.mangaId, chapterNumber, 1),
-                                        );
+                                        try {
+                                          await markChapterRead(
+                                            widget.token,
+                                            await FludexUtils().getChapterID(
+                                                widget.mangaId,
+                                                chapterNumber,
+                                                1),
+                                          );
+                                          chapterNumber++;
+                                          setState(() {
+                                            pageIndex = 0;
+                                          });
+                                          filepaths = _getAllFilePaths(
+                                              FludexUtils().getChapterID(
+                                                  widget.mangaId,
+                                                  chapterNumber,
+                                                  1),
+                                              widget.dataSaver);
+                                        } catch (e) {
+                                          print(e);
+                                        }
+                                        setState(() {
+                                          hasChangedChapter = false;
+                                        });
+
                                         print('Marked chapter as read');
                                         setState(() {
                                           hasChangedChapter = false;
@@ -196,7 +210,18 @@ class _MangaReaderState extends State<MangaReader> {
                                           imgLoading = false;
                                         } else if (chapterNumber != 1 &&
                                             pageIndex == 0) {
-                                          chapterNumber--;
+                                          setState(() {
+                                            hasChangedChapter = true;
+                                            chapterNumber--;
+                                            filepaths = _getAllFilePaths(
+                                                FludexUtils().getChapterID(
+                                                    widget.mangaId,
+                                                    chapterNumber,
+                                                    1),
+                                                widget.dataSaver);
+                                            pageIndex = 0;
+                                            hasChangedChapter = false;
+                                          });
                                         }
                                       },
                                     );

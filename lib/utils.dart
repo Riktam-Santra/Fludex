@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fludex/saveDataModels/settings.dart';
+import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/login/Login.dart' as l;
 import 'package:mangadex_library/mangadex_library.dart';
 import 'package:fludex/saveDataModels/loginData.dart';
@@ -28,7 +29,7 @@ class FludexUtils {
     var file = await File('data/appData/settings.json').create(recursive: true);
     var contents = await file.readAsString();
     if (contents == '') {
-      file.writeAsString(
+      await file.writeAsString(
         jsonEncode(
           Settings(lightMode: true, dataSaver: false),
         ),
@@ -38,11 +39,16 @@ class FludexUtils {
     return jsonData;
   }
 
-  void saveLoginData(String session, String refresh) {
+  void saveLoginData(String session, String refresh) async {
     var user = LoginData(session, refresh);
     var encodedJson = jsonEncode(user);
     var file = File('data/loginData.json');
-    file.writeAsString(encodedJson);
+    await file.writeAsString(encodedJson);
+  }
+
+  void disposeLoginData() async {
+    var file = File('data/loginData.json');
+    await file.writeAsString('');
   }
 
   void saveSettings(bool lightMode, bool dataSaver) async {
@@ -339,6 +345,25 @@ class FludexUtils {
       );
     } else {
       return Container();
+    }
+  }
+
+  static ReadingStatus statusStringToEnum(String status) {
+    switch (status) {
+      case 'reading':
+        return ReadingStatus.reading;
+      case 'completed':
+        return ReadingStatus.completed;
+      case 'dropped':
+        return ReadingStatus.dropped;
+      case 'on_hold':
+        return ReadingStatus.on_hold;
+      case 'plan_to_read':
+        return ReadingStatus.plan_to_read;
+      case 're_reading':
+        return ReadingStatus.re_reading;
+      default:
+        return ReadingStatus.reading;
     }
   }
 }

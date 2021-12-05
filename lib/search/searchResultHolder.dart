@@ -163,6 +163,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                 mangaId: widget.mangaId,
                                 token: widget.token,
                                 dataSaver: widget.dataSaver,
+                                totalChapters: chapterData.total,
+                                lightMode: lightMode,
                               ),
                             ),
                           );

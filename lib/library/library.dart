@@ -9,9 +9,12 @@ import 'package:fludex/utils.dart';
 import 'package:fludex/login/home_page_animator.dart';
 
 import 'package:mangadex_library/mangadex_library.dart' as lib;
+import 'package:mangadex_library/models/common/allMangaReadingStatus.dart';
+import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/login/Login.dart';
 import 'package:mangadex_library/models/user/logged_user_details/logged_user_details.dart';
 import 'package:mangadex_library/models/user/user_followed_manga/user_followed_manga.dart';
+import 'package:mangadex_library/models/common/data.dart' as mangadat;
 
 class Library extends StatefulWidget {
   final bool dataSaver;
@@ -24,13 +27,17 @@ class Library extends StatefulWidget {
 class _Library extends State<Library> {
   late Token token;
   int resultOffset = 0;
+  List<String> dropDownMenuItems = [
+    'All',
+    'Reading',
+    'Completed',
+    'Dropped',
+    'Plan to read',
+    'Re-Reading',
+    'On Hold'
+  ];
 
-  bool valueReading = true;
-  bool valueOnHold = true;
-  bool valuePlanToRead = true;
-  bool valueDropped = true;
-  bool valueReReading = true;
-  bool valueCompleted = true;
+  String selectedValue = 'All';
 
   @override
   void initState() {
@@ -68,118 +75,26 @@ class _Library extends State<Library> {
     return _data();
   }
 
-  // Widget _buildPopupDialog(BuildContext context) {
-  //   //default filter values
+  ReadingStatus? checkReadingStatus(String status) {
+    if (status.toLowerCase() == 'all') {
+      return null;
+    } else {
+      return FludexUtils.statusStringToEnum(status.toLowerCase());
+    }
+  }
 
-  //   return new AlertDialog(
-  //     title: const Text('Filters'),
-  //     content: new Column(
-  //       mainAxisSize: MainAxisSize.min,
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: <Widget>[
-  //         StatefulBuilder(
-  //             builder: (BuildContext context, StateSetter setState) {
-  //           return CheckboxListTile(
-  //             value: valueReading,
-  //             onChanged: (value) {
-  //               print(value);
-  //               setState(() {
-  //                 valueReading = value!;
-  //               });
-  //               print(valueReading);
-  //             },
-  //             title: Text("Reading"),
-  //           );
-  //         }),
-  //         StatefulBuilder(
-  //             builder: (BuildContext context, StateSetter setState) {
-  //           return CheckboxListTile(
-  //             value: valueReading,
-  //             onChanged: (value) {
-  //               print(value);
-  //               setState(() {
-  //                 valueReading = value!;
-  //               });
-  //               print(valueReading);
-  //             },
-  //             title: Text("On hold"),
-  //           );
-  //         }),
-  //         StatefulBuilder(
-  //             builder: (BuildContext context, StateSetter setState) {
-  //           return CheckboxListTile(
-  //             value: valueReading,
-  //             onChanged: (value) {
-  //               print(value);
-  //               setState(() {
-  //                 valueReading = value!;
-  //               });
-  //               print(valueReading);
-  //             },
-  //             title: Text("Plan to Read"),
-  //           );
-  //         }),
-  //         StatefulBuilder(
-  //             builder: (BuildContext context, StateSetter setState) {
-  //           return CheckboxListTile(
-  //             value: valueReading,
-  //             onChanged: (value) {
-  //               print(value);
-  //               setState(() {
-  //                 valueReading = value!;
-  //               });
-  //               print(valueReading);
-  //             },
-  //             title: Text("Dropped"),
-  //           );
-  //         }),
-  //         StatefulBuilder(
-  //             builder: (BuildContext context, StateSetter setState) {
-  //           return CheckboxListTile(
-  //             value: valueReading,
-  //             onChanged: (value) {
-  //               print(value);
-  //               setState(() {
-  //                 valueReading = value!;
-  //               });
-  //               print(valueReading);
-  //             },
-  //             title: Text("Re-reading"),
-  //           );
-  //         }),
-  //         StatefulBuilder(
-  //             builder: (BuildContext context, StateSetter setState) {
-  //           return CheckboxListTile(
-  //             value: valueReading,
-  //             onChanged: (value) {
-  //               print(value);
-  //               setState(() {
-  //                 valueReading = value!;
-  //               });
-  //               print(valueReading);
-  //             },
-  //             title: Text("Completed"),
-  //           );
-  //         }),
-  //       ],
-  //     ),
-  //     actions: <Widget>[
-  //       new TextButton(
-  //         onPressed: () {
-  //           Navigator.of(context).pop();
-  //           setState(() {});
-  //         },
-  //         child: const Text('Apply'),
-  //       ),
-  //       new TextButton(
-  //         onPressed: () {
-  //           Navigator.of(context).pop();
-  //         },
-  //         child: const Text('Close'),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Future<List<mangadat.Data>> filterManga(String token) async {
+    List<mangadat.Data> mangaList = [];
+    var followedManga = await lib.getUserFollowedManga(token);
+    var mangaWithStatus = await lib.getAllUserMangaReadingStatus(token,
+        readingStatus: checkReadingStatus(selectedValue));
+    followedManga.data.forEach((element) {
+      if (mangaWithStatus.statuses.containsKey(element.id)) {
+        mangaList.add(element);
+      }
+    });
+    return mangaList;
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -198,13 +113,6 @@ class _Library extends State<Library> {
           },
         ),
         actions: [
-          // IconButton(
-          //   tooltip: "Filters",
-          //   onPressed: () {
-          //     showDialog(context: context, builder: _buildPopupDialog);
-          //   },
-          //   icon: Icon(Icons.filter_alt),
-          // ),
           IconButton(
             tooltip: "Settings",
             onPressed: () async {
@@ -308,8 +216,9 @@ class _Library extends State<Library> {
                 title: Text(
                   'Logout',
                 ),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
+                  FludexUtils().disposeLoginData();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -396,47 +305,129 @@ class _Library extends State<Library> {
                   var tags = <String>[];
                   return Column(
                     children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Container(
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                mainAxisExtent: 300,
-                                crossAxisCount: 2,
-                              ),
-                              itemCount: followedManga.data!.data.length,
-                              itemBuilder: (BuildContext context, index) {
-                                tags = [];
-                                for (int i = 0;
-                                    i <
-                                        followedManga.data!.data[index]
-                                            .attributes.tags.length;
-                                    i++) {
-                                  tags.add(followedManga.data!.data[index]
-                                      .attributes.tags[i].attributes.name.en);
-                                }
-                                return SearchResultHolder(
-                                  token: token.session,
-                                  description: followedManga.data!.data[index]
-                                      .attributes.description.en,
-                                  title: followedManga
-                                      .data!.data[index].attributes.title.en,
-                                  mangaId: followedManga.data!.data[index].id,
-                                  baseUrl: 'https://uploads.mangadex.org',
-                                  status: followedManga
-                                      .data!.data[index].attributes.status,
-                                  tags: tags,
-                                  demographic: followedManga.data!.data[index]
-                                      .attributes.publicationDemographic,
-                                  rating: followedManga.data!.data[index]
-                                      .attributes.contentRating,
-                                  dataSaver: widget.dataSaver,
-                                );
-                              },
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Icon(Icons.filter_alt),
                             ),
-                          ),
+                            DropdownButton(
+                              elevation: 10,
+                              underline: Container(),
+                              items: dropDownMenuItems
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                return DropdownMenuItem<String>(
+                                    child: Container(
+                                      margin: EdgeInsets.all(10),
+                                      child: Text(
+                                        value,
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    ),
+                                    value: value);
+                              }).toList(),
+                              value: selectedValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  selectedValue = newValue.toString();
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: FutureBuilder(
+                          future: filterManga(widget.token.session),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<mangadat.Data>>
+                                  allMangaStatus) {
+                            if (allMangaStatus.connectionState ==
+                                ConnectionState.done) {
+                              return allMangaStatus.data == null
+                                  ? Center(
+                                      child: Text(
+                                        "Nothing found >:3",
+                                        style: TextStyle(fontSize: 24),
+                                      ),
+                                    )
+                                  : SingleChildScrollView(
+                                      child: Container(
+                                        child: GridView.builder(
+                                          shrinkWrap: true,
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            mainAxisExtent: 300,
+                                            crossAxisCount: 2,
+                                          ),
+                                          itemCount:
+                                              allMangaStatus.data!.length,
+                                          itemBuilder:
+                                              (BuildContext context, index) {
+                                            tags = [];
+                                            for (int i = 0;
+                                                i <
+                                                    allMangaStatus.data![index]
+                                                        .attributes.tags.length;
+                                                i++) {
+                                              tags.add(allMangaStatus
+                                                  .data![index]
+                                                  .attributes
+                                                  .tags[i]
+                                                  .attributes
+                                                  .name
+                                                  .en);
+                                            }
+                                            return SearchResultHolder(
+                                              token: token.session,
+                                              description: allMangaStatus
+                                                  .data![index]
+                                                  .attributes
+                                                  .description
+                                                  .en,
+                                              title: allMangaStatus.data![index]
+                                                  .attributes.title.en,
+                                              mangaId: allMangaStatus
+                                                  .data![index].id,
+                                              baseUrl:
+                                                  'https://uploads.mangadex.org',
+                                              status: allMangaStatus
+                                                  .data![index]
+                                                  .attributes
+                                                  .status,
+                                              tags: tags,
+                                              demographic: allMangaStatus
+                                                  .data![index]
+                                                  .attributes
+                                                  .publicationDemographic,
+                                              rating: allMangaStatus
+                                                  .data![index]
+                                                  .attributes
+                                                  .contentRating,
+                                              dataSaver: widget.dataSaver,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                            } else {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 100),
+                                  child: Container(
+                                    child: LinearProgressIndicator(),
+                                    height: 30,
+                                    width: 500,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ),
                       SizedBox(
@@ -452,9 +443,11 @@ class _Library extends State<Library> {
                                     color: Colors.white,
                                     onPressed: () {
                                       if (resultOffset * 10 != 0) {
-                                        setState(() {
-                                          resultOffset--;
-                                        });
+                                        setState(
+                                          () {
+                                            resultOffset--;
+                                          },
+                                        );
                                       }
                                     },
                                     icon: Icon(
@@ -468,19 +461,20 @@ class _Library extends State<Library> {
                                     ),
                                   ),
                                   IconButton(
-                                      color: Colors.white,
-                                      onPressed: () {
-                                        print(followedManga.data!.total);
-                                        if (resultOffset * 10 <
-                                            (followedManga.data!.total ~/ 10)) {
-                                          setState(() {
-                                            resultOffset++;
-                                          });
-                                        }
-                                      },
-                                      icon: Icon(
-                                        Icons.arrow_forward,
-                                      ))
+                                    color: Colors.white,
+                                    onPressed: () {
+                                      print(followedManga.data!.total);
+                                      if (resultOffset * 10 <
+                                          (followedManga.data!.total ~/ 10)) {
+                                        setState(() {
+                                          resultOffset++;
+                                        });
+                                      }
+                                    },
+                                    icon: Icon(
+                                      Icons.arrow_forward,
+                                    ),
+                                  )
                                 ],
                               )
                             : null,

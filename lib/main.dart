@@ -26,6 +26,7 @@ class MainPage extends StatelessWidget {
                     primaryColor: Color.fromARGB(255, 255, 103, 64),
                     primarySwatch: createMaterialColor(Color(0xFFFF6740)))
                 : ThemeData.dark().copyWith(
+                    primaryColor: Color.fromARGB(255, 255, 103, 64),
                     progressIndicatorTheme: ProgressIndicatorThemeData(
                       color: Color.fromARGB(255, 255, 103, 64),
                     ),

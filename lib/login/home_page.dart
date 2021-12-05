@@ -97,6 +97,64 @@ class _HomePageState extends State<HomePage> {
                                             onChanged: (value) {
                                               password = value;
                                             },
+                                            onSubmitted: (value) async {
+                                              if (animation.loginButtonOpacity
+                                                  .isCompleted) {
+                                                if (password == '' &&
+                                                        username == '' ||
+                                                    password == '' ||
+                                                    username == '') {
+                                                  setState(() {
+                                                    loginText =
+                                                        'username or password empty';
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    animation.controller
+                                                        .reverse();
+                                                  });
+                                                  try {
+                                                    var loginData =
+                                                        await lib.login(
+                                                            username, password);
+                                                    if (loginData!.result ==
+                                                        'ok') {
+                                                      animation.controller
+                                                          .reverse()
+                                                          .whenComplete(() => {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            Library(
+                                                                      token: loginData
+                                                                          .token,
+                                                                      dataSaver:
+                                                                          true,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              });
+                                                    } else {
+                                                      setState(() {
+                                                        animation.controller
+                                                            .forward();
+                                                        loginText =
+                                                            'Username or Password incorrect.';
+                                                      });
+                                                    }
+                                                  } catch (e) {
+                                                    setState(() {
+                                                      loginText =
+                                                          "Something went wrong while connecting :(";
+                                                      animation.controller
+                                                          .forward();
+                                                    });
+                                                  }
+                                                }
+                                              }
+                                            },
                                           ),
                                         ),
                                         Opacity(

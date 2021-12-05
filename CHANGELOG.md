@@ -61,3 +61,5 @@
 
 ## 0.1.2
  - added a color filter option to the manga reader for adjusting the brightness of the pages.
+ - added an option to filter manga based on reading status in the library.
+ - fixed a bug where the chapter changed but the manga page didn't.
