@@ -34,7 +34,7 @@ class _AboutFludexState extends State<AboutFludex> {
                       'A very basic manga reader',
                     ),
                     Text(
-                      'Version: 0.1.2',
+                      'Version: 0.1.3',
                     ),
                     Text(
                       'Powered by Mangadex',

@@ -9,7 +9,6 @@ import 'package:fludex/utils.dart';
 import 'package:fludex/login/home_page_animator.dart';
 
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/models/common/allMangaReadingStatus.dart';
 import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/login/Login.dart';
 import 'package:mangadex_library/models/user/logged_user_details/logged_user_details.dart';
@@ -26,6 +25,7 @@ class Library extends StatefulWidget {
 
 class _Library extends State<Library> {
   late Token token;
+  int gridCount = 2;
   int resultOffset = 0;
   List<String> dropDownMenuItems = [
     'All',
@@ -349,7 +349,7 @@ class _Library extends State<Library> {
                                   allMangaStatus) {
                             if (allMangaStatus.connectionState ==
                                 ConnectionState.done) {
-                              return allMangaStatus.data == null
+                              return allMangaStatus.data!.length == 0
                                   ? Center(
                                       child: Text(
                                         "Nothing found >:3",
@@ -357,64 +357,88 @@ class _Library extends State<Library> {
                                       ),
                                     )
                                   : SingleChildScrollView(
-                                      child: Container(
-                                        child: GridView.builder(
-                                          shrinkWrap: true,
-                                          gridDelegate:
-                                              SliverGridDelegateWithFixedCrossAxisCount(
-                                            mainAxisExtent: 300,
-                                            crossAxisCount: 2,
+                                      child: LayoutBuilder(
+                                          builder: (context, constraints) {
+                                        return Container(
+                                          child: GridView.builder(
+                                            padding: EdgeInsets.zero,
+                                            shrinkWrap: true,
+                                            gridDelegate:
+                                                SliverGridDelegateWithFixedCrossAxisCount(
+                                              mainAxisExtent: 300,
+                                              crossAxisCount:
+                                                  (constraints.maxWidth < 908)
+                                                      ? 4
+                                                      : 2,
+                                            ),
+                                            itemCount:
+                                                allMangaStatus.data!.length,
+                                            itemBuilder:
+                                                (BuildContext context, index) {
+                                              tags = [];
+                                              for (int i = 0;
+                                                  i <
+                                                      allMangaStatus
+                                                          .data![index]
+                                                          .attributes
+                                                          .tags
+                                                          .length;
+                                                  i++) {
+                                                tags.add(allMangaStatus
+                                                    .data![index]
+                                                    .attributes
+                                                    .tags[i]
+                                                    .attributes
+                                                    .name
+                                                    .en);
+                                              }
+                                              return SearchResultHolder(
+                                                token: token.session,
+                                                description: allMangaStatus
+                                                    .data![index]
+                                                    .attributes
+                                                    .description
+                                                    .en,
+                                                title: allMangaStatus
+                                                    .data![index]
+                                                    .attributes
+                                                    .title
+                                                    .en,
+                                                mangaId: allMangaStatus
+                                                    .data![index].id,
+                                                baseUrl:
+                                                    'https://uploads.mangadex.org',
+                                                status: allMangaStatus
+                                                    .data![index]
+                                                    .attributes
+                                                    .status,
+                                                tags: tags,
+                                                demographic: allMangaStatus
+                                                    .data![index]
+                                                    .attributes
+                                                    .publicationDemographic,
+                                                rating: allMangaStatus
+                                                    .data![index]
+                                                    .attributes
+                                                    .contentRating,
+                                                dataSaver: widget.dataSaver,
+                                              );
+                                            },
                                           ),
-                                          itemCount:
-                                              allMangaStatus.data!.length,
-                                          itemBuilder:
-                                              (BuildContext context, index) {
-                                            tags = [];
-                                            for (int i = 0;
-                                                i <
-                                                    allMangaStatus.data![index]
-                                                        .attributes.tags.length;
-                                                i++) {
-                                              tags.add(allMangaStatus
-                                                  .data![index]
-                                                  .attributes
-                                                  .tags[i]
-                                                  .attributes
-                                                  .name
-                                                  .en);
-                                            }
-                                            return SearchResultHolder(
-                                              token: token.session,
-                                              description: allMangaStatus
-                                                  .data![index]
-                                                  .attributes
-                                                  .description
-                                                  .en,
-                                              title: allMangaStatus.data![index]
-                                                  .attributes.title.en,
-                                              mangaId: allMangaStatus
-                                                  .data![index].id,
-                                              baseUrl:
-                                                  'https://uploads.mangadex.org',
-                                              status: allMangaStatus
-                                                  .data![index]
-                                                  .attributes
-                                                  .status,
-                                              tags: tags,
-                                              demographic: allMangaStatus
-                                                  .data![index]
-                                                  .attributes
-                                                  .publicationDemographic,
-                                              rating: allMangaStatus
-                                                  .data![index]
-                                                  .attributes
-                                                  .contentRating,
-                                              dataSaver: widget.dataSaver,
-                                            );
-                                          },
-                                        ),
-                                      ),
+                                        );
+                                      }),
                                     );
+                            } else if (allMangaStatus.hasError) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 100),
+                                  child: Container(
+                                    child: LinearProgressIndicator(),
+                                    height: 30,
+                                    width: 500,
+                                  ),
+                                ),
+                              );
                             } else {
                               return Center(
                                 child: Padding(

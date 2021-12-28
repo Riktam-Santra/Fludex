@@ -165,439 +165,572 @@ class _AboutMangaState extends State<AboutManga> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : FutureBuilder(
-              future: _getMangaData(mangaId),
-              builder: (context, AsyncSnapshot<SingleMangaData> mangaData) {
-                if (mangaData.connectionState == ConnectionState.done) {
-                  return SingleChildScrollView(
-                    child: FutureBuilder(
-                      future: _getCoverData(mangaId),
-                      builder: (context, AsyncSnapshot<String> data) {
-                        if (data.connectionState == ConnectionState.done) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  data.data!,
+          : LayoutBuilder(builder: (context, constraints) {
+              return FutureBuilder(
+                future: _getMangaData(mangaId),
+                builder: (context, AsyncSnapshot<SingleMangaData> mangaData) {
+                  if (mangaData.connectionState == ConnectionState.done) {
+                    return SingleChildScrollView(
+                      child: FutureBuilder(
+                        future: _getCoverData(mangaId),
+                        builder: (context, AsyncSnapshot<String> data) {
+                          if (data.connectionState == ConnectionState.done) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    data.data!,
+                                  ),
+                                  fit: BoxFit.cover,
+                                  colorFilter: widget.lightMode
+                                      ? null
+                                      : ColorFilter.mode(
+                                          Color.fromARGB(125, 18, 18, 18),
+                                          BlendMode.darken),
                                 ),
-                                fit: BoxFit.cover,
-                                colorFilter: widget.lightMode
-                                    ? null
-                                    : ColorFilter.mode(
-                                        Color.fromARGB(125, 18, 18, 18),
-                                        BlendMode.darken),
                               ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(40.0),
-                              child: Card(
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            child: FutureBuilder(
-                                              future: _getCoverData(mangaId),
-                                              builder: (context,
-                                                  AsyncSnapshot<String> cover) {
-                                                if (cover.connectionState ==
-                                                    ConnectionState.done) {
-                                                  return SizedBox(
-                                                    height: 500,
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: cover.data!,
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                                  );
-                                                } else {
-                                                  return Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10.0),
-                                                    child: SizedBox(
+                              child: Padding(
+                                padding: const EdgeInsets.all(40.0),
+                                child: Card(
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              child: FutureBuilder(
+                                                future: _getCoverData(mangaId),
+                                                builder: (context,
+                                                    AsyncSnapshot<String>
+                                                        cover) {
+                                                  if (cover.connectionState ==
+                                                      ConnectionState.done) {
+                                                    return SizedBox(
                                                       height: 500,
-                                                      width: 400,
-                                                      child: Center(
-                                                          child:
-                                                              CircularProgressIndicator()),
-                                                    ),
-                                                  );
-                                                }
-                                              },
+                                                      child: CachedNetworkImage(
+                                                        imageUrl: cover.data!,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10.0),
+                                                      child: SizedBox(
+                                                        height: 500,
+                                                        width: 400,
+                                                        child: Center(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                          Container(
-                                            child: Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                      mangaData.data!.data
-                                                          .attributes.title.en,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                          fontSize: 30),
+                                            Container(
+                                              child: Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Text(
+                                                        mangaData
+                                                            .data!
+                                                            .data
+                                                            .attributes
+                                                            .title
+                                                            .en,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                            fontSize: 30),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(8),
-                                                    child:
-                                                        SingleChildScrollView(
-                                                      scrollDirection:
-                                                          Axis.horizontal,
-                                                      child: Row(
-                                                        children: tagWidgets(
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      child:
+                                                          SingleChildScrollView(
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        child: Row(
+                                                          children: tagWidgets(
+                                                              mangaData
+                                                                  .data!
+                                                                  .data
+                                                                  .attributes
+                                                                  .tags,
+                                                              appLightMode),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      child:
+                                                          SingleChildScrollView(
+                                                        controller:
+                                                            ScrollController(),
+                                                        child: Container(
+                                                          height: 200,
+                                                          child: Text(
                                                             mangaData
                                                                 .data!
                                                                 .data
                                                                 .attributes
-                                                                .tags,
-                                                            appLightMode),
+                                                                .description
+                                                                .en,
+                                                            style: TextStyle(),
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(8),
-                                                    child: Text(
-                                                      mangaData
-                                                          .data!
-                                                          .data
-                                                          .attributes
-                                                          .description
-                                                          .en,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      maxLines: 10,
-                                                      style: TextStyle(),
+                                                    Row(
+                                                      children: [
+                                                        FludexUtils
+                                                            .ratingContainer(
+                                                                mangaData
+                                                                    .data!
+                                                                    .data
+                                                                    .attributes
+                                                                    .contentRating,
+                                                                appLightMode),
+                                                        FludexUtils
+                                                            .statusContainer(
+                                                                mangaData
+                                                                    .data!
+                                                                    .data
+                                                                    .attributes
+                                                                    .status,
+                                                                appLightMode),
+                                                        FludexUtils
+                                                            .demographicContainer(
+                                                                mangaData
+                                                                    .data!
+                                                                    .data
+                                                                    .attributes
+                                                                    .publicationDemographic,
+                                                                appLightMode),
+                                                      ],
                                                     ),
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      FludexUtils
-                                                          .ratingContainer(
-                                                              mangaData
-                                                                  .data!
-                                                                  .data
-                                                                  .attributes
-                                                                  .contentRating,
-                                                              appLightMode),
-                                                      FludexUtils
-                                                          .statusContainer(
-                                                              mangaData
-                                                                  .data!
-                                                                  .data
-                                                                  .attributes
-                                                                  .status,
-                                                              appLightMode),
-                                                      FludexUtils
-                                                          .demographicContainer(
-                                                              mangaData
-                                                                  .data!
-                                                                  .data
-                                                                  .attributes
-                                                                  .publicationDemographic,
-                                                              appLightMode),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 40,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(8),
-                                                    child: Text(
-                                                      'Year of Release: ' +
-                                                          getYear(mangaData
-                                                              .data!
-                                                              .data
-                                                              .attributes
-                                                              .year),
+                                                    SizedBox(
+                                                      height: 40,
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(8),
-                                                    child: Text(
-                                                      'No. of Chapters: ${widget.totalChapters}',
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      child: Text(
+                                                        'Year of Release: ' +
+                                                            getYear(mangaData
+                                                                .data!
+                                                                .data
+                                                                .attributes
+                                                                .year),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 30,
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 20),
-                                                    child: FutureBuilder(
-                                                      future: _mangaFollowCheck(
-                                                          token, mangaId),
-                                                      builder: (context,
-                                                          AsyncSnapshot<bool>
-                                                              data) {
-                                                        if (data.connectionState ==
-                                                            ConnectionState
-                                                                .done) {
-                                                          print(data.data!);
-                                                          if (data.data! ==
-                                                              true) {
-                                                            return ElevatedButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                await _unFollowManga(
-                                                                    token,
-                                                                    mangaId);
-                                                                print(
-                                                                    'Unfollowed manga $mangaId');
-                                                                setState(() {
-                                                                  isFollowed =
-                                                                      false;
-                                                                });
-                                                              },
-                                                              child: Container(
-                                                                width: 222,
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      'Added to library!',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              25),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      width: 10,
-                                                                    ),
-                                                                    Icon(Icons
-                                                                        .favorite),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            );
-                                                          } else {
-                                                            return ElevatedButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                await _followManga(
-                                                                    token,
-                                                                    mangaId);
-                                                                print(
-                                                                    'Followed manga $mangaId');
-                                                                setState(() {
-                                                                  isFollowed =
-                                                                      true;
-                                                                });
-                                                              },
-                                                              child: Container(
-                                                                width: 222,
-                                                                child: Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child:
-                                                                          Text(
-                                                                        'Add to library!',
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      child: Text(
+                                                        'No. of Chapters: ${widget.totalChapters}',
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 30,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 20),
+                                                      child: FutureBuilder(
+                                                        future:
+                                                            _mangaFollowCheck(
+                                                                token, mangaId),
+                                                        builder: (context,
+                                                            AsyncSnapshot<bool>
+                                                                data) {
+                                                          if (data.connectionState ==
+                                                              ConnectionState
+                                                                  .done) {
+                                                            print(data.data!);
+                                                            if (data.data! ==
+                                                                true) {
+                                                              return ElevatedButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  await _unFollowManga(
+                                                                      token,
+                                                                      mangaId);
+                                                                  print(
+                                                                      'Unfollowed manga $mangaId');
+                                                                  setState(() {
+                                                                    isFollowed =
+                                                                        false;
+                                                                  });
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  width: 222,
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        'Added to library!',
                                                                         style: TextStyle(
                                                                             fontSize:
                                                                                 25),
                                                                       ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      width: 10,
-                                                                    ),
-                                                                    Icon(Icons
-                                                                        .favorite),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            );
-                                                          }
-                                                        } else {
-                                                          return Center(
-                                                            child:
-                                                                CircularProgressIndicator(),
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 40),
-                                      child: Container(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
-                                                'Chapters',
-                                                style: TextStyle(fontSize: 30),
-                                              ),
-                                            ),
-                                            Container(
-                                              child: FutureBuilder(
-                                                future: _getChapterData(mangaId,
-                                                    offset: _chapterPageOffset *
-                                                        10),
-                                                builder: (BuildContext context,
-                                                    AsyncSnapshot<
-                                                            ch.ChapterData?>
-                                                        chapterData) {
-                                                  if (chapterData
-                                                          .connectionState ==
-                                                      ConnectionState.done) {
-                                                    print(chapterData
-                                                        .data!.total);
-
-                                                    print(chapterData
-                                                        .data!.offset);
-                                                    return Column(
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Row(
-                                                            children: [
-                                                              Text(
-                                                                'Quick open chapter: ',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        17),
-                                                              ),
-                                                              SizedBox(
-                                                                  child:
-                                                                      TextField(
-                                                                    style:
-                                                                        TextStyle(),
-                                                                    inputFormatters: [
-                                                                      FilteringTextInputFormatter
-                                                                          .digitsOnly
+                                                                      SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Icon(Icons
+                                                                          .favorite),
                                                                     ],
-                                                                    onChanged:
-                                                                        (value) {
-                                                                      _desiredInputChapterNumber =
-                                                                          int.parse(
-                                                                              value);
-                                                                    },
                                                                   ),
-                                                                  width: 50),
-                                                              Text(
-                                                                ' / ${widget.totalChapters.toString()}',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 17,
                                                                 ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 30,
-                                                              ),
-                                                              ElevatedButton(
-                                                                onPressed: () {
+                                                              );
+                                                            } else {
+                                                              return ElevatedButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  await _followManga(
+                                                                      token,
+                                                                      mangaId);
+                                                                  print(
+                                                                      'Followed manga $mangaId');
                                                                   setState(() {
-                                                                    hasPressed =
+                                                                    isFollowed =
                                                                         true;
                                                                   });
-                                                                  if (_desiredInputChapterNumber <=
-                                                                          widget
-                                                                              .totalChapters ||
-                                                                      _desiredInputChapterNumber !=
-                                                                          0) {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                MangaReader(
-                                                                          mangaTitle: mangaData
-                                                                              .data!
-                                                                              .data
-                                                                              .attributes
-                                                                              .title
-                                                                              .en,
-                                                                          token:
-                                                                              token,
-                                                                          mangaId:
-                                                                              mangaId,
-                                                                          chapterNumber:
-                                                                              _desiredInputChapterNumber,
-                                                                          dataSaver:
-                                                                              widget.dataSaver,
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  width: 222,
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          'Add to library!',
+                                                                          style:
+                                                                              TextStyle(fontSize: 25),
                                                                         ),
                                                                       ),
-                                                                    );
+                                                                      SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Icon(Icons
+                                                                          .favorite),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }
+                                                          } else {
+                                                            return Center(
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            );
+                                                          }
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 40),
+                                        child: Container(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  'Chapters',
+                                                  style:
+                                                      TextStyle(fontSize: 30),
+                                                ),
+                                              ),
+                                              Container(
+                                                child: FutureBuilder(
+                                                  future: _getChapterData(
+                                                      mangaId,
+                                                      offset:
+                                                          _chapterPageOffset *
+                                                              10),
+                                                  builder: (BuildContext
+                                                          context,
+                                                      AsyncSnapshot<
+                                                              ch.ChapterData?>
+                                                          chapterData) {
+                                                    if (chapterData
+                                                            .connectionState ==
+                                                        ConnectionState.done) {
+                                                      print(chapterData
+                                                          .data!.total);
+
+                                                      print(chapterData
+                                                          .data!.offset);
+                                                      return Column(
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10.0),
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                  'Quick open chapter: ',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          17),
+                                                                ),
+                                                                SizedBox(
+                                                                    child:
+                                                                        TextField(
+                                                                      style:
+                                                                          TextStyle(),
+                                                                      inputFormatters: [
+                                                                        FilteringTextInputFormatter
+                                                                            .digitsOnly
+                                                                      ],
+                                                                      onChanged:
+                                                                          (value) {
+                                                                        _desiredInputChapterNumber =
+                                                                            int.parse(value);
+                                                                      },
+                                                                    ),
+                                                                    width: 50),
+                                                                Text(
+                                                                  ' / ${widget.totalChapters.toString()}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        17,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 30,
+                                                                ),
+                                                                ElevatedButton(
+                                                                  onPressed:
+                                                                      () {
                                                                     setState(
                                                                         () {
                                                                       hasPressed =
-                                                                          false;
+                                                                          true;
                                                                     });
-                                                                  }
-                                                                },
-                                                                child: Row(
-                                                                  children: [
-                                                                    SizedBox(
-                                                                      width: 10,
-                                                                    ),
-                                                                    Text(
-                                                                        'Open Chapter'),
-                                                                    SizedBox(
-                                                                      width: 10,
-                                                                    ),
-                                                                  ],
+                                                                    if (_desiredInputChapterNumber <=
+                                                                            widget
+                                                                                .totalChapters ||
+                                                                        _desiredInputChapterNumber !=
+                                                                            0) {
+                                                                      Navigator
+                                                                          .push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              MangaReader(
+                                                                            mangaTitle:
+                                                                                mangaData.data!.data.attributes.title.en,
+                                                                            token:
+                                                                                token,
+                                                                            mangaId:
+                                                                                mangaId,
+                                                                            chapterNumber:
+                                                                                _desiredInputChapterNumber,
+                                                                            dataSaver:
+                                                                                widget.dataSaver,
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                      setState(
+                                                                          () {
+                                                                        hasPressed =
+                                                                            false;
+                                                                      });
+                                                                    }
+                                                                  },
+                                                                  child: Row(
+                                                                    children: [
+                                                                      SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Text(
+                                                                          'Open Chapter'),
+                                                                      SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                    ],
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            ],
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                        ListView.builder(
-                                                            shrinkWrap: true,
-                                                            itemCount:
-                                                                chapterData
-                                                                    .data!
-                                                                    .data
-                                                                    .length,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return FutureBuilder(
-                                                                  future:
-                                                                      _readChapters,
-                                                                  builder: (context,
-                                                                      AsyncSnapshot<
-                                                                              ReadChapters?>
-                                                                          readChapters) {
-                                                                    if (readChapters
-                                                                            .connectionState ==
-                                                                        ConnectionState
-                                                                            .done) {
-                                                                      for (var element in readChapters
-                                                                          .data!
-                                                                          .data) {
-                                                                        print(
-                                                                            element);
-                                                                      }
+                                                          ListView.builder(
+                                                              shrinkWrap: true,
+                                                              itemCount:
+                                                                  chapterData
+                                                                      .data!
+                                                                      .data
+                                                                      .length,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return FutureBuilder(
+                                                                    future: getAllReadChapters(
+                                                                        token,
+                                                                        mangaId),
+                                                                    builder: (context,
+                                                                        AsyncSnapshot<ReadChapters?>
+                                                                            readChapters) {
                                                                       if (readChapters
+                                                                              .connectionState ==
+                                                                          ConnectionState
+                                                                              .done) {
+                                                                        for (var element in readChapters
+                                                                            .data!
+                                                                            .data) {
+                                                                          print(
+                                                                              element);
+                                                                        }
+                                                                        if (readChapters.data ==
+                                                                            null) {
+                                                                          return Center(
+                                                                            child:
+                                                                                CircularProgressIndicator(),
+                                                                          );
+                                                                        } else {
+                                                                          readChapters
+                                                                              .data!
+                                                                              .data
+                                                                              .forEach((e) {
+                                                                            print(e);
+                                                                          });
+                                                                          return Opacity(
+                                                                            opacity: (readChapters.data == null)
+                                                                                ? 1
+                                                                                : (readChapters.data!.data.contains(chapterData.data!.data[index].id) ? 0.5 : 1.0),
+                                                                            child:
+                                                                                Padding(
+                                                                              padding: const EdgeInsets.only(left: 8, right: 8),
+                                                                              child: ListTile(
+                                                                                title: Text(
+                                                                                  'Chapter ' + chapterData.data!.data[index].attributes.chapter,
+                                                                                  style: TextStyle(fontSize: 17),
+                                                                                ),
+                                                                                subtitle: Padding(
+                                                                                  padding: const EdgeInsets.all(8.0),
+                                                                                  child: Row(
+                                                                                    children: [
+                                                                                      Text(
+                                                                                        'Volume ' + chapterData.data!.data[index].attributes.volume,
+                                                                                        style: TextStyle(),
+                                                                                      ),
+                                                                                      SizedBox(
+                                                                                        width: 10,
+                                                                                      ),
+                                                                                      Text(
+                                                                                        'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
+                                                                                      )
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                                trailing: PopupMenuButton<int>(
+                                                                                  itemBuilder: (context) => [
+                                                                                    (readChapters.data == null)
+                                                                                        ? PopupMenuItem(
+                                                                                            child: ListTile(
+                                                                                              leading: Icon(Icons.check_outlined),
+                                                                                              title: Text("Mark as read"),
+                                                                                            ),
+                                                                                            onTap: () async {
+                                                                                              await markChapterRead(token, chapterData.data!.data[index].id);
+                                                                                            },
+                                                                                          )
+                                                                                        : readChapters.data!.data.contains(chapterData.data!.data[index].id)
+                                                                                            ? PopupMenuItem(
+                                                                                                child: ListTile(
+                                                                                                  leading: Icon(Icons.check),
+                                                                                                  title: Text("Mark as unread"),
+                                                                                                ),
+                                                                                                onTap: () async {
+                                                                                                  var result = await markChapterUnread(token, chapterData.data!.data[index].id);
+                                                                                                  setState(() {});
+                                                                                                  if (result.result == 'ok') {
+                                                                                                    print('Marked ${chapterData.data!.data[index].id}');
+                                                                                                  } else {
+                                                                                                    print('Something went wrong while marking ${chapterData.data!.data[index].id} as unread');
+                                                                                                  }
+                                                                                                },
+                                                                                              )
+                                                                                            : PopupMenuItem(
+                                                                                                child: ListTile(
+                                                                                                  leading: Icon(Icons.check_outlined),
+                                                                                                  title: Text("Mark as read"),
+                                                                                                ),
+                                                                                                onTap: () async {
+                                                                                                  var result = await markChapterRead(token, chapterData.data!.data[index].id);
+                                                                                                  setState(() {});
+                                                                                                  if (result.result == 'ok') {
+                                                                                                    print('Marked ${chapterData.data!.data[index].id}');
+                                                                                                  } else {
+                                                                                                    print('Something went wrong while marking ${chapterData.data!.data[index].id} as read');
+                                                                                                  }
+                                                                                                },
+                                                                                              ),
+                                                                                  ],
+                                                                                ),
+                                                                                onTap: () {
+                                                                                  setState(() {
+                                                                                    hasPressed = true;
+                                                                                  });
+                                                                                  Navigator.push(
+                                                                                    context,
+                                                                                    MaterialPageRoute(
+                                                                                      builder: (context) => MangaReader(
+                                                                                        mangaTitle: mangaData.data!.data.attributes.title.en,
+                                                                                        token: token,
+                                                                                        mangaId: mangaId,
+                                                                                        chapterNumber: ((_chapterPageOffset) * 10) + index + 1,
+                                                                                        dataSaver: widget.dataSaver,
+                                                                                      ),
+                                                                                    ),
+                                                                                  );
+                                                                                  setState(() {
+                                                                                    hasPressed = false;
+                                                                                  });
+                                                                                },
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        }
+                                                                      } else if (readChapters
                                                                               .data ==
                                                                           null) {
                                                                         return Center(
@@ -605,249 +738,143 @@ class _AboutMangaState extends State<AboutManga> {
                                                                               CircularProgressIndicator(),
                                                                         );
                                                                       } else {
-                                                                        return Opacity(
-                                                                          opacity: (readChapters.data == null)
-                                                                              ? 1
-                                                                              : (readChapters.data!.data.contains(chapterData.data!.data[index].id) ? 0.5 : 1.0),
+                                                                        return Center(
                                                                           child:
-                                                                              Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(left: 8, right: 8),
-                                                                            child:
-                                                                                ListTile(
-                                                                              title: Text(
-                                                                                'Chapter ' + chapterData.data!.data[index].attributes.chapter,
-                                                                                style: TextStyle(fontSize: 17),
-                                                                              ),
-                                                                              subtitle: Padding(
-                                                                                padding: const EdgeInsets.all(8.0),
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    Text(
-                                                                                      'Volume ' + chapterData.data!.data[index].attributes.volume,
-                                                                                      style: TextStyle(),
-                                                                                    ),
-                                                                                    SizedBox(
-                                                                                      width: 10,
-                                                                                    ),
-                                                                                    Text(
-                                                                                      'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
-                                                                                    )
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              trailing: PopupMenuButton<int>(
-                                                                                itemBuilder: (context) => [
-                                                                                  (readChapters.data == null)
-                                                                                      ? PopupMenuItem(
-                                                                                          child: ListTile(
-                                                                                            leading: Icon(Icons.check_outlined),
-                                                                                            title: Text("Mark as read"),
-                                                                                          ),
-                                                                                          onTap: () async {
-                                                                                            await markChapterRead(token, chapterData.data!.data[index].id);
-                                                                                          },
-                                                                                        )
-                                                                                      : readChapters.data!.data.contains(chapterData.data!.data[index].id)
-                                                                                          ? PopupMenuItem(
-                                                                                              child: ListTile(
-                                                                                                leading: Icon(Icons.check),
-                                                                                                title: Text("Mark as unread"),
-                                                                                              ),
-                                                                                              onTap: () async {
-                                                                                                var result = await markChapterUnread(token, chapterData.data!.data[index].id);
-                                                                                                setState(() {});
-                                                                                                if (result.result == 'ok') {
-                                                                                                  print('Marked ${chapterData.data!.data[index].id}');
-                                                                                                } else {
-                                                                                                  print('Something went wrong while marking ${chapterData.data!.data[index].id} as unread');
-                                                                                                }
-                                                                                              },
-                                                                                            )
-                                                                                          : PopupMenuItem(
-                                                                                              child: ListTile(
-                                                                                                leading: Icon(Icons.check_outlined),
-                                                                                                title: Text("Mark as read"),
-                                                                                              ),
-                                                                                              onTap: () async {
-                                                                                                var result = await markChapterRead(token, chapterData.data!.data[index].id);
-                                                                                                setState(() {});
-                                                                                                if (result.result == 'ok') {
-                                                                                                  print('Marked ${chapterData.data!.data[index].id}');
-                                                                                                } else {
-                                                                                                  print('Something went wrong while marking ${chapterData.data!.data[index].id} as read');
-                                                                                                }
-                                                                                              },
-                                                                                            ),
-                                                                                ],
-                                                                              ),
-                                                                              onTap: () {
-                                                                                setState(() {
-                                                                                  hasPressed = true;
-                                                                                });
-                                                                                Navigator.push(
-                                                                                  context,
-                                                                                  MaterialPageRoute(
-                                                                                    builder: (context) => MangaReader(
-                                                                                      mangaTitle: mangaData.data!.data.attributes.title.en,
-                                                                                      token: token,
-                                                                                      mangaId: mangaId,
-                                                                                      chapterNumber: ((_chapterPageOffset) * 10) + index + 1,
-                                                                                      dataSaver: widget.dataSaver,
-                                                                                    ),
-                                                                                  ),
-                                                                                );
-                                                                                setState(() {
-                                                                                  hasPressed = false;
-                                                                                });
-                                                                              },
-                                                                            ),
-                                                                          ),
+                                                                              CircularProgressIndicator(),
                                                                         );
                                                                       }
-                                                                    } else if (readChapters
-                                                                            .data ==
-                                                                        null) {
-                                                                      return Center(
-                                                                        child:
-                                                                            CircularProgressIndicator(),
-                                                                      );
-                                                                    } else {
-                                                                      return Center(
-                                                                        child:
-                                                                            CircularProgressIndicator(),
-                                                                      );
-                                                                    }
-                                                                  });
-                                                            }),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            IconButton(
-                                                              onPressed: () {
-                                                                if (_chapterPageOffset *
-                                                                        10 !=
-                                                                    0) {
-                                                                  setState(() {
-                                                                    _chapterPageOffset--;
-                                                                  });
-                                                                }
-                                                              },
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .arrow_back,
+                                                                    });
+                                                              }),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              IconButton(
+                                                                onPressed: () {
+                                                                  if (_chapterPageOffset *
+                                                                          10 !=
+                                                                      0) {
+                                                                    setState(
+                                                                        () {
+                                                                      _chapterPageOffset--;
+                                                                    });
+                                                                  }
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .arrow_back,
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8),
-                                                              child: Text(
-                                                                '${_chapterPageOffset + 1}',
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(8),
+                                                                child: Text(
+                                                                  '${_chapterPageOffset + 1}',
+                                                                ),
                                                               ),
-                                                            ),
-                                                            IconButton(
-                                                              onPressed: () {
-                                                                print(
-                                                                    chapterData
-                                                                        .data!
-                                                                        .total);
-                                                                if (_chapterPageOffset *
-                                                                        10 <
-                                                                    chapterData
-                                                                        .data!
-                                                                        .total) {
-                                                                  setState(() {
-                                                                    _chapterPageOffset++;
-                                                                  });
-                                                                }
-                                                              },
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .arrow_forward,
-                                                              ),
-                                                            )
-                                                          ],
-                                                        )
-                                                      ],
-                                                    );
-                                                  } else if (chapterData
-                                                      .hasError) {
-                                                    return Center(
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                            child: Text(
-                                                              'Something went wrong :(',
-                                                            ),
-                                                          ),
-                                                          Expanded(
-                                                            child: Text(
-                                                              'Please make sure you are connected to the internet and the internet is working properly',
-                                                            ),
-                                                          ),
+                                                              IconButton(
+                                                                onPressed: () {
+                                                                  print(chapterData
+                                                                      .data!
+                                                                      .total);
+                                                                  if (_chapterPageOffset *
+                                                                          10 <
+                                                                      chapterData
+                                                                          .data!
+                                                                          .total) {
+                                                                    setState(
+                                                                        () {
+                                                                      _chapterPageOffset++;
+                                                                    });
+                                                                  }
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .arrow_forward,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          )
                                                         ],
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    return Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Center(
-                                                        child: SizedBox(
-                                                          height: 100,
-                                                          width: 100,
-                                                          child:
-                                                              CircularProgressIndicator(),
+                                                      );
+                                                    } else if (chapterData
+                                                        .hasError) {
+                                                      return Center(
+                                                        child: Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: Text(
+                                                                'Something went wrong :(',
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child: Text(
+                                                                'Please make sure you are connected to the internet and the internet is working properly',
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                      ),
-                                                    );
-                                                  }
-                                                },
+                                                      );
+                                                    } else {
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: Center(
+                                                          child: SizedBox(
+                                                            height: 100,
+                                                            width: 100,
+                                                            child:
+                                                                CircularProgressIndicator(),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        } else if (data.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          return Center(
-                            child: Text(
-                              'Something went wrong :\'(',
-                              style: TextStyle(fontSize: 17),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  );
-                } else {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: CircularProgressIndicator(),
+                            );
+                          } else if (data.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            return Center(
+                              child: Text(
+                                'Something went wrong :\'(',
+                                style: TextStyle(fontSize: 17),
+                              ),
+                            );
+                          }
+                        },
                       ),
-                    ),
-                  );
-                }
-              },
-            ),
+                    );
+                  } else {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: SizedBox(
+                          height: 200,
+                          width: 200,
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    );
+                  }
+                },
+              );
+            }),
     );
   }
 }
