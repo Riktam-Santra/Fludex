@@ -5,7 +5,6 @@ import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/login/Login.dart' as l;
 import 'package:mangadex_library/mangadex_library.dart';
 import 'package:fludex/saveDataModels/loginData.dart';
-import 'package:mangadex_library/jsonSearchCommands.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -83,13 +82,13 @@ class FludexUtils {
       if (token.isEmpty) {
         print('THERE IS NO TOKEN!');
       }
-      var baseUrl = 'https://uploads.mangadex.org';
-      var filenames =
-          await JsonUtils.getChapterFilenames(await chapterId, isDataSaverMode);
       var urls = <String>[];
-      var chapterData =
-          await JsonUtils.getChapterDataByChapterId(await chapterId);
-      var chapterHash = chapterData.data.attributes.hash;
+      var chapterData = await getChapterDataByChapterId(await chapterId);
+      var baseUrl = chapterData.baseUrl;
+      var chapterHash = chapterData.chapter.hash;
+      var filenames = isDataSaverMode
+          ? chapterData.chapter.dataSaver
+          : chapterData.chapter.data;
 
       filenames.forEach(
         (v) {

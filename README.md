@@ -38,6 +38,8 @@ When reading the manga, click once on a page to go to the next page and click tw
 
 - The layout may seem buggy when resizing the app window at the about manga page of a manga.
 - The message 'Nothing found >:3' may occur on your library even if the library isn't empty, in that case please re-login to your account or restart the app.
+- The number of chapters are displayed incorrectly
+- The current chapter number shown by the manga reader is not always accurate
 
 ## Running the App
 

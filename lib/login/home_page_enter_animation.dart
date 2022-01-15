@@ -1,4 +1,3 @@
-import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 
 class HomePageEnterAnimation {

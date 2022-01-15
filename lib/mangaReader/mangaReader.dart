@@ -74,13 +74,6 @@ class _MangaReaderState extends State<MangaReader> {
                 },
               ),
               title: Text(widget.mangaTitle),
-              // actions: [
-              //   IconButton(
-              //     onPressed: () {},
-              //     icon: Icon(Icons.filter_b_and_w),
-              //     tooltip: "Visual Filters",
-              //   )
-              // ],
             ),
             body: Stack(children: [
               SingleChildScrollView(

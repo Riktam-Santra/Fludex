@@ -3,9 +3,9 @@ import 'package:fludex/mangaReader/aboutManga.dart';
 import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/models/cover/Cover.dart';
 
 class SearchResultHolder extends StatefulWidget {
+  final bool? gridView;
   final bool dataSaver;
   final String token;
   final String mangaId;
@@ -26,7 +26,8 @@ class SearchResultHolder extends StatefulWidget {
       required this.tags,
       required this.demographic,
       required this.rating,
-      required this.dataSaver});
+      required this.dataSaver,
+      this.gridView = false});
   _SearchResultHolder createState() => _SearchResultHolder();
 }
 
@@ -34,6 +35,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
   bool hasPressed = false;
   late bool lightMode;
   Widget build(BuildContext context) {
+    print(widget.gridView);
     lightMode = Theme.of(context).brightness == Brightness.light;
     return LayoutBuilder(builder: (context, constraints) {
       return FutureBuilder(
@@ -75,7 +77,10 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                     child: InkWell(
                       child: Card(
                         elevation: 1,
-                        child: (constraints.maxWidth < 427)
+                        child: (constraints.maxWidth < 427 &&
+                                    widget.gridView == true ||
+                                constraints.maxWidth < 427 ||
+                                widget.gridView == true)
                             ? Container(
                                 decoration: BoxDecoration(
                                   image: DecorationImage(

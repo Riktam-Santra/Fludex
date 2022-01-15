@@ -80,3 +80,15 @@
 - fixed a bug where user couldn't mark a chapter as read or unread.
 - fixed a bug where the library layout got disoriented on resizing window to small sizes.
 - going from one chapter to another while reading a manga now automatically marks the chapter as read.
+
+## 0.1.4
+
+- added option to change manga reading status for a manga.
+- added option to change translated language for a manga.
+- added option to change the tile view in the library.
+- added refresh button in the library to refresh library entries.
+
+- changed the padding for 'Add to library' button.
+- changed class name 'readManga.dart' to 'mangaReader.dart'.
+
+- removed 'background.dart' class.

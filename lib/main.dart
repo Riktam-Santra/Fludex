@@ -24,8 +24,16 @@ class MainPage extends StatelessWidget {
             theme: (lightMode.data ?? true)
                 ? ThemeData(
                     primaryColor: Color.fromARGB(255, 255, 103, 64),
-                    primarySwatch: createMaterialColor(Color(0xFFFF6740)))
+                    primarySwatch: createMaterialColor(
+                      Color(0xFFFF6740),
+                    ),
+                  )
                 : ThemeData.dark().copyWith(
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        primary: Color.fromARGB(255, 255, 103, 64),
+                      ),
+                    ),
                     primaryColor: Color.fromARGB(255, 255, 103, 64),
                     progressIndicatorTheme: ProgressIndicatorThemeData(
                       color: Color.fromARGB(255, 255, 103, 64),

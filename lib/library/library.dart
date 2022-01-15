@@ -7,7 +7,6 @@ import 'package:fludex/settings/settingsPage.dart';
 import 'package:fludex/search/searchResultHolder.dart';
 import 'package:fludex/utils.dart';
 import 'package:fludex/login/home_page_animator.dart';
-
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/login/Login.dart';
@@ -27,6 +26,7 @@ class _Library extends State<Library> {
   late Token token;
   int gridCount = 2;
   int resultOffset = 0;
+  bool gridView = false;
   List<String> dropDownMenuItems = [
     'All',
     'Reading',
@@ -83,10 +83,13 @@ class _Library extends State<Library> {
     }
   }
 
-  Future<List<mangadat.Data>> filterManga(String token) async {
+  Future<List<mangadat.Data>> filterManga(Token _token) async {
     List<mangadat.Data> mangaList = [];
-    var followedManga = await lib.getUserFollowedManga(token);
-    var mangaWithStatus = await lib.getAllUserMangaReadingStatus(token,
+    var _loginData = await lib.refresh(_token.refresh);
+    _token = _loginData.token;
+    token = _loginData.token;
+    var followedManga = await lib.getUserFollowedManga(_token.session);
+    var mangaWithStatus = await lib.getAllUserMangaReadingStatus(_token.session,
         readingStatus: checkReadingStatus(selectedValue));
     followedManga.data.forEach((element) {
       if (mangaWithStatus.statuses.containsKey(element.id)) {
@@ -114,7 +117,20 @@ class _Library extends State<Library> {
         ),
         actions: [
           IconButton(
-            tooltip: "Settings",
+            tooltip: 'Refresh library',
+            onPressed: () {
+              setState(() {});
+            },
+            icon: Icon(Icons.refresh),
+          ),
+          Divider(
+            thickness: 2,
+            height: 10,
+            color: Colors.white,
+            indent: 1,
+          ),
+          IconButton(
+            tooltip: 'Settings',
             onPressed: () async {
               var settings = await FludexUtils().getSettings();
               Navigator.push(
@@ -310,6 +326,14 @@ class _Library extends State<Library> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
+                            IconButton(
+                                tooltip: 'Change view',
+                                onPressed: () {
+                                  setState(() {
+                                    gridView = !gridView;
+                                  });
+                                },
+                                icon: Icon(Icons.grid_view)),
                             Container(
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 10),
@@ -343,7 +367,7 @@ class _Library extends State<Library> {
                       ),
                       Expanded(
                         child: FutureBuilder(
-                          future: filterManga(widget.token.session),
+                          future: filterManga(widget.token),
                           builder: (BuildContext context,
                               AsyncSnapshot<List<mangadat.Data>>
                                   allMangaStatus) {
@@ -366,10 +390,21 @@ class _Library extends State<Library> {
                                             gridDelegate:
                                                 SliverGridDelegateWithFixedCrossAxisCount(
                                               mainAxisExtent: 300,
-                                              crossAxisCount:
-                                                  (constraints.maxWidth < 908)
+                                              crossAxisCount: (constraints
+                                                          .maxWidth >
+                                                      908)
+                                                  ? ((gridView == false)
+                                                      ? 2
+                                                      : 8)
+                                                  : ((constraints.maxWidth <
+                                                                  908 &&
+                                                              gridView ==
+                                                                  true ||
+                                                          constraints.maxWidth <
+                                                              908 ||
+                                                          gridView == true)
                                                       ? 4
-                                                      : 2,
+                                                      : 2),
                                             ),
                                             itemCount:
                                                 allMangaStatus.data!.length,
@@ -393,6 +428,7 @@ class _Library extends State<Library> {
                                                     .en);
                                               }
                                               return SearchResultHolder(
+                                                gridView: gridView,
                                                 token: token.session,
                                                 description: allMangaStatus
                                                     .data![index]
