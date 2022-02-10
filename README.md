@@ -2,6 +2,10 @@
 
 A very basic manga reader made using flutter and mangadex API. It uses the [mangadex_library package](https://pub.dev/packages/mangadex_library).
 
+# RE-WRITE Under Progress
+
+I had started developing this app since the time I had just started learning flutter and I didn't know a thing about it but now things are different and so I have decided to re-write this app with a better project structure and a better UI. Of course I'm not abandoning this project or deleting the previous code, but yeah code will be idle for a while until a write a better version of it and upload the better version.
+
 ## A few things to remember
 
 - The app only supports windows at the moment. Android and other platforms can be compiled too, just remember that it's never tested on those devices so, it might become a nightmare when you look at it. Good luck to your eyes, honestly.
