@@ -7,8 +7,14 @@ void main() {
 }
 
 Future<bool> getLightModeSetting() async {
-  var settings = await FludexUtils().getSettings();
-  return settings.lightMode;
+  try {
+    var settings = await FludexUtils().getSettings();
+    return settings.lightMode;
+  } on Exception {
+    await FludexUtils().saveSettings(true, false);
+    var settings = await FludexUtils().getSettings();
+    return settings.lightMode;
+  }
 }
 
 class MainPage extends StatelessWidget {

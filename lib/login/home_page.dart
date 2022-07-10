@@ -2,6 +2,7 @@ import 'package:fludex/library/library.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'home_page_enter_animation.dart';
 
@@ -117,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                                                     var loginData =
                                                         await lib.login(
                                                             username, password);
-                                                    if (loginData!.result ==
+                                                    if (loginData.result ==
                                                         'ok') {
                                                       animation.controller
                                                           .reverse()
@@ -169,9 +170,10 @@ class _HomePageState extends State<HomePage> {
                                                     onPressed: () async {
                                                       const url =
                                                           'https://mangadex.org/account/signup';
-                                                      if (await canLaunch(
+                                                      if (await canLaunchUrlString(
                                                           url)) {
-                                                        await launch(url);
+                                                        await launchUrl(
+                                                            Uri.parse(url));
                                                       } else {
                                                         throw 'Could not launch $url';
                                                       }
@@ -213,7 +215,8 @@ class _HomePageState extends State<HomePage> {
                                                     child: Text(
                                                       "Login",
                                                       style: TextStyle(
-                                                          fontSize: 30),
+                                                        fontSize: 24,
+                                                      ),
                                                     ),
                                                   ),
                                                   onPressed: animation
@@ -240,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                                                                   await lib.login(
                                                                       username,
                                                                       password);
-                                                              if (loginData!
+                                                              if (loginData
                                                                       .result ==
                                                                   'ok') {
                                                                 animation

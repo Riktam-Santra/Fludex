@@ -50,7 +50,7 @@ class FludexUtils {
     await file.writeAsString('');
   }
 
-  void saveSettings(bool lightMode, bool dataSaver) async {
+  Future<void> saveSettings(bool lightMode, bool dataSaver) async {
     var user = Settings(lightMode: lightMode, dataSaver: dataSaver);
     var encodedJson = jsonEncode(user);
     var file = File('data/appData/settings.json');
@@ -74,38 +74,28 @@ class FludexUtils {
     return dataResponse;
   }
 
-  Future<List<String>?> getAllFilePaths(String globalToken,
-      Future<String> chapterId, String mangaId, bool isDataSaverMode) async {
-    var chapter = await getChapters(mangaId);
-    if (chapter != null) {
-      var token = globalToken;
-      if (token.isEmpty) {
-        print('THERE IS NO TOKEN!');
-      }
-      var urls = <String>[];
-      var chapterData = await getChapterDataByChapterId(await chapterId);
-      var baseUrl = chapterData.baseUrl;
-      var chapterHash = chapterData.chapter.hash;
-      var filenames = isDataSaverMode
-          ? chapterData.chapter.dataSaver
-          : chapterData.chapter.data;
-
-      filenames.forEach(
-        (v) {
-          isDataSaverMode
-              ? urls.add('$baseUrl/$token/data-saver/$chapterHash/$v')
-              : urls.add('$baseUrl/$token/data/$chapterHash/$v');
-        },
+  Future<List<String>> getAllFilePaths(
+      String chapterId, bool isDataSaverMode) async {
+    var urls = <String>[];
+    var chapterData = await getChapterDataByChapterId(chapterId);
+    for (String filename in chapterData.chapter.dataSaver) {
+      urls.add(
+        constructPageUrl(
+          chapterData.baseUrl,
+          isDataSaverMode,
+          chapterData.chapter.hash,
+          filename,
+        ),
       );
-      return urls;
     }
+    return urls;
   }
 
   Future<String> getChapterID(
       String mangaId, int? chapterNum, int? limit) async {
     var _chapterId =
         await getChapters(mangaId, offset: (chapterNum! - 1), limit: limit);
-    return _chapterId!.data[0].id;
+    return _chapterId.data[0].id;
   }
 
   static Container statusContainer(String status, bool lightMode) {

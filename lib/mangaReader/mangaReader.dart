@@ -8,6 +8,7 @@ class MangaReader extends StatefulWidget {
   final String mangaId;
   final String token;
   final int chapterNumber;
+  final String chapterId;
   final bool dataSaver;
 
   MangaReader(
@@ -15,6 +16,7 @@ class MangaReader extends StatefulWidget {
       required this.token,
       required this.mangaId,
       required this.chapterNumber,
+      required this.chapterId,
       required this.dataSaver});
   _MangaReaderState createState() => _MangaReaderState();
 }
@@ -26,14 +28,12 @@ class _MangaReaderState extends State<MangaReader> {
   int filterBlue = 18;
   late bool dataSaver;
   late int chapterNumber;
-  late Future<List<String>?> filepaths;
+  late Future<List<String>> filepaths;
   void initState() {
     super.initState();
     chapterNumber = widget.chapterNumber;
     dataSaver = widget.dataSaver;
-    filepaths = _getAllFilePaths(
-        FludexUtils().getChapterID(widget.mangaId, chapterNumber, 1),
-        widget.dataSaver);
+    filepaths = _getAllFilePaths(widget.chapterId, widget.dataSaver);
   }
 
   bool imgLoading = false;
@@ -42,10 +42,9 @@ class _MangaReaderState extends State<MangaReader> {
   bool colorDialogVisible = false;
   final _controller = ScrollController();
 
-  Future<List<String>?> _getAllFilePaths(
-      Future<String> chapterId, bool isDataSaverMode) async {
-    return await FludexUtils().getAllFilePaths(
-        widget.token, chapterId, widget.mangaId, isDataSaverMode);
+  Future<List<String>> _getAllFilePaths(
+      String chapterId, bool isDataSaverMode) async {
+    return await FludexUtils().getAllFilePaths(chapterId, isDataSaverMode);
   }
 
   Widget build(BuildContext context) {
@@ -133,12 +132,11 @@ class _MangaReaderState extends State<MangaReader> {
                                           setState(() {
                                             pageIndex = 0;
                                           });
+                                          var newChapId = await FludexUtils()
+                                              .getChapterID(widget.mangaId,
+                                                  chapterNumber, 1);
                                           filepaths = _getAllFilePaths(
-                                              FludexUtils().getChapterID(
-                                                  widget.mangaId,
-                                                  chapterNumber,
-                                                  1),
-                                              widget.dataSaver);
+                                              newChapId, widget.dataSaver);
                                         } catch (e) {
                                           print(e);
                                         }
@@ -194,30 +192,27 @@ class _MangaReaderState extends State<MangaReader> {
                                       );
                                     },
                                   ),
-                                  onDoubleTap: () {
-                                    setState(
-                                      () {
-                                        if (pageIndex != 0) {
-                                          imgLoading = true;
-                                          pageIndex--;
-                                          imgLoading = false;
-                                        } else if (chapterNumber != 1 &&
-                                            pageIndex == 0) {
-                                          setState(() {
-                                            hasChangedChapter = true;
-                                            chapterNumber--;
-                                            filepaths = _getAllFilePaths(
-                                                FludexUtils().getChapterID(
-                                                    widget.mangaId,
-                                                    chapterNumber,
-                                                    1),
-                                                widget.dataSaver);
-                                            pageIndex = 0;
-                                            hasChangedChapter = false;
-                                          });
-                                        }
-                                      },
-                                    );
+                                  onDoubleTap: () async {
+                                    if (pageIndex != 0) {
+                                      imgLoading = true;
+                                      pageIndex--;
+                                      imgLoading = false;
+                                    } else if (chapterNumber != 1 &&
+                                        pageIndex == 0) {
+                                      setState(() {
+                                        hasChangedChapter = true;
+                                        chapterNumber--;
+                                      });
+                                      var newChapId = await FludexUtils()
+                                          .getChapterID(
+                                              widget.mangaId, chapterNumber, 1);
+                                      filepaths = _getAllFilePaths(
+                                          newChapId, widget.dataSaver);
+                                      setState(() {
+                                        pageIndex = 0;
+                                        hasChangedChapter = false;
+                                      });
+                                    }
                                   },
                                   onTap: () async {
                                     if (data.data!.length != pageIndex + 1) {

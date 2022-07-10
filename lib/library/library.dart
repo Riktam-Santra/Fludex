@@ -59,20 +59,16 @@ class _Library extends State<Library> {
   Future<UserFollowedManga> _getUserLibrary(Token _token, int? _offset) async {
     var response =
         await lib.getUserFollowedMangaResponse(_token.session, offset: _offset);
-    _data() async {
-      try {
-        return UserFollowedManga.fromJson(jsonDecode(response.body));
-      } catch (e) {
-        _token = (await lib.refresh(_token.refresh)).token;
-        var _refreshedResponse =
-            await lib.getUserFollowedMangaResponse(_token.session);
-        token = _token;
-        FludexUtils().saveLoginData(_token.session, _token.refresh);
-        return UserFollowedManga.fromJson(jsonDecode(_refreshedResponse.body));
-      }
+    try {
+      return UserFollowedManga.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      _token = (await lib.refresh(_token.refresh)).token;
+      var _refreshedResponse =
+          await lib.getUserFollowedMangaResponse(_token.session);
+      token = _token;
+      FludexUtils().saveLoginData(_token.session, _token.refresh);
+      return UserFollowedManga.fromJson(jsonDecode(_refreshedResponse.body));
     }
-
-    return _data();
   }
 
   ReadingStatus? checkReadingStatus(String status) {
@@ -430,33 +426,8 @@ class _Library extends State<Library> {
                                               return SearchResultHolder(
                                                 gridView: gridView,
                                                 token: token.session,
-                                                description: allMangaStatus
-                                                    .data![index]
-                                                    .attributes
-                                                    .description
-                                                    .en,
-                                                title: allMangaStatus
-                                                    .data![index]
-                                                    .attributes
-                                                    .title
-                                                    .en,
-                                                mangaId: allMangaStatus
-                                                    .data![index].id,
-                                                baseUrl:
-                                                    'https://uploads.mangadex.org',
-                                                status: allMangaStatus
-                                                    .data![index]
-                                                    .attributes
-                                                    .status,
-                                                tags: tags,
-                                                demographic: allMangaStatus
-                                                    .data![index]
-                                                    .attributes
-                                                    .publicationDemographic,
-                                                rating: allMangaStatus
-                                                    .data![index]
-                                                    .attributes
-                                                    .contentRating,
+                                                mangaData:
+                                                    allMangaStatus.data![index],
                                                 dataSaver: widget.dataSaver,
                                               );
                                             },

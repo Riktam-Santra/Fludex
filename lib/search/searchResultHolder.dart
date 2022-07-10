@@ -3,31 +3,18 @@ import 'package:fludex/mangaReader/aboutManga.dart';
 import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
+import 'package:mangadex_library/models/common/data.dart';
 
 class SearchResultHolder extends StatefulWidget {
   final bool? gridView;
   final bool dataSaver;
   final String token;
-  final String mangaId;
-  final String baseUrl;
-  final String title;
-  final String status;
-  final String description;
-  final List<String> tags;
-  final String demographic;
-  final String rating;
+  final Data mangaData;
   SearchResultHolder(
-      {required this.baseUrl,
-      required this.mangaId,
-      required this.title,
-      required this.status,
-      required this.token,
-      required this.description,
-      required this.tags,
-      required this.demographic,
-      required this.rating,
-      required this.dataSaver,
-      this.gridView = false});
+      {required this.dataSaver,
+      this.gridView = false,
+      required this.mangaData,
+      required this.token});
   _SearchResultHolder createState() => _SearchResultHolder();
 }
 
@@ -39,12 +26,12 @@ class _SearchResultHolder extends State<SearchResultHolder> {
     lightMode = Theme.of(context).brightness == Brightness.light;
     return LayoutBuilder(builder: (context, constraints) {
       return FutureBuilder(
-        future: lib.getCoverArtUrl(widget.mangaId, res: 256),
-        builder: (context, AsyncSnapshot<String?> coverUrl) {
+        future: lib.getCoverArtUrl([widget.mangaData.id], res: 256),
+        builder: (context, AsyncSnapshot<List<String>> coverUrl) {
           if (coverUrl.connectionState == ConnectionState.done) {
             if (coverUrl.data != null) {
               List<Widget> tagWidgets = <Widget>[];
-              var requiredTagList = widget.tags.take(4);
+              var requiredTagList = widget.mangaData.attributes.tags.take(4);
               for (int i = 0; i < requiredTagList.length; i++) {
                 tagWidgets.add(
                   Container(
@@ -62,7 +49,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                       right: 10,
                     ),
                     child: Text(
-                      widget.tags[i],
+                      widget.mangaData.attributes.tags[i].attributes.name.en,
                       style: TextStyle(
                         color: lightMode ? Colors.black : Colors.white,
                       ),
@@ -85,7 +72,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
                                     fit: BoxFit.cover,
-                                    image: NetworkImage(coverUrl.data!),
+                                    image: NetworkImage(coverUrl.data![0]),
                                   ),
                                 ),
                                 height: 200,
@@ -119,7 +106,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                           height: 40,
                                           child: Center(
                                             child: Text(
-                                              widget.title,
+                                              widget.mangaData.attributes.title
+                                                  .en,
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 1,
                                               style: TextStyle(
@@ -137,7 +125,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                   Container(
                                     alignment: Alignment.centerLeft,
                                     child: CachedNetworkImage(
-                                      imageUrl: coverUrl.data!,
+                                      imageUrl: coverUrl.data![0],
                                       placeholder:
                                           (BuildContext context, url) => Center(
                                         child: Container(
@@ -159,7 +147,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                           Padding(
                                             padding: const EdgeInsets.all(5.0),
                                             child: Text(
-                                              widget.title,
+                                              widget.mangaData.attributes.title
+                                                  .en,
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                               style: TextStyle(
@@ -185,7 +174,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                           ),
                                           Container(
                                             child: Text(
-                                              widget.description,
+                                              widget.mangaData.attributes
+                                                  .description.en,
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 4,
                                             ),
@@ -198,13 +188,17 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                             child: Row(
                                               children: [
                                                 FludexUtils.statusContainer(
-                                                    widget.status, lightMode),
-                                                FludexUtils
-                                                    .demographicContainer(
-                                                        widget.demographic,
-                                                        lightMode),
+                                                    widget.mangaData.attributes
+                                                        .status,
+                                                    lightMode),
+                                                FludexUtils.demographicContainer(
+                                                    widget.mangaData.attributes
+                                                        .publicationDemographic,
+                                                    lightMode),
                                                 FludexUtils.ratingContainer(
-                                                    widget.rating, lightMode),
+                                                    widget.mangaData.attributes
+                                                        .contentRating,
+                                                    lightMode),
                                               ],
                                             ),
                                           )
@@ -216,35 +210,17 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                               ),
                       ),
                       onTap: () async {
-                        setState(() {
-                          hasPressed = true;
-                        });
-                        var chapterData = await lib.getChapters(widget.mangaId);
-                        try {
-                          if (chapterData != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AboutManga(
-                                  mangaId: widget.mangaId,
-                                  token: widget.token,
-                                  dataSaver: widget.dataSaver,
-                                  totalChapters: chapterData.total,
-                                  lightMode: lightMode,
-                                ),
-                              ),
-                            );
-                          }
-                          setState(() {
-                            hasPressed = false;
-                          });
-                        } catch (e) {
-                          print(e.toString());
-                          setState(() {
-                            hasPressed = false;
-                          });
-                          showBanner();
-                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AboutManga(
+                              token: widget.token,
+                              dataSaver: widget.dataSaver,
+                              lightMode: lightMode,
+                              mangaData: widget.mangaData,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),

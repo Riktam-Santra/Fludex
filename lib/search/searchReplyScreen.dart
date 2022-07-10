@@ -20,8 +20,8 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
   _SearchReplyScreen(this.searchQuery, this.token);
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: lib.search(searchQuery),
-      builder: (context, AsyncSnapshot<Search?> searchData) {
+      future: lib.search(query: searchQuery),
+      builder: (context, AsyncSnapshot<Search> searchData) {
         if (searchData.connectionState == ConnectionState.done) {
           if (searchData.hasError) {
             return Container(
@@ -61,17 +61,7 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
                   }
                   return SearchResultHolder(
                     token: token,
-                    description:
-                        searchData.data!.data[index].attributes.description.en,
-                    title: searchData.data!.data[index].attributes.title.en,
-                    mangaId: searchData.data!.data[index].id,
-                    baseUrl: 'https://uploads.mangadex.org',
-                    status: searchData.data!.data[index].attributes.status,
-                    tags: tags,
-                    demographic: searchData
-                        .data!.data[index].attributes.publicationDemographic,
-                    rating:
-                        searchData.data!.data[index].attributes.contentRating,
+                    mangaData: searchData.data!.data[index],
                     dataSaver: widget.dataSaver,
                   );
                 },
