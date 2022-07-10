@@ -2,15 +2,22 @@
 
 A very basic manga reader made using flutter and mangadex API. It uses the [mangadex_library package](https://pub.dev/packages/mangadex_library).
 
-# What happened to the rewrite?
+# Help wanted
+
+I'm looking for Mac and Linux users who can just build the release version of the app for their respective OSs so the app can support multiple platforms. If anyone could, it would be a great help.
+
+# FAQ
+## What happened to the rewrite?
 
 I had planned a rewrite with better project structure and a better UI but unfortunately my hardisk crashed and I didn't have it comitted so I lost most of the progress.
 
 As of now, the re-write is stalled since writing all of that will take even more time and so I'll just continue developing the current version.
 
-# Help wanted
+## Why is the versioning so confusing?
 
-I'm looking for Mac and Linux users who can just build the release version of the app for their respective OSs so the app can support multiple platforms. If anyone could, it would be a great help.
+This app is my first ever actual app that I have committed myself too and that is actually in long term development. Before, I had no idea how versioning worked and so I was totally a newbie.
+
+Long story short, I didn't know how versioning worked and by the time I understood the correct way it as too late.
 
 ## A few things to remember
 
@@ -27,6 +34,8 @@ I'm looking for Mac and Linux users who can just build the release version of th
 The latest releases can always be found on the [releases](https://github.com/Riktam-Santra/Fludex/releases) page, if you are looking ahead to try the app.
 
 ## Preview
+
+**NOTE:** The preview videos below ARE NOT UPDATED and DO NOT show most features included in the app. They will be updated soon.
 
 Light mode:
 
@@ -72,10 +81,9 @@ Extract your release zip archive and open mangadex_app.exe (make sure that all t
 
 ## Things coming next
 
-- ~~Download manga and view library offline~~ This seems to be involving the application of isolates which is a bit complicated to handle at the moment and so has been postponed.
-- Option to change the reading status of manga in the library.
-- Change the view of the list tiles.
-
+- ~~Download manga~~ This seems to be involving the application of isolates which is a bit complicated to handle at the moment and so has been postponed. I would be a serious help if someone could reach out to me to help me understand isolates.
+- Option to use the app without logging in.
+- View library offline (This might take more time to get implemented).
 ## Reach me
 
 - Need to get in touch for something? I might not be always active on my github but im always there on Discord, if you need to ask for something (or maybe just talk) just dm me on Rick~#9387
