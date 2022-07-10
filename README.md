@@ -2,9 +2,15 @@
 
 A very basic manga reader made using flutter and mangadex API. It uses the [mangadex_library package](https://pub.dev/packages/mangadex_library).
 
-# RE-WRITE Under Progress
+# What happened to the rewrite?
 
-I had started developing this app since the time I had just started learning flutter and I didn't know a thing about it but now things are different and so I have decided to re-write this app with a better project structure and a better UI. Of course I'm not abandoning this project or deleting the previous code, but yeah code will be idle for a while until a write a better version of it and upload the better version.
+I had planned a rewrite with better project structure and a better UI but unfortunately my hardisk crashed and I didn't have it comitted so I lost most of the progress.
+
+As of now, the re-write is stalled since writing all of that will take even more time and so I'll just continue developing the current version.
+
+# Help wanted
+
+I'm looking for Mac and Linux users who can just build the release version of the app for their respective OSs so the app can support multiple platforms. If anyone could, it would be a great help.
 
 ## A few things to remember
 
