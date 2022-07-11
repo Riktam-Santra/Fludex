@@ -8,6 +8,7 @@ import 'package:mangadex_library/models/common/mangaReadingStatus.dart';
 import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/common/tags.dart';
 import 'package:mangadex_library/models/common/data.dart';
+import 'package:mangadex_library/models/login/Login.dart';
 
 import '/mangaReader/mangaReader.dart';
 import '../utils.dart';
@@ -15,7 +16,7 @@ import '../utils.dart';
 class AboutManga extends StatefulWidget {
   final Data mangaData;
   final bool dataSaver;
-  final String token;
+  final Token? token;
   final bool lightMode;
   AboutManga({
     required this.mangaData,
@@ -71,7 +72,7 @@ class _AboutMangaState extends State<AboutManga> {
     }
   }
 
-  Future<bool> _mangaFollowCheck(_token, _mangaId) async {
+  Future<bool> _mangaFollowCheck(String _token, String _mangaId) async {
     var data = await checkIfUserFollowsManga(_token, _mangaId);
     return data;
   }
@@ -369,185 +370,158 @@ class _AboutMangaState extends State<AboutManga> {
                                                             .attributes.year),
                                                   ),
                                                 ),
-                                                // Padding(
-                                                //   padding:
-                                                //       const EdgeInsets.all(8),
-                                                //   child: Text(
-                                                //     'No. of Chapters: ${widget.totalChapters}',
-                                                //   ),
-                                                // ),
                                                 Padding(
                                                   padding:
                                                       const EdgeInsets.only(
                                                           left: 20, top: 20),
-                                                  child: FutureBuilder(
-                                                    future: _mangaFollowCheck(
-                                                        widget.token,
-                                                        widget.mangaData.id),
-                                                    builder: (context,
-                                                        AsyncSnapshot<bool>
-                                                            data) {
-                                                      if (data.connectionState ==
-                                                          ConnectionState
-                                                              .done) {
-                                                        print(data.data!);
-                                                        if (data.data! ==
-                                                            true) {
-                                                          return Card(
-                                                            color:
-                                                                Color.fromARGB(
-                                                                    255,
-                                                                    255,
-                                                                    103,
-                                                                    64),
-                                                            child: Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      left: 8,
-                                                                      right: 8),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children: [
-                                                                  FutureBuilder(
-                                                                    future: getMangaReadingStatus(
-                                                                        widget
-                                                                            .token,
-                                                                        widget
-                                                                            .mangaData
-                                                                            .id),
-                                                                    builder: (context,
-                                                                        AsyncSnapshot<MangaReadingStatus>
-                                                                            mangaReadingStatus) {
-                                                                      if (mangaReadingStatus
-                                                                              .connectionState ==
-                                                                          ConnectionState
-                                                                              .done) {
-                                                                        return DropdownButton(
-                                                                          iconEnabledColor:
-                                                                              Colors.white,
-                                                                          underline:
-                                                                              Container(),
-                                                                          dropdownColor: Color.fromARGB(
-                                                                              255,
-                                                                              255,
-                                                                              103,
-                                                                              64),
-                                                                          value: parseReadingStatusToString(mangaReadingStatus
-                                                                              .data!
-                                                                              .status),
-                                                                          items:
-                                                                              readingStatusOptions.map((e) {
-                                                                            print(e);
-                                                                            return DropdownMenuItem(
-                                                                                child: Text(e),
-                                                                                value: e);
-                                                                          }).toList(),
-                                                                          style:
-                                                                              TextStyle(fontSize: 24),
-                                                                          onChanged:
-                                                                              (newValue) async {
-                                                                            await setMangaReadingStatus(
-                                                                                widget.token,
-                                                                                widget.mangaData.id,
-                                                                                parseStringToReadingStatusEnum(newValue.toString()));
-                                                                            setState(() {});
-                                                                          },
-                                                                        );
-                                                                      } else {
-                                                                        return CircularProgressIndicator(
-                                                                          color:
-                                                                              Colors.white,
-                                                                        );
-                                                                      }
-                                                                    },
-                                                                  ),
-                                                                  IconButton(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    onPressed:
-                                                                        () async {
-                                                                      await unfollowManga(
-                                                                          widget
-                                                                              .token,
-                                                                          widget
-                                                                              .mangaData
-                                                                              .id);
-                                                                      print(
-                                                                          'Unfollowed manga ${widget.mangaData.id}');
-                                                                      setState(
-                                                                          () {
-                                                                        isFollowed =
-                                                                            false;
-                                                                      });
-                                                                    },
-                                                                    icon:
-                                                                        Tooltip(
-                                                                      message:
-                                                                          'Remove from library',
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .cancel,
-                                                                        semanticLabel:
-                                                                            'Remove from library',
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          );
-                                                        } else {
-                                                          return ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              await followManga(
-                                                                  widget.token,
+                                                  child: (widget.token == null)
+                                                      ? Container()
+                                                      : FutureBuilder(
+                                                          future:
+                                                              _mangaFollowCheck(
+                                                                  widget.token!
+                                                                      .session,
                                                                   widget
                                                                       .mangaData
-                                                                      .id);
-                                                              print(
-                                                                  'Followed manga ${widget.mangaData.id}');
-                                                              setState(() {
-                                                                isFollowed =
-                                                                    true;
-                                                              });
-                                                            },
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(10),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                children: [
-                                                                  Text(
-                                                                    'Add to library!',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            25),
+                                                                      .id),
+                                                          builder: (context,
+                                                              AsyncSnapshot<
+                                                                      bool>
+                                                                  data) {
+                                                            if (data.connectionState ==
+                                                                ConnectionState
+                                                                    .done) {
+                                                              print(data.data!);
+                                                              if (data.data! ==
+                                                                  true) {
+                                                                return Card(
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          255,
+                                                                          103,
+                                                                          64),
+                                                                  child:
+                                                                      Container(
+                                                                    padding: EdgeInsets.only(
+                                                                        left: 8,
+                                                                        right:
+                                                                            8),
+                                                                    child: Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      children: [
+                                                                        FutureBuilder(
+                                                                          future: getMangaReadingStatus(
+                                                                              widget.token!.session,
+                                                                              widget.mangaData.id),
+                                                                          builder:
+                                                                              (context, AsyncSnapshot<MangaReadingStatus> mangaReadingStatus) {
+                                                                            if (mangaReadingStatus.connectionState ==
+                                                                                ConnectionState.done) {
+                                                                              return DropdownButton(
+                                                                                iconEnabledColor: Colors.white,
+                                                                                underline: Container(),
+                                                                                dropdownColor: Color.fromARGB(255, 255, 103, 64),
+                                                                                value: parseReadingStatusToString(mangaReadingStatus.data!.status),
+                                                                                items: readingStatusOptions.map((e) {
+                                                                                  print(e);
+                                                                                  return DropdownMenuItem(child: Text(e), value: e);
+                                                                                }).toList(),
+                                                                                style: TextStyle(fontSize: 24),
+                                                                                onChanged: (newValue) async {
+                                                                                  await setMangaReadingStatus(widget.token!.session, widget.mangaData.id, parseStringToReadingStatusEnum(newValue.toString()));
+                                                                                  setState(() {});
+                                                                                },
+                                                                              );
+                                                                            } else {
+                                                                              return CircularProgressIndicator(
+                                                                                color: Colors.white,
+                                                                              );
+                                                                            }
+                                                                          },
+                                                                        ),
+                                                                        IconButton(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          onPressed:
+                                                                              () async {
+                                                                            await unfollowManga(widget.token!.session,
+                                                                                widget.mangaData.id);
+                                                                            print('Unfollowed manga ${widget.mangaData.id}');
+                                                                            setState(() {
+                                                                              isFollowed = false;
+                                                                            });
+                                                                          },
+                                                                          icon:
+                                                                              Tooltip(
+                                                                            message:
+                                                                                'Remove from library',
+                                                                            child:
+                                                                                Icon(
+                                                                              Icons.cancel,
+                                                                              semanticLabel: 'Remove from library',
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                  SizedBox(
-                                                                    width: 10,
+                                                                );
+                                                              } else {
+                                                                return ElevatedButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    await followManga(
+                                                                        widget
+                                                                            .token!
+                                                                            .session,
+                                                                        widget
+                                                                            .mangaData
+                                                                            .id);
+                                                                    print(
+                                                                        'Followed manga ${widget.mangaData.id}');
+                                                                    setState(
+                                                                        () {
+                                                                      isFollowed =
+                                                                          true;
+                                                                    });
+                                                                  },
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            10),
+                                                                    child: Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      children: [
+                                                                        Text(
+                                                                          'Add to library!',
+                                                                          style:
+                                                                              TextStyle(fontSize: 25),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              10,
+                                                                        ),
+                                                                        Icon(Icons
+                                                                            .favorite),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                  Icon(Icons
-                                                                      .favorite),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                      } else {
-                                                        return Center(
-                                                          child:
-                                                              CircularProgressIndicator(),
-                                                        );
-                                                      }
-                                                    },
-                                                  ),
+                                                                );
+                                                              }
+                                                            } else {
+                                                              return Center(
+                                                                child:
+                                                                    CircularProgressIndicator(),
+                                                              );
+                                                            }
+                                                          },
+                                                        ),
                                                 ),
                                               ],
                                             ),
@@ -768,141 +742,187 @@ class _AboutMangaState extends State<AboutManga> {
                                                                 itemBuilder:
                                                                     (context,
                                                                         index) {
-                                                                  return FutureBuilder(
-                                                                      future: getAllReadChapters(
-                                                                          widget
-                                                                              .token,
-                                                                          widget
-                                                                              .mangaData
-                                                                              .id),
-                                                                      builder: (context,
-                                                                          AsyncSnapshot<ReadChapters?>
-                                                                              readChapters) {
-                                                                        if (readChapters.connectionState ==
-                                                                            ConnectionState.done) {
-                                                                          for (var element in readChapters
-                                                                              .data!
-                                                                              .data) {
-                                                                            print(element);
-                                                                          }
-                                                                          if (readChapters.data ==
-                                                                              null) {
-                                                                            return Center(
-                                                                              child: CircularProgressIndicator(),
-                                                                            );
-                                                                          } else {
-                                                                            readChapters.data!.data.forEach((e) {
-                                                                              print(e);
-                                                                            });
-                                                                            return Opacity(
-                                                                              opacity: (readChapters.data == null) ? 1 : (readChapters.data!.data.contains(chapterData.data!.data[index].id) ? 0.5 : 1.0),
-                                                                              child: Padding(
-                                                                                padding: const EdgeInsets.only(left: 8, right: 8),
-                                                                                child: ListTile(
-                                                                                  title: Text(
-                                                                                    'Chapter ' + chapterData.data!.data[index].attributes.chapter,
-                                                                                    style: TextStyle(fontSize: 17),
+                                                                  return (widget
+                                                                              .token ==
+                                                                          null)
+                                                                      ? Padding(
+                                                                          padding: const EdgeInsets.only(
+                                                                              left: 8,
+                                                                              right: 8),
+                                                                          child:
+                                                                              ListTile(
+                                                                            title:
+                                                                                Text(
+                                                                              'Chapter ' + chapterData.data!.data[index].attributes.chapter,
+                                                                              style: TextStyle(fontSize: 17),
+                                                                            ),
+                                                                            subtitle:
+                                                                                Padding(
+                                                                              padding: const EdgeInsets.all(8.0),
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  Text(
+                                                                                    'Volume ' + chapterData.data!.data[index].attributes.volume,
+                                                                                    style: TextStyle(),
                                                                                   ),
-                                                                                  subtitle: Padding(
-                                                                                    padding: const EdgeInsets.all(8.0),
-                                                                                    child: Row(
-                                                                                      children: [
-                                                                                        Text(
-                                                                                          'Volume ' + chapterData.data!.data[index].attributes.volume,
-                                                                                          style: TextStyle(),
-                                                                                        ),
-                                                                                        SizedBox(
-                                                                                          width: 10,
-                                                                                        ),
-                                                                                        Text(
-                                                                                          'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
+                                                                                  SizedBox(
+                                                                                    width: 10,
                                                                                   ),
-                                                                                  trailing: PopupMenuButton<int>(
-                                                                                    itemBuilder: (context) => [
-                                                                                      (readChapters.data == null)
-                                                                                          ? PopupMenuItem(
-                                                                                              child: ListTile(
-                                                                                                leading: Icon(Icons.check_outlined),
-                                                                                                title: Text("Mark as read"),
-                                                                                              ),
-                                                                                              onTap: () async {
-                                                                                                await markChapterRead(widget.token, chapterData.data!.data[index].id);
-                                                                                              },
-                                                                                            )
-                                                                                          : readChapters.data!.data.contains(chapterData.data!.data[index].id)
+                                                                                  Text(
+                                                                                    'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            onTap:
+                                                                                () {
+                                                                              setState(() {
+                                                                                hasPressed = true;
+                                                                              });
+                                                                              Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                  builder: (context) => MangaReader(
+                                                                                    mangaTitle: widget.mangaData.attributes.title.en,
+                                                                                    mangaId: widget.mangaData.id,
+                                                                                    chapterNumber: ((_chapterPageOffset) * 10) + index + 1,
+                                                                                    dataSaver: widget.dataSaver,
+                                                                                    chapterId: chapterData.data!.data[index].id,
+                                                                                    token: widget.token,
+                                                                                  ),
+                                                                                ),
+                                                                              );
+                                                                              setState(() {
+                                                                                hasPressed = false;
+                                                                              });
+                                                                            },
+                                                                          ),
+                                                                        )
+                                                                      : FutureBuilder(
+                                                                          future: getAllReadChapters(
+                                                                              widget.token!.session,
+                                                                              widget.mangaData.id),
+                                                                          builder: (context, AsyncSnapshot<ReadChapters?> readChapters) {
+                                                                            if (readChapters.connectionState ==
+                                                                                ConnectionState.done) {
+                                                                              for (var element in readChapters.data!.data) {
+                                                                                print(element);
+                                                                              }
+                                                                              if (readChapters.data == null) {
+                                                                                return Center(
+                                                                                  child: CircularProgressIndicator(),
+                                                                                );
+                                                                              } else {
+                                                                                readChapters.data!.data.forEach((e) {
+                                                                                  print(e);
+                                                                                });
+                                                                                return Opacity(
+                                                                                  opacity: (readChapters.data == null) ? 1 : (readChapters.data!.data.contains(chapterData.data!.data[index].id) ? 0.5 : 1.0),
+                                                                                  child: Padding(
+                                                                                    padding: const EdgeInsets.only(left: 8, right: 8),
+                                                                                    child: ListTile(
+                                                                                      title: Text(
+                                                                                        'Chapter ' + chapterData.data!.data[index].attributes.chapter,
+                                                                                        style: TextStyle(fontSize: 17),
+                                                                                      ),
+                                                                                      subtitle: Padding(
+                                                                                        padding: const EdgeInsets.all(8.0),
+                                                                                        child: Row(
+                                                                                          children: [
+                                                                                            Text(
+                                                                                              'Volume ' + chapterData.data!.data[index].attributes.volume,
+                                                                                              style: TextStyle(),
+                                                                                            ),
+                                                                                            SizedBox(
+                                                                                              width: 10,
+                                                                                            ),
+                                                                                            Text(
+                                                                                              'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                      ),
+                                                                                      trailing: PopupMenuButton<int>(
+                                                                                        itemBuilder: (context) => [
+                                                                                          (readChapters.data == null)
                                                                                               ? PopupMenuItem(
-                                                                                                  child: ListTile(
-                                                                                                    leading: Icon(Icons.check),
-                                                                                                    title: Text("Mark as unread"),
-                                                                                                  ),
-                                                                                                  onTap: () async {
-                                                                                                    var result = await markChapterUnread(widget.token, chapterData.data!.data[index].id);
-                                                                                                    setState(() {});
-                                                                                                    if (result.result == 'ok') {
-                                                                                                      print('Marked ${chapterData.data!.data[index].id}');
-                                                                                                    } else {
-                                                                                                      print('Something went wrong while marking ${chapterData.data!.data[index].id} as unread');
-                                                                                                    }
-                                                                                                  },
-                                                                                                )
-                                                                                              : PopupMenuItem(
                                                                                                   child: ListTile(
                                                                                                     leading: Icon(Icons.check_outlined),
                                                                                                     title: Text("Mark as read"),
                                                                                                   ),
                                                                                                   onTap: () async {
-                                                                                                    var result = await markChapterRead(widget.token, chapterData.data!.data[index].id);
-                                                                                                    setState(() {});
-                                                                                                    if (result.result == 'ok') {
-                                                                                                      print('Marked ${chapterData.data!.data[index].id}');
-                                                                                                    } else {
-                                                                                                      print('Something went wrong while marking ${chapterData.data!.data[index].id} as read');
-                                                                                                    }
+                                                                                                    await markChapterRead(widget.token!.session, chapterData.data!.data[index].id);
                                                                                                   },
-                                                                                                ),
-                                                                                    ],
-                                                                                  ),
-                                                                                  onTap: () {
-                                                                                    setState(() {
-                                                                                      hasPressed = true;
-                                                                                    });
-                                                                                    Navigator.push(
-                                                                                      context,
-                                                                                      MaterialPageRoute(
-                                                                                        builder: (context) => MangaReader(
-                                                                                          mangaTitle: widget.mangaData.attributes.title.en,
-                                                                                          token: widget.token,
-                                                                                          mangaId: widget.mangaData.id,
-                                                                                          chapterNumber: ((_chapterPageOffset) * 10) + index + 1,
-                                                                                          dataSaver: widget.dataSaver,
-                                                                                          chapterId: chapterData.data!.data[index].id,
-                                                                                        ),
+                                                                                                )
+                                                                                              : readChapters.data!.data.contains(chapterData.data!.data[index].id)
+                                                                                                  ? PopupMenuItem(
+                                                                                                      child: ListTile(
+                                                                                                        leading: Icon(Icons.check),
+                                                                                                        title: Text("Mark as unread"),
+                                                                                                      ),
+                                                                                                      onTap: () async {
+                                                                                                        var result = await markChapterUnread(widget.token!.session, chapterData.data!.data[index].id);
+                                                                                                        setState(() {});
+                                                                                                        if (result.result == 'ok') {
+                                                                                                          print('Marked ${chapterData.data!.data[index].id}');
+                                                                                                        } else {
+                                                                                                          print('Something went wrong while marking ${chapterData.data!.data[index].id} as unread');
+                                                                                                        }
+                                                                                                      },
+                                                                                                    )
+                                                                                                  : PopupMenuItem(
+                                                                                                      child: ListTile(
+                                                                                                        leading: Icon(Icons.check_outlined),
+                                                                                                        title: Text("Mark as read"),
+                                                                                                      ),
+                                                                                                      onTap: () async {
+                                                                                                        var result = await markChapterRead(widget.token!.session, chapterData.data!.data[index].id);
+                                                                                                        setState(() {});
+                                                                                                        if (result.result == 'ok') {
+                                                                                                          print('Marked ${chapterData.data!.data[index].id}');
+                                                                                                        } else {
+                                                                                                          print('Something went wrong while marking ${chapterData.data!.data[index].id} as read');
+                                                                                                        }
+                                                                                                      },
+                                                                                                    ),
+                                                                                        ],
                                                                                       ),
-                                                                                    );
-                                                                                    setState(() {
-                                                                                      hasPressed = false;
-                                                                                    });
-                                                                                  },
-                                                                                ),
-                                                                              ),
-                                                                            );
-                                                                          }
-                                                                        } else if (readChapters.data ==
-                                                                            null) {
-                                                                          return Center(
-                                                                            child:
-                                                                                CircularProgressIndicator(),
-                                                                          );
-                                                                        } else {
-                                                                          return Center(
-                                                                            child:
-                                                                                CircularProgressIndicator(),
-                                                                          );
-                                                                        }
-                                                                      });
+                                                                                      onTap: () {
+                                                                                        setState(() {
+                                                                                          hasPressed = true;
+                                                                                        });
+                                                                                        Navigator.push(
+                                                                                          context,
+                                                                                          MaterialPageRoute(
+                                                                                            builder: (context) => MangaReader(
+                                                                                              mangaTitle: widget.mangaData.attributes.title.en,
+                                                                                              mangaId: widget.mangaData.id,
+                                                                                              chapterNumber: ((_chapterPageOffset) * 10) + index + 1,
+                                                                                              dataSaver: widget.dataSaver,
+                                                                                              chapterId: chapterData.data!.data[index].id,
+                                                                                              token: widget.token,
+                                                                                            ),
+                                                                                          ),
+                                                                                        );
+                                                                                        setState(() {
+                                                                                          hasPressed = false;
+                                                                                        });
+                                                                                      },
+                                                                                    ),
+                                                                                  ),
+                                                                                );
+                                                                              }
+                                                                            } else if (readChapters.data ==
+                                                                                null) {
+                                                                              return Center(
+                                                                                child: CircularProgressIndicator(),
+                                                                              );
+                                                                            } else {
+                                                                              return Center(
+                                                                                child: CircularProgressIndicator(),
+                                                                              );
+                                                                            }
+                                                                          });
                                                                 }),
                                                             Row(
                                                               mainAxisAlignment:

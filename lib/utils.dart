@@ -78,15 +78,28 @@ class FludexUtils {
       String chapterId, bool isDataSaverMode) async {
     var urls = <String>[];
     var chapterData = await getChapterDataByChapterId(chapterId);
-    for (String filename in chapterData.chapter.dataSaver) {
-      urls.add(
-        constructPageUrl(
-          chapterData.baseUrl,
-          isDataSaverMode,
-          chapterData.chapter.hash,
-          filename,
-        ),
-      );
+    if (isDataSaverMode) {
+      for (String filename in chapterData.chapter.dataSaver) {
+        urls.add(
+          constructPageUrl(
+            chapterData.baseUrl,
+            isDataSaverMode,
+            chapterData.chapter.hash,
+            filename,
+          ),
+        );
+      }
+    } else {
+      for (String filename in chapterData.chapter.data) {
+        urls.add(
+          constructPageUrl(
+            chapterData.baseUrl,
+            isDataSaverMode,
+            chapterData.chapter.hash,
+            filename,
+          ),
+        );
+      }
     }
     return urls;
   }

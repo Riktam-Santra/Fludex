@@ -4,11 +4,12 @@ import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/models/common/data.dart';
+import 'package:mangadex_library/models/login/Login.dart';
 
 class SearchResultHolder extends StatefulWidget {
   final bool? gridView;
   final bool dataSaver;
-  final String token;
+  final Token? token;
   final Data mangaData;
   SearchResultHolder(
       {required this.dataSaver,

@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
+import 'package:mangadex_library/models/login/Login.dart';
 import 'package:mangadex_library/models/search/Search.dart';
 import 'searchResultHolder.dart';
 
 class SearchReplyScreen extends StatefulWidget {
   final bool dataSaver;
   final String searchQuery;
-  final String token;
+  final Token? token;
   SearchReplyScreen(
       {required this.searchQuery,
       required this.token,
       required this.dataSaver});
-  _SearchReplyScreen createState() => _SearchReplyScreen(searchQuery, token);
+  _SearchReplyScreen createState() => _SearchReplyScreen();
 }
 
 class _SearchReplyScreen extends State<SearchReplyScreen> {
-  final String searchQuery;
-  final String token;
-  _SearchReplyScreen(this.searchQuery, this.token);
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: lib.search(query: searchQuery),
+      future: lib.search(query: widget.searchQuery),
       builder: (context, AsyncSnapshot<Search> searchData) {
         if (searchData.connectionState == ConnectionState.done) {
           if (searchData.hasError) {
@@ -44,28 +42,34 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
           } else {
             var tags = <String>[];
             return Container(
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  mainAxisExtent: 300,
-                  crossAxisCount: 2,
-                ),
-                itemCount: searchData.data!.data.length,
-                itemBuilder: (BuildContext context, index) {
-                  tags = [];
-                  for (int i = 0;
-                      i < searchData.data!.data[index].attributes.tags.length;
-                      i++) {
-                    tags.add(searchData.data!.data[index].attributes.tags[i]
-                        .attributes.name.en);
-                  }
-                  return SearchResultHolder(
-                    token: token,
-                    mangaData: searchData.data!.data[index],
-                    dataSaver: widget.dataSaver,
-                  );
-                },
-              ),
+              child: searchData.data!.data.length != 0
+                  ? GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisExtent: 300,
+                        crossAxisCount: 2,
+                      ),
+                      itemCount: searchData.data!.data.length,
+                      itemBuilder: (BuildContext context, index) {
+                        tags = [];
+                        for (int i = 0;
+                            i <
+                                searchData
+                                    .data!.data[index].attributes.tags.length;
+                            i++) {
+                          tags.add(searchData.data!.data[index].attributes
+                              .tags[i].attributes.name.en);
+                        }
+                        return SearchResultHolder(
+                          token: widget.token,
+                          mangaData: searchData.data!.data[index],
+                          dataSaver: widget.dataSaver,
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text("Nothing found :D"),
+                    ),
             );
           }
         } else {

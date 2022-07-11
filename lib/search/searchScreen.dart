@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:mangadex_library/models/login/Login.dart';
 import 'searchReplyScreen.dart';
 
 class SearchPage extends StatefulWidget {
-  final String token;
+  final Token? token;
   final bool dataSaver;
   SearchPage({required this.token, required this.dataSaver});
-  _SearchPageState createState() => _SearchPageState(token);
+  _SearchPageState createState() => _SearchPageState();
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final String token;
-  _SearchPageState(this.token);
   bool hasTyped = false;
   String searchValue = '';
   bool dataPresent = false;
@@ -100,7 +99,7 @@ class _SearchPageState extends State<SearchPage> {
                   child: hasTyped
                       ? SearchReplyScreen(
                           searchQuery: searchValue,
-                          token: token,
+                          token: widget.token,
                           dataSaver: widget.dataSaver,
                         )
                       : Container(),

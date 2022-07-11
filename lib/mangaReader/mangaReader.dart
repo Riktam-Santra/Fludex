@@ -2,11 +2,12 @@ import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mangadex_library/mangadex_library.dart';
+import 'package:mangadex_library/models/login/Login.dart';
 
 class MangaReader extends StatefulWidget {
   final String mangaTitle;
   final String mangaId;
-  final String token;
+  final Token? token;
   final int chapterNumber;
   final String chapterId;
   final bool dataSaver;
@@ -121,13 +122,15 @@ class _MangaReaderState extends State<MangaReader> {
                                           hasChangedChapter = true;
                                         });
                                         try {
-                                          await markChapterRead(
-                                            widget.token,
-                                            await FludexUtils().getChapterID(
-                                                widget.mangaId,
-                                                chapterNumber,
-                                                1),
-                                          );
+                                          if (widget.token != null) {
+                                            await markChapterRead(
+                                              widget.token!.session,
+                                              await FludexUtils().getChapterID(
+                                                  widget.mangaId,
+                                                  chapterNumber,
+                                                  1),
+                                            );
+                                          }
                                           chapterNumber++;
                                           setState(() {
                                             pageIndex = 0;
@@ -191,6 +194,13 @@ class _MangaReaderState extends State<MangaReader> {
                                         ),
                                       );
                                     },
+                                    errorWidget: (context, String a, b) {
+                                      return Container(
+                                        child: Center(
+                                          child: Text("Unable to load image"),
+                                        ),
+                                      );
+                                    },
                                   ),
                                   onDoubleTap: () async {
                                     if (pageIndex != 0) {
@@ -227,12 +237,14 @@ class _MangaReaderState extends State<MangaReader> {
                                         hasChangedChapter = true;
                                         chapterNumber++;
                                       });
-                                      markChapterRead(
-                                          widget.token,
-                                          await FludexUtils().getChapterID(
-                                              widget.mangaId,
-                                              chapterNumber,
-                                              1));
+                                      if (widget.token != null) {
+                                        markChapterRead(
+                                            widget.token!.session,
+                                            await FludexUtils().getChapterID(
+                                                widget.mangaId,
+                                                chapterNumber,
+                                                1));
+                                      }
                                       setState(() {
                                         pageIndex = 0;
                                         hasChangedChapter = false;

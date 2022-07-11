@@ -1,4 +1,5 @@
 import 'package:fludex/library/library.dart';
+import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:url_launcher/url_launcher.dart';
@@ -287,6 +288,35 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                         ),
+                                        animation.loginButtonOpacity.isCompleted
+                                            ? TextButton(
+                                                onPressed: () async {
+                                                  var settings =
+                                                      await FludexUtils()
+                                                          .getSettings();
+                                                  animation.controller
+                                                      .reverse()
+                                                      .whenComplete(() => {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        Library(
+                                                                  dataSaver:
+                                                                      settings
+                                                                          .dataSaver,
+                                                                ),
+                                                              ),
+                                                            )
+                                                          });
+                                                  // animation.controller
+                                                  //     .forward();
+                                                },
+                                                child: Text(
+                                                    'Continue without an account'),
+                                              )
+                                            : Container(),
                                       ],
                                     ),
                                   ),

@@ -7,6 +7,8 @@ import 'package:fludex/settings/settingsPage.dart';
 import 'package:fludex/search/searchResultHolder.dart';
 import 'package:fludex/utils.dart';
 import 'package:fludex/login/home_page_animator.dart';
+import 'package:mangadex_library/mangadexServerException.dart';
+
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/login/Login.dart';
@@ -16,14 +18,14 @@ import 'package:mangadex_library/models/common/data.dart' as mangadat;
 
 class Library extends StatefulWidget {
   final bool dataSaver;
-  final Token token;
+  final Token? token;
 
-  Library({required this.token, required this.dataSaver});
+  Library({this.token, required this.dataSaver});
   _Library createState() => _Library();
 }
 
 class _Library extends State<Library> {
-  late Token token;
+  late Token? token;
   int gridCount = 2;
   int resultOffset = 0;
   bool gridView = false;
@@ -39,20 +41,46 @@ class _Library extends State<Library> {
 
   String selectedValue = 'All';
 
+  late Future<UserFollowedManga> userLibrary;
+  late Future<List<mangadat.Data>> filteredMangaList;
+
   @override
   void initState() {
     super.initState();
+    if (widget.token != null) {
+      userLibrary = _getUserLibrary(
+        widget.token!,
+        (resultOffset * 10),
+      );
+      filteredMangaList = filterManga(widget.token!);
+    }
     token = widget.token;
   }
 
-  Future<UserDetails> _getLoggedUserDetails(Token _token) async {
-    try {
-      var userDetails = await lib.getLoggedUserDetails(_token.session);
+  Future<UserDetails> _getLoggedUserDetails(Token? _token) async {
+    if (widget.token != null && _token != null) {
+      try {
+        var userDetails = await lib.getLoggedUserDetails(_token.session);
 
-      return userDetails;
-    } catch (e) {
-      token = (await lib.refresh(widget.token.refresh)).token;
-      return await lib.getLoggedUserDetails(token.session);
+        return userDetails;
+      } catch (e) {
+        token = (await lib.refresh(widget.token!.refresh)).token;
+        return await lib.getLoggedUserDetails(token!.session);
+      }
+    } else {
+      return UserDetails(
+        'ok',
+        Data(
+          '',
+          '',
+          Attributes(
+            'Anonymous',
+            [],
+            0,
+          ),
+          [],
+        ),
+      );
     }
   }
 
@@ -81,18 +109,34 @@ class _Library extends State<Library> {
 
   Future<List<mangadat.Data>> filterManga(Token _token) async {
     List<mangadat.Data> mangaList = [];
-    var _loginData = await lib.refresh(_token.refresh);
-    _token = _loginData.token;
-    token = _loginData.token;
-    var followedManga = await lib.getUserFollowedManga(_token.session);
-    var mangaWithStatus = await lib.getAllUserMangaReadingStatus(_token.session,
-        readingStatus: checkReadingStatus(selectedValue));
-    followedManga.data.forEach((element) {
-      if (mangaWithStatus.statuses.containsKey(element.id)) {
-        mangaList.add(element);
-      }
-    });
-    return mangaList;
+    try {
+      var followedManga = await lib.getUserFollowedManga(_token.session);
+      var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
+          _token.session,
+          readingStatus: checkReadingStatus(selectedValue));
+      followedManga.data.forEach((element) {
+        if (mangaWithStatus.statuses.containsKey(element.id)) {
+          mangaList.add(element);
+        }
+      });
+      return mangaList;
+    } on MangadexServerException catch (e) {
+      e.info.errors.forEach((element) {
+        print(element);
+      });
+      token = (await lib.refresh(widget.token!.refresh)).token;
+
+      var followedManga = await lib.getUserFollowedManga(token!.session);
+      var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
+          token!.session,
+          readingStatus: checkReadingStatus(selectedValue));
+      followedManga.data.forEach((element) {
+        if (mangaWithStatus.statuses.containsKey(element.id)) {
+          mangaList.add(element);
+        }
+      });
+      return mangaList;
+    }
   }
 
   Widget build(BuildContext context) {
@@ -115,7 +159,9 @@ class _Library extends State<Library> {
           IconButton(
             tooltip: 'Refresh library',
             onPressed: () {
-              setState(() {});
+              setState(() {
+                filteredMangaList = filterManga(widget.token!);
+              });
             },
             icon: Icon(Icons.refresh),
           ),
@@ -215,8 +261,8 @@ class _Library extends State<Library> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SearchPage(
-                          token: token.session, dataSaver: widget.dataSaver),
+                      builder: (context) =>
+                          SearchPage(token: token, dataSaver: widget.dataSaver),
                     ),
                   );
                 },
@@ -263,270 +309,340 @@ class _Library extends State<Library> {
       body: Hero(
         tag: 'login_transition',
         child: Container(
-          child: FutureBuilder(
-            future: _getUserLibrary(token, (resultOffset * 10)),
-            builder: (context, AsyncSnapshot<UserFollowedManga> followedManga) {
-              if (followedManga.connectionState == ConnectionState.done) {
-                if (followedManga.hasError) {
-                  return Container(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Something went wrong :\'(',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+          child: (token == null)
+              ? Center(
+                  child: SizedBox(
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Text(
+                              'Please login into your mangadex account to start using the library'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            FludexUtils().disposeLoginData();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePageAnimator(),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text("Logout"),
                           ),
-                          Padding(
-                            padding: EdgeInsets.all(25),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : FutureBuilder(
+                  future: userLibrary,
+                  builder: (context,
+                      AsyncSnapshot<UserFollowedManga> followedManga) {
+                    if (followedManga.connectionState == ConnectionState.done) {
+                      if (followedManga.hasError) {
+                        return Container(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Something went wrong :\'(',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(25),
+                                  child: Text(
+                                    'But you can try logging in again',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Login again',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      primary:
+                                          Color.fromARGB(18, 255, 255, 255)),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      } else if (followedManga.data!.data.length == 0) {
+                        return Container(
+                          child: Center(
                             child: Text(
-                              'But you can try logging in again',
+                              'A way too empty library...',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Login again',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                primary: Color.fromARGB(18, 255, 255, 255)),
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                } else if (followedManga.data!.data.length == 0) {
-                  return Container(
-                    child: Center(
-                      child: Text(
-                        'A way too empty library...',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    ),
-                  );
-                } else {
-                  var tags = <String>[];
-                  return Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                        );
+                      } else {
+                        var tags = <String>[];
+                        return Column(
                           children: [
-                            IconButton(
-                                tooltip: 'Change view',
-                                onPressed: () {
-                                  setState(() {
-                                    gridView = !gridView;
-                                  });
-                                },
-                                icon: Icon(Icons.grid_view)),
                             Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Icon(Icons.filter_alt),
-                            ),
-                            DropdownButton(
-                              elevation: 10,
-                              underline: Container(),
-                              items: dropDownMenuItems
-                                  .map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                return DropdownMenuItem<String>(
-                                    child: Container(
-                                      margin: EdgeInsets.all(10),
-                                      child: Text(
-                                        value,
-                                        style: TextStyle(fontSize: 20),
-                                      ),
-                                    ),
-                                    value: value);
-                              }).toList(),
-                              value: selectedValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  selectedValue = newValue.toString();
-                                });
-                              },
-                            )
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: FutureBuilder(
-                          future: filterManga(widget.token),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<mangadat.Data>>
-                                  allMangaStatus) {
-                            if (allMangaStatus.connectionState ==
-                                ConnectionState.done) {
-                              return allMangaStatus.data!.length == 0
-                                  ? Center(
-                                      child: Text(
-                                        "Nothing found >:3",
-                                        style: TextStyle(fontSize: 24),
-                                      ),
-                                    )
-                                  : SingleChildScrollView(
-                                      child: LayoutBuilder(
-                                          builder: (context, constraints) {
-                                        return Container(
-                                          child: GridView.builder(
-                                            padding: EdgeInsets.zero,
-                                            shrinkWrap: true,
-                                            gridDelegate:
-                                                SliverGridDelegateWithFixedCrossAxisCount(
-                                              mainAxisExtent: 300,
-                                              crossAxisCount: (constraints
-                                                          .maxWidth >
-                                                      908)
-                                                  ? ((gridView == false)
-                                                      ? 2
-                                                      : 8)
-                                                  : ((constraints.maxWidth <
-                                                                  908 &&
-                                                              gridView ==
-                                                                  true ||
-                                                          constraints.maxWidth <
-                                                              908 ||
-                                                          gridView == true)
-                                                      ? 4
-                                                      : 2),
-                                            ),
-                                            itemCount:
-                                                allMangaStatus.data!.length,
-                                            itemBuilder:
-                                                (BuildContext context, index) {
-                                              tags = [];
-                                              for (int i = 0;
-                                                  i <
-                                                      allMangaStatus
-                                                          .data![index]
-                                                          .attributes
-                                                          .tags
-                                                          .length;
-                                                  i++) {
-                                                tags.add(allMangaStatus
-                                                    .data![index]
-                                                    .attributes
-                                                    .tags[i]
-                                                    .attributes
-                                                    .name
-                                                    .en);
-                                              }
-                                              return SearchResultHolder(
-                                                gridView: gridView,
-                                                token: token.session,
-                                                mangaData:
-                                                    allMangaStatus.data![index],
-                                                dataSaver: widget.dataSaver,
-                                              );
-                                            },
-                                          ),
-                                        );
-                                      }),
-                                    );
-                            } else if (allMangaStatus.hasError) {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 100),
-                                  child: Container(
-                                    child: LinearProgressIndicator(),
-                                    height: 30,
-                                    width: 500,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 100),
-                                  child: Container(
-                                    child: LinearProgressIndicator(),
-                                    height: 30,
-                                    width: 500,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: (followedManga.data!.total > 10)
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              margin: EdgeInsets.symmetric(horizontal: 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   IconButton(
-                                    color: Colors.white,
-                                    onPressed: () {
-                                      if (resultOffset * 10 != 0) {
-                                        setState(
-                                          () {
-                                            resultOffset--;
-                                          },
-                                        );
-                                      }
-                                    },
-                                    icon: Icon(
-                                      Icons.arrow_back,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: Text(
-                                      '${resultOffset + 1}',
-                                    ),
-                                  ),
-                                  IconButton(
-                                    color: Colors.white,
-                                    onPressed: () {
-                                      print(followedManga.data!.total);
-                                      if (resultOffset * 10 <
-                                          (followedManga.data!.total ~/ 10)) {
+                                      tooltip: 'Change view',
+                                      onPressed: () {
                                         setState(() {
-                                          resultOffset++;
+                                          gridView = !gridView;
                                         });
-                                      }
+                                      },
+                                      icon: Icon(Icons.grid_view)),
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Icon(Icons.filter_alt),
+                                  ),
+                                  DropdownButton(
+                                    elevation: 10,
+                                    underline: Container(),
+                                    items: dropDownMenuItems
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                          child: Container(
+                                            margin: EdgeInsets.all(10),
+                                            child: Text(
+                                              value,
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                          ),
+                                          value: value);
+                                    }).toList(),
+                                    value: selectedValue,
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        selectedValue = newValue.toString();
+                                      });
                                     },
-                                    icon: Icon(
-                                      Icons.arrow_forward,
-                                    ),
                                   )
                                 ],
-                              )
-                            : null,
-                      )
-                    ],
-                  );
-                }
-              } else {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 100),
-                    child: Container(
-                      child: LinearProgressIndicator(),
-                      height: 30,
-                      width: 500,
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
+                              ),
+                            ),
+                            Expanded(
+                              child: (token == null)
+                                  ? Center(
+                                      child: Container(),
+                                    )
+                                  : FutureBuilder(
+                                      future: filteredMangaList,
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<List<mangadat.Data>>
+                                              allMangaStatus) {
+                                        if (allMangaStatus.connectionState ==
+                                            ConnectionState.done) {
+                                          return allMangaStatus.data!.length ==
+                                                  0
+                                              ? Center(
+                                                  child: Text(
+                                                    "Nothing found >:3",
+                                                    style:
+                                                        TextStyle(fontSize: 24),
+                                                  ),
+                                                )
+                                              : SingleChildScrollView(
+                                                  child: LayoutBuilder(builder:
+                                                      (context, constraints) {
+                                                    return Container(
+                                                      child: GridView.builder(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        shrinkWrap: true,
+                                                        gridDelegate:
+                                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                                          mainAxisExtent: 300,
+                                                          crossAxisCount: (constraints
+                                                                      .maxWidth >
+                                                                  908)
+                                                              ? ((gridView ==
+                                                                      false)
+                                                                  ? 2
+                                                                  : 8)
+                                                              : ((constraints.maxWidth <
+                                                                              908 &&
+                                                                          gridView ==
+                                                                              true ||
+                                                                      constraints
+                                                                              .maxWidth <
+                                                                          908 ||
+                                                                      gridView ==
+                                                                          true)
+                                                                  ? 4
+                                                                  : 2),
+                                                        ),
+                                                        itemCount:
+                                                            allMangaStatus
+                                                                .data!.length,
+                                                        itemBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                index) {
+                                                          tags = [];
+                                                          for (int i = 0;
+                                                              i <
+                                                                  allMangaStatus
+                                                                      .data![
+                                                                          index]
+                                                                      .attributes
+                                                                      .tags
+                                                                      .length;
+                                                              i++) {
+                                                            tags.add(
+                                                                allMangaStatus
+                                                                    .data![
+                                                                        index]
+                                                                    .attributes
+                                                                    .tags[i]
+                                                                    .attributes
+                                                                    .name
+                                                                    .en);
+                                                          }
+                                                          return SearchResultHolder(
+                                                            gridView: gridView,
+                                                            token: token,
+                                                            mangaData:
+                                                                allMangaStatus
+                                                                        .data![
+                                                                    index],
+                                                            dataSaver: widget
+                                                                .dataSaver,
+                                                          );
+                                                        },
+                                                      ),
+                                                    );
+                                                  }),
+                                                );
+                                        } else if (allMangaStatus.hasError) {
+                                          return Center(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 100),
+                                              child: Container(
+                                                child:
+                                                    LinearProgressIndicator(),
+                                                height: 30,
+                                                width: 500,
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          return Center(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 100),
+                                              child: Container(
+                                                child:
+                                                    LinearProgressIndicator(),
+                                                height: 30,
+                                                width: 500,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: (followedManga.data!.total > 10)
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          color: Colors.white,
+                                          onPressed: () {
+                                            if (resultOffset * 10 != 0) {
+                                              setState(
+                                                () {
+                                                  resultOffset--;
+                                                  userLibrary = _getUserLibrary(
+                                                    widget.token!,
+                                                    (resultOffset * 10),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          },
+                                          icon: Icon(
+                                            Icons.arrow_back,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Text(
+                                            '${resultOffset + 1}',
+                                          ),
+                                        ),
+                                        IconButton(
+                                          color: Colors.white,
+                                          onPressed: () {
+                                            print(followedManga.data!.total);
+                                            if (resultOffset * 10 <
+                                                (followedManga.data!.total ~/
+                                                    10)) {
+                                              setState(() {
+                                                resultOffset++;
+                                                userLibrary = _getUserLibrary(
+                                                  widget.token!,
+                                                  (resultOffset * 10),
+                                                );
+                                              });
+                                            }
+                                          },
+                                          icon: Icon(
+                                            Icons.arrow_forward,
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  : null,
+                            )
+                          ],
+                        );
+                      }
+                    } else {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 100),
+                          child: Container(
+                            child: LinearProgressIndicator(),
+                            height: 30,
+                            width: 500,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
         ),
       ),
     );
