@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fludex/mangaReader/aboutManga.dart';
 import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/models/common/data.dart';
 import 'package:mangadex_library/models/login/Login.dart';
@@ -22,12 +25,32 @@ class SearchResultHolder extends StatefulWidget {
 class _SearchResultHolder extends State<SearchResultHolder> {
   bool hasPressed = false;
   late bool lightMode;
+  late Future<List<String>> coverArtUrl;
+
+  @override
+  void initState() {
+    coverArtUrl = _getCoverArtUrl(widget.mangaData.id, 256);
+    super.initState();
+  }
+
+  Future<List<String>> _getCoverArtUrl(String mangaId, int res) async {
+    try {
+      var artUrlData = await lib.getCoverArtUrl([mangaId], res: 256);
+      return artUrlData;
+    } on SocketException {
+      return Future.error("Unable to connect to the internet");
+    } on MangadexServerException catch (e) {
+      return Future.error(
+          "Mangadex Server Exception: ${e.info.errors.toString()}");
+    }
+  }
+
   Widget build(BuildContext context) {
     print(widget.gridView);
     lightMode = Theme.of(context).brightness == Brightness.light;
     return LayoutBuilder(builder: (context, constraints) {
       return FutureBuilder(
-        future: lib.getCoverArtUrl([widget.mangaData.id], res: 256),
+        future: coverArtUrl,
         builder: (context, AsyncSnapshot<List<String>> coverUrl) {
           if (coverUrl.connectionState == ConnectionState.done) {
             if (coverUrl.data != null) {

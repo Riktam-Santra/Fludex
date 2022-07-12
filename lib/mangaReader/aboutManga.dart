@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/models/chapter/ChapterData.dart' as ch;
 import 'package:mangadex_library/mangadex_library.dart';
 import 'package:mangadex_library/models/chapter/readChapters.dart';
@@ -30,6 +33,9 @@ class AboutManga extends StatefulWidget {
 
 class _AboutMangaState extends State<AboutManga> {
   late Future<List<String>> coverArtUrl;
+  late Future<MangaReadingStatus> mangaReadingStatus;
+  late Future<ReadChapters> readChapterList;
+
   String translatedLangStartValue = 'English';
   final List<String> translatedLanguageOptions = [
     'Any',
@@ -56,12 +62,38 @@ class _AboutMangaState extends State<AboutManga> {
   int _chapterPageOffset = 0;
   //int _desiredInputChapterNumber = 0;
 
+  Future<MangaReadingStatus> _getMangaReadingStatus(
+      String mangaId, Token? token) async {
+    try {
+      var data = await getMangaReadingStatus(
+          widget.token!.session, widget.mangaData.id);
+      return data;
+    } on MangadexServerException catch (e) {
+      return Future.error(
+          "Mangadex Server Exception: ${e.info.errors.toString()}");
+    } on SocketException {
+      return Future.error("Unable to connect to the internet.");
+    }
+  }
+
   Future<ch.ChapterData?> _getChapterData(String mangaId,
       {int? offset, List<LanguageCodes>? translatedLanguage}) async {
     var _offset = offset ?? 0;
     var chapters = await getChapters(mangaId,
         offset: _offset, translatedLanguage: translatedLanguage);
     return chapters;
+  }
+
+  Future<ReadChapters> _getReadChapters(Token? token, String mangaId) {
+    try {
+      var data = getAllReadChapters(widget.token!.session, widget.mangaData.id);
+      return data;
+    } on MangadexServerException catch (e) {
+      return Future.error(
+          "Mangadex Server Exception: ${e.info.errors.toString()}");
+    } on SocketException {
+      return Future.error("Unable to connect to the internet.");
+    }
   }
 
   String getYear(int year) {
@@ -73,8 +105,15 @@ class _AboutMangaState extends State<AboutManga> {
   }
 
   Future<bool> _mangaFollowCheck(String _token, String _mangaId) async {
-    var data = await checkIfUserFollowsManga(_token, _mangaId);
-    return data;
+    try {
+      var data = await checkIfUserFollowsManga(_token, _mangaId);
+      return data;
+    } on MangadexServerException catch (e) {
+      return Future.error(
+          "Mangadex Server Exception: ${e.info.errors.toString()}");
+    } on SocketException {
+      return Future.error("Unable to connect to the internet");
+    }
   }
 
   bool isFollowed = false;
@@ -178,8 +217,22 @@ class _AboutMangaState extends State<AboutManga> {
 
   @override
   void initState() {
-    coverArtUrl = getCoverArtUrl([widget.mangaData.id], res: 512);
+    coverArtUrl = _getCoverArtUrl(widget.mangaData.id, 512);
+    mangaReadingStatus =
+        _getMangaReadingStatus(widget.mangaData.id, widget.token);
     super.initState();
+  }
+
+  Future<List<String>> _getCoverArtUrl(String mangaId, int res) async {
+    try {
+      var data = await getCoverArtUrl([widget.mangaData.id], res: 512);
+      return data;
+    } on MangadexServerException catch (e) {
+      return Future.error(
+          "Mangadex server exception: ${e.info.errors.toString()}");
+    } on SocketException {
+      return Future.error("Unable to connect to the internet");
+    }
   }
 
   @override
@@ -391,128 +444,133 @@ class _AboutMangaState extends State<AboutManga> {
                                                             if (data.connectionState ==
                                                                 ConnectionState
                                                                     .done) {
-                                                              print(data.data!);
-                                                              if (data.data! ==
-                                                                  true) {
+                                                              if (data
+                                                                  .hasError) {
                                                                 return Card(
-                                                                  color: Color
-                                                                      .fromARGB(
-                                                                          255,
-                                                                          255,
-                                                                          103,
-                                                                          64),
-                                                                  child:
-                                                                      Container(
-                                                                    padding: EdgeInsets.only(
-                                                                        left: 8,
-                                                                        right:
-                                                                            8),
-                                                                    child: Row(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .min,
-                                                                      children: [
-                                                                        FutureBuilder(
-                                                                          future: getMangaReadingStatus(
-                                                                              widget.token!.session,
-                                                                              widget.mangaData.id),
-                                                                          builder:
-                                                                              (context, AsyncSnapshot<MangaReadingStatus> mangaReadingStatus) {
-                                                                            if (mangaReadingStatus.connectionState ==
-                                                                                ConnectionState.done) {
-                                                                              return DropdownButton(
-                                                                                iconEnabledColor: Colors.white,
-                                                                                underline: Container(),
-                                                                                dropdownColor: Color.fromARGB(255, 255, 103, 64),
-                                                                                value: parseReadingStatusToString(mangaReadingStatus.data!.status),
-                                                                                items: readingStatusOptions.map((e) {
-                                                                                  print(e);
-                                                                                  return DropdownMenuItem(child: Text(e), value: e);
-                                                                                }).toList(),
-                                                                                style: TextStyle(fontSize: 24),
-                                                                                onChanged: (newValue) async {
-                                                                                  await setMangaReadingStatus(widget.token!.session, widget.mangaData.id, parseStringToReadingStatusEnum(newValue.toString()));
-                                                                                  setState(() {});
-                                                                                },
-                                                                              );
-                                                                            } else {
-                                                                              return CircularProgressIndicator(
-                                                                                color: Colors.white,
-                                                                              );
-                                                                            }
-                                                                          },
-                                                                        ),
-                                                                        IconButton(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          onPressed:
-                                                                              () async {
-                                                                            await unfollowManga(widget.token!.session,
-                                                                                widget.mangaData.id);
-                                                                            print('Unfollowed manga ${widget.mangaData.id}');
-                                                                            setState(() {
-                                                                              isFollowed = false;
-                                                                            });
-                                                                          },
-                                                                          icon:
-                                                                              Tooltip(
-                                                                            message:
-                                                                                'Remove from library',
-                                                                            child:
-                                                                                Icon(
-                                                                              Icons.cancel,
-                                                                              semanticLabel: 'Remove from library',
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
+                                                                  child: Text(
+                                                                      "Unable to get the manga's current reading status"),
                                                                 );
                                                               } else {
-                                                                return ElevatedButton(
-                                                                  onPressed:
-                                                                      () async {
-                                                                    await followManga(
-                                                                        widget
-                                                                            .token!
-                                                                            .session,
-                                                                        widget
-                                                                            .mangaData
-                                                                            .id);
-                                                                    print(
-                                                                        'Followed manga ${widget.mangaData.id}');
-                                                                    setState(
-                                                                        () {
-                                                                      isFollowed =
-                                                                          true;
-                                                                    });
-                                                                  },
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            10),
-                                                                    child: Row(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .min,
-                                                                      children: [
-                                                                        Text(
-                                                                          'Add to library!',
-                                                                          style:
-                                                                              TextStyle(fontSize: 25),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              10,
-                                                                        ),
-                                                                        Icon(Icons
-                                                                            .favorite),
-                                                                      ],
+                                                                print(
+                                                                    data.data!);
+                                                                if (data.data! ==
+                                                                    true) {
+                                                                  return Card(
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            255,
+                                                                            103,
+                                                                            64),
+                                                                    child:
+                                                                        Container(
+                                                                      padding: EdgeInsets.only(
+                                                                          left:
+                                                                              8,
+                                                                          right:
+                                                                              8),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          FutureBuilder(
+                                                                            future:
+                                                                                mangaReadingStatus,
+                                                                            builder:
+                                                                                (context, AsyncSnapshot<MangaReadingStatus> mangaReadingStatus) {
+                                                                              if (mangaReadingStatus.connectionState == ConnectionState.done) {
+                                                                                return DropdownButton(
+                                                                                  iconEnabledColor: Colors.white,
+                                                                                  underline: Container(),
+                                                                                  dropdownColor: Color.fromARGB(255, 255, 103, 64),
+                                                                                  value: parseReadingStatusToString(mangaReadingStatus.data!.status),
+                                                                                  items: readingStatusOptions.map((e) {
+                                                                                    print(e);
+                                                                                    return DropdownMenuItem(child: Text(e), value: e);
+                                                                                  }).toList(),
+                                                                                  style: TextStyle(fontSize: 24),
+                                                                                  onChanged: (newValue) async {
+                                                                                    await setMangaReadingStatus(widget.token!.session, widget.mangaData.id, parseStringToReadingStatusEnum(newValue.toString()));
+                                                                                    setState(() {});
+                                                                                  },
+                                                                                );
+                                                                              } else {
+                                                                                return CircularProgressIndicator(
+                                                                                  color: Colors.white,
+                                                                                );
+                                                                              }
+                                                                            },
+                                                                          ),
+                                                                          IconButton(
+                                                                            color:
+                                                                                Colors.white,
+                                                                            onPressed:
+                                                                                () async {
+                                                                              await unfollowManga(widget.token!.session, widget.mangaData.id);
+                                                                              print('Unfollowed manga ${widget.mangaData.id}');
+                                                                              setState(() {
+                                                                                isFollowed = false;
+                                                                              });
+                                                                            },
+                                                                            icon:
+                                                                                Tooltip(
+                                                                              message: 'Remove from library',
+                                                                              child: Icon(
+                                                                                Icons.cancel,
+                                                                                semanticLabel: 'Remove from library',
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                );
+                                                                  );
+                                                                } else {
+                                                                  return ElevatedButton(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      await followManga(
+                                                                          widget
+                                                                              .token!
+                                                                              .session,
+                                                                          widget
+                                                                              .mangaData
+                                                                              .id);
+                                                                      print(
+                                                                          'Followed manga ${widget.mangaData.id}');
+                                                                      setState(
+                                                                          () {
+                                                                        isFollowed =
+                                                                            true;
+                                                                      });
+                                                                    },
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              10),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          Text(
+                                                                            'Add to library!',
+                                                                            style:
+                                                                                TextStyle(fontSize: 25),
+                                                                          ),
+                                                                          SizedBox(
+                                                                            width:
+                                                                                10,
+                                                                          ),
+                                                                          Icon(Icons
+                                                                              .favorite),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                }
                                                               }
                                                             } else {
                                                               return Center(
@@ -799,10 +857,10 @@ class _AboutMangaState extends State<AboutManga> {
                                                                           ),
                                                                         )
                                                                       : FutureBuilder(
-                                                                          future: getAllReadChapters(
-                                                                              widget.token!.session,
-                                                                              widget.mangaData.id),
-                                                                          builder: (context, AsyncSnapshot<ReadChapters?> readChapters) {
+                                                                          future:
+                                                                              readChapterList,
+                                                                          builder:
+                                                                              (context, AsyncSnapshot<ReadChapters> readChapters) {
                                                                             if (readChapters.connectionState ==
                                                                                 ConnectionState.done) {
                                                                               for (var element in readChapters.data!.data) {

@@ -26,15 +26,17 @@ class _AboutFludexState extends State<AboutFludex> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Fludex',
-                        style: TextStyle(
-                          fontSize: 50,
-                        )),
+                    Text(
+                      'Fludex',
+                      style: TextStyle(
+                        fontSize: 50,
+                      ),
+                    ),
                     Text(
                       'A very basic manga reader',
                     ),
                     Text(
-                      'Version: 0.1.5',
+                      'Version: 0.2.0',
                     ),
                     Text(
                       'Powered by Mangadex',

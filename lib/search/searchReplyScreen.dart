@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/models/login/Login.dart';
 import 'package:mangadex_library/models/search/Search.dart';
@@ -16,9 +19,29 @@ class SearchReplyScreen extends StatefulWidget {
 }
 
 class _SearchReplyScreen extends State<SearchReplyScreen> {
+  late Future<Search> searchData;
+
+  @override
+  void initState() {
+    searchData = _search(query: widget.searchQuery);
+    super.initState();
+  }
+
+  Future<Search> _search({required String query}) async {
+    try {
+      var data = await lib.search(query: query);
+      return data;
+    } on MangadexServerException catch (e) {
+      return Future.error(
+          "Mangadex server exception: ${e.info.errors.toString()}");
+    } on SocketException {
+      return Future.error("Unable to connect to the internet");
+    }
+  }
+
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: lib.search(query: widget.searchQuery),
+      future: searchData,
       builder: (context, AsyncSnapshot<Search> searchData) {
         if (searchData.connectionState == ConnectionState.done) {
           if (searchData.hasError) {

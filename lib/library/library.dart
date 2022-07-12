@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:fludex/info/aboutFludex.dart';
@@ -43,6 +44,7 @@ class _Library extends State<Library> {
 
   late Future<UserFollowedManga> userLibrary;
   late Future<List<mangadat.Data>> filteredMangaList;
+  late Future<UserDetails> userDetails;
 
   @override
   void initState() {
@@ -52,8 +54,9 @@ class _Library extends State<Library> {
         widget.token!,
         (resultOffset * 10),
       );
-      filteredMangaList = filterManga(widget.token!);
+      filteredMangaList = _filterManga(widget.token!);
     }
+    userDetails = _getLoggedUserDetails(widget.token);
     token = widget.token;
   }
 
@@ -63,9 +66,13 @@ class _Library extends State<Library> {
         var userDetails = await lib.getLoggedUserDetails(_token.session);
 
         return userDetails;
-      } catch (e) {
-        token = (await lib.refresh(widget.token!.refresh)).token;
-        return await lib.getLoggedUserDetails(token!.session);
+      } on Exception catch (e) {
+        if (e is MangadexServerException) {
+          token = (await lib.refresh(widget.token!.refresh)).token;
+          return await lib.getLoggedUserDetails(token!.session);
+        } else {
+          return Future.error('Unable to connect to the internet');
+        }
       }
     } else {
       return UserDetails(
@@ -89,13 +96,17 @@ class _Library extends State<Library> {
         await lib.getUserFollowedMangaResponse(_token.session, offset: _offset);
     try {
       return UserFollowedManga.fromJson(jsonDecode(response.body));
-    } catch (e) {
-      _token = (await lib.refresh(_token.refresh)).token;
-      var _refreshedResponse =
-          await lib.getUserFollowedMangaResponse(_token.session);
-      token = _token;
-      FludexUtils().saveLoginData(_token.session, _token.refresh);
-      return UserFollowedManga.fromJson(jsonDecode(_refreshedResponse.body));
+    } on Exception catch (e) {
+      if (e is MangadexServerException) {
+        _token = (await lib.refresh(_token.refresh)).token;
+        var _refreshedResponse =
+            await lib.getUserFollowedMangaResponse(_token.session);
+        token = _token;
+        FludexUtils().saveLoginData(_token.session, _token.refresh);
+        return UserFollowedManga.fromJson(jsonDecode(_refreshedResponse.body));
+      } else {
+        return Future.error('Unable to connect to the internet');
+      }
     }
   }
 
@@ -107,7 +118,7 @@ class _Library extends State<Library> {
     }
   }
 
-  Future<List<mangadat.Data>> filterManga(Token _token) async {
+  Future<List<mangadat.Data>> _filterManga(Token _token) async {
     List<mangadat.Data> mangaList = [];
     try {
       var followedManga = await lib.getUserFollowedManga(_token.session);
@@ -136,6 +147,8 @@ class _Library extends State<Library> {
         }
       });
       return mangaList;
+    } on SocketException {
+      return Future.error(Exception('Unable to connect to the internet'));
     }
   }
 
@@ -160,7 +173,7 @@ class _Library extends State<Library> {
             tooltip: 'Refresh library',
             onPressed: () {
               setState(() {
-                filteredMangaList = filterManga(widget.token!);
+                filteredMangaList = _filterManga(widget.token!);
               });
             },
             icon: Icon(Icons.refresh),
@@ -200,37 +213,58 @@ class _Library extends State<Library> {
               Container(
                 child: Center(
                   child: FutureBuilder(
-                      future: _getLoggedUserDetails(widget.token),
+                      future: userDetails,
                       builder: (context, AsyncSnapshot<UserDetails> snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
-                          return Column(
-                            children: [
-                              Container(
-                                margin: EdgeInsets.all(10),
-                                padding: EdgeInsets.all(20),
-                                height: 150,
-                                child: Center(
-                                  child: Text(
-                                    snapshot.data!.data.attributes.username
-                                        .characters.first
-                                        .toUpperCase(),
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 70),
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Unable to load data, please check your internet",
                                   ),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {});
+                                    },
+                                    child: Text("Retry"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Column(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(20),
+                                  height: 150,
+                                  child: Center(
+                                    child: Text(
+                                      snapshot.data!.data.attributes.username
+                                          .characters.first
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 70),
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Color.fromARGB(255, 255, 103, 64),
+                                      shape: BoxShape.circle),
                                 ),
-                                decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 255, 103, 64),
-                                    shape: BoxShape.circle),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                snapshot.data!.data.attributes.username,
-                                style: TextStyle(fontSize: 17),
-                              )
-                            ],
-                          );
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  snapshot.data!.data.attributes.username,
+                                  style: TextStyle(fontSize: 17),
+                                )
+                              ],
+                            );
+                          }
                         } else {
                           return CircularProgressIndicator();
                         }
@@ -542,11 +576,27 @@ class _Library extends State<Library> {
                                             child: Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 100),
-                                              child: Container(
-                                                child:
-                                                    LinearProgressIndicator(),
-                                                height: 30,
-                                                width: 500,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                      "Unable to fetch your library at the moment."),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        filteredMangaList =
+                                                            filteredMangaList =
+                                                                _filterManga(
+                                                                    widget
+                                                                        .token!);
+                                                      });
+                                                    },
+                                                    child: Text("Retry"),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           );
