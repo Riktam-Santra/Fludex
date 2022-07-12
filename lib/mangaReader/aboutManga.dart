@@ -220,6 +220,7 @@ class _AboutMangaState extends State<AboutManga> {
     coverArtUrl = _getCoverArtUrl(widget.mangaData.id, 512);
     mangaReadingStatus =
         _getMangaReadingStatus(widget.mangaData.id, widget.token);
+    readChapterList = _getReadChapters(widget.token, widget.mangaData.id);
     super.initState();
   }
 
