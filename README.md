@@ -15,7 +15,7 @@ As of now, the re-write is stalled since writing all of that will take even more
 
 ## Why is the versioning so confusing?
 
-This app is my first ever actual app that I have committed myself too and that is actually in long term development. Before, I had no idea how versioning worked and so I was totally a newbie.
+This app is my first ever actual app that I have committed myself to and that is actually in long term development. Before, I had no idea how versioning worked and so I was totally a newbie.
 
 Long story short, I didn't know how versioning worked and by the time I understood the correct way it as too late.
 
