@@ -84,6 +84,7 @@ Extract your release zip archive and open mangadex_app.exe (make sure that all t
 - ~~Download manga~~ This seems to be involving the application of isolates which is a bit complicated to handle at the moment and so has been postponed. I would be a serious help if someone could reach out to me to help me understand isolates.
 - Option to use the app without logging in.
 - View library offline (This might take more time to get implemented).
+- A manga source search option by use of the [SauceNao API](https://saucenao.com/) (Currently working on this using the [saucenao](https://pub.dev/packages/saucenao) package).
 ## Reach me
 
 - Need to get in touch for something? I might not be always active on my github but im always there on Discord, if you need to ask for something (or maybe just talk) just dm me on Rick~#9387
