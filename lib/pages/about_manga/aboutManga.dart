@@ -884,22 +884,27 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                         'Chapter ' + chapterData.data!.data[index].attributes.chapter,
                                                                                         style: TextStyle(fontSize: 17),
                                                                                       ),
-                                                                                      subtitle: Padding(
-                                                                                        padding: const EdgeInsets.all(8.0),
-                                                                                        child: Row(
-                                                                                          children: [
-                                                                                            Text(
-                                                                                              'Volume ' + chapterData.data!.data[index].attributes.volume,
-                                                                                              style: TextStyle(),
+                                                                                      subtitle: Column(
+                                                                                        mainAxisSize: MainAxisSize.min,
+                                                                                        children: [
+                                                                                          Padding(
+                                                                                            padding: const EdgeInsets.all(8.0),
+                                                                                            child: Row(
+                                                                                              children: [
+                                                                                                Text(
+                                                                                                  'Volume ' + chapterData.data!.data[index].attributes.volume,
+                                                                                                  style: TextStyle(),
+                                                                                                ),
+                                                                                                SizedBox(
+                                                                                                  width: 10,
+                                                                                                ),
+                                                                                                Text(
+                                                                                                  'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
+                                                                                                ),
+                                                                                              ],
                                                                                             ),
-                                                                                            SizedBox(
-                                                                                              width: 10,
-                                                                                            ),
-                                                                                            Text(
-                                                                                              'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
-                                                                                            ),
-                                                                                          ],
-                                                                                        ),
+                                                                                          ),
+                                                                                        ],
                                                                                       ),
                                                                                       trailing: PopupMenuButton<int>(
                                                                                         itemBuilder: (context) => [

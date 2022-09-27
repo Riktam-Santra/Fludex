@@ -1,4 +1,4 @@
-import 'package:fludex/library/library.dart';
+import 'package:fludex/pages/library/library.dart';
 import 'package:fludex/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;

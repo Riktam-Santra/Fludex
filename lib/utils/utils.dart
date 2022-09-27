@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:fludex/saveDataModels/settings.dart';
+import 'package:fludex/services/data_models/settings_data/settings.dart';
 import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/login/Login.dart' as l;
 import 'package:mangadex_library/mangadex_library.dart';
-import 'package:fludex/saveDataModels/loginData.dart';
+import 'package:fludex/services/data_models/user_data/login_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -36,6 +36,17 @@ class FludexUtils {
     }
     var jsonData = Settings.fromJson(jsonDecode(contents));
     return jsonData;
+  }
+
+  Future<bool> getLightModeSetting() async {
+    try {
+      var settings = await getSettings();
+      return settings.lightMode;
+    } on Exception {
+      await FludexUtils().saveSettings(true, false);
+      var settings = await getSettings();
+      return settings.lightMode;
+    }
   }
 
   void saveLoginData(String session, String refresh) async {

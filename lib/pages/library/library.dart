@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:fludex/utils/utils.dart';
+import 'package:fludex/pages/saucenao/saucenao_page.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fludex/info/aboutFludex.dart';
-import 'package:fludex/search/searchScreen.dart';
-import 'package:fludex/settings/settingsPage.dart';
-import 'package:fludex/search/searchResultHolder.dart';
-import 'package:fludex/utils.dart';
-import 'package:fludex/login/home_page_animator.dart';
+import 'package:fludex/pages/about/aboutFludex.dart';
+import 'package:fludex/pages/search/search_page.dart';
+import 'package:fludex/pages/settings/settings_page.dart';
+import 'package:fludex/pages/search/widgets/search_result_holder_widget.dart';
+import 'package:fludex/services/controllers/animation_controllers/home_page_anim_controller.dart';
 import 'package:mangadex_library/mangadexServerException.dart';
 
 import 'package:mangadex_library/mangadex_library.dart' as lib;
@@ -30,6 +31,7 @@ class _Library extends State<Library> {
   int gridCount = 2;
   int resultOffset = 0;
   bool gridView = false;
+  bool lightMode = true;
   List<String> dropDownMenuItems = [
     'All',
     'Reading',
@@ -58,6 +60,7 @@ class _Library extends State<Library> {
     }
     userDetails = _getLoggedUserDetails(widget.token);
     token = widget.token;
+    FludexUtils().getLightModeSetting().then((value) => {lightMode = value});
   }
 
   Future<UserDetails> _getLoggedUserDetails(Token? _token) async {
@@ -277,6 +280,9 @@ class _Library extends State<Library> {
                 ),
                 title: Text(
                   'Library',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -289,6 +295,7 @@ class _Library extends State<Library> {
                 ),
                 title: Text(
                   'Search Manga',
+                  style: TextStyle(fontSize: 16),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -302,11 +309,30 @@ class _Library extends State<Library> {
                 },
               ),
               ListTile(
+                leading: SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: Image(
+                    image: AssetImage('data/media/SauceNAO_ico.png'),
+                    color: lightMode ? Colors.grey : Colors.white,
+                  ),
+                ),
+                title: Text('SauceNAO'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SaucenaoSearch()),
+                  );
+                },
+              ),
+              ListTile(
                 leading: Icon(
                   Icons.logout,
                 ),
                 title: Text(
                   'Logout',
+                  style: TextStyle(fontSize: 16),
                 ),
                 onTap: () async {
                   Navigator.pop(context);
@@ -325,6 +351,7 @@ class _Library extends State<Library> {
                 ),
                 title: Text(
                   'About Fludex',
+                  style: TextStyle(fontSize: 16),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -413,7 +440,7 @@ class _Library extends State<Library> {
                                     ),
                                   ),
                                   style: ElevatedButton.styleFrom(
-                                      primary:
+                                      backgroundColor:
                                           Color.fromARGB(18, 255, 255, 255)),
                                 )
                               ],

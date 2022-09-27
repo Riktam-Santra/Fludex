@@ -127,15 +127,19 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                               ],
                                                   begin: Alignment.bottomCenter,
                                                   end: Alignment.topCenter)),
-                                          height: 40,
+                                          height: 60,
                                           child: Center(
-                                            child: Text(
-                                              widget.mangaData.attributes.title
-                                                  .en,
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                  color: Colors.white),
+                                            child: Container(
+                                              margin: EdgeInsets.all(5),
+                                              child: Text(
+                                                widget.mangaData.attributes
+                                                    .title.en,
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                                textScaleFactor: 1.15,
+                                              ),
                                             ),
                                           ),
                                         ),

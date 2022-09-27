@@ -1,5 +1,5 @@
-import 'package:fludex/saveDataModels/settings.dart';
-import 'package:fludex/utils.dart';
+import 'package:fludex/services/data_models/settings_data/settings.dart';
+import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {

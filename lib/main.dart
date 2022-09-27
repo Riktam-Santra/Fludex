@@ -1,20 +1,9 @@
-import 'package:fludex/login/home_page_animator.dart';
-import 'package:fludex/utils.dart';
+import 'package:fludex/services/controllers/animation_controllers/home_page_anim_controller.dart';
+import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(MainPage());
-}
-
-Future<bool> getLightModeSetting() async {
-  try {
-    var settings = await FludexUtils().getSettings();
-    return settings.lightMode;
-  } on Exception {
-    await FludexUtils().saveSettings(true, false);
-    var settings = await FludexUtils().getSettings();
-    return settings.lightMode;
-  }
 }
 
 class MainPage extends StatelessWidget {
@@ -23,7 +12,7 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: getLightModeSetting(),
+        future: FludexUtils().getLightModeSetting(),
         builder: (context, AsyncSnapshot<bool> lightMode) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,

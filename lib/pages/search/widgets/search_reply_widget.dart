@@ -5,7 +5,7 @@ import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/models/login/Login.dart';
 import 'package:mangadex_library/models/search/Search.dart';
-import 'searchResultHolder.dart';
+import 'search_result_holder_widget.dart';
 
 class SearchReplyScreen extends StatefulWidget {
   final bool dataSaver;

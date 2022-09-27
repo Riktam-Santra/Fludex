@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/models/login/Login.dart';
-import 'searchReplyScreen.dart';
+import 'widgets/search_reply_widget.dart';
 
 class SearchPage extends StatefulWidget {
   final Token? token;
