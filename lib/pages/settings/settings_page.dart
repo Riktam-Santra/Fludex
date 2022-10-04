@@ -3,8 +3,7 @@ import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
-  final Settings settings;
-  const SettingsPage({Key? key, required this.settings}) : super(key: key);
+  const SettingsPage({Key? key}) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -13,11 +12,11 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   late bool dataSaver;
   late bool lightMode;
+  late Future<Settings?> settings;
 
   void initState() {
     super.initState();
-    dataSaver = widget.settings.dataSaver;
-    lightMode = widget.settings.lightMode;
+    settings = FludexUtils().getSettings();
   }
 
   @override
@@ -37,8 +36,8 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              FludexUtils().saveSettings(lightMode, dataSaver);
+            onPressed: () async {
+              await FludexUtils().saveSettings(lightMode, dataSaver);
               showBanner();
             },
             icon: Icon(
@@ -47,51 +46,55 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-      body: AnimatedContainer(
-        duration: Duration(milliseconds: 150),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Container(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.data_saver_on,
-                  ),
-                  title: Text(
-                    'Data saver',
-                  ),
-                  trailing: Switch(
-                    value: dataSaver,
-                    onChanged: (value) {
-                      setState(() {
-                        dataSaver = value;
-                      });
-                      print(dataSaver);
-                    },
+      body: FutureBuilder(
+          future: settings,
+          builder: (context, AsyncSnapshot<Settings?> settings) {
+            return AnimatedContainer(
+              duration: Duration(milliseconds: 150),
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Container(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(
+                          Icons.data_saver_on,
+                        ),
+                        title: Text(
+                          'Data saver',
+                        ),
+                        trailing: Switch(
+                          value: settings.data!.dataSaver,
+                          onChanged: (value) {
+                            setState(() {
+                              dataSaver = value;
+                            });
+                            print(dataSaver);
+                          },
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(
+                          Icons.light_mode,
+                        ),
+                        title: Text(
+                          'Light mode',
+                        ),
+                        trailing: Switch(
+                          value: settings.data!.lightMode,
+                          onChanged: (value) {
+                            setState(() {
+                              lightMode = value;
+                            });
+                          },
+                        ),
+                      )
+                    ],
                   ),
                 ),
-                ListTile(
-                  leading: Icon(
-                    Icons.light_mode,
-                  ),
-                  title: Text(
-                    'Light mode',
-                  ),
-                  trailing: Switch(
-                    value: lightMode,
-                    onChanged: (value) {
-                      setState(() {
-                        lightMode = value;
-                      });
-                    },
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            );
+          }),
     );
   }
 

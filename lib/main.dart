@@ -1,6 +1,12 @@
-import 'package:fludex/services/controllers/animation_controllers/home_page_anim_controller.dart';
+import 'dart:ui';
+
+import 'package:fludex/pages/library/library.dart';
+import 'package:fludex/services/controllers/animation_controllers/login_page_anim_controller.dart';
+import 'package:fludex/services/data_models/settings_data/settings.dart';
+import 'package:fludex/services/data_models/user_data/login_data.dart';
 import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:mangadex_library/models/login/Login.dart';
 
 void main() {
   runApp(MainPage());
@@ -12,42 +18,65 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: FludexUtils().getLightModeSetting(),
-        builder: (context, AsyncSnapshot<bool> lightMode) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: (lightMode.data ?? true)
-                ? ThemeData(
-                    primaryColor: Color.fromARGB(255, 255, 103, 64),
-                    primarySwatch: createMaterialColor(
-                      Color(0xFFFF6740),
-                    ),
-                  )
-                : ThemeData.dark().copyWith(
-                    textButtonTheme: TextButtonThemeData(
-                      style: TextButton.styleFrom(
-                        primary: Color.fromARGB(255, 255, 103, 64),
+        future: FludexUtils().getSettings(),
+        builder: (context, AsyncSnapshot<Settings?> settings) {
+          if (settings.connectionState == ConnectionState.done) {
+            return MaterialApp(
+              scrollBehavior: MyCustomScrollBehavior(),
+              debugShowCheckedModeBanner: false,
+              theme: ((settings.data == null) ? true : settings.data!.lightMode)
+                  ? ThemeData(
+                      primaryColor: Color.fromARGB(255, 255, 103, 64),
+                      primarySwatch: createMaterialColor(
+                        Color(0xFFFF6740),
+                      ),
+                    )
+                  : ThemeData.dark().copyWith(
+                      textButtonTheme: TextButtonThemeData(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Color.fromARGB(255, 255, 103, 64),
+                        ),
+                      ),
+                      primaryColor: Color.fromARGB(255, 255, 103, 64),
+                      progressIndicatorTheme: ProgressIndicatorThemeData(
+                        color: Color.fromARGB(255, 255, 103, 64),
+                      ),
+                      floatingActionButtonTheme: FloatingActionButtonThemeData(
+                        backgroundColor: Color.fromARGB(255, 255, 103, 64),
+                        extendedTextStyle: TextStyle(color: Colors.white),
+                      ),
+                      elevatedButtonTheme: ElevatedButtonThemeData(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.all(10),
+                          backgroundColor: Color.fromARGB(255, 255, 103, 64),
+                        ),
                       ),
                     ),
-                    primaryColor: Color.fromARGB(255, 255, 103, 64),
-                    progressIndicatorTheme: ProgressIndicatorThemeData(
-                      color: Color.fromARGB(255, 255, 103, 64),
-                    ),
-                    floatingActionButtonTheme: FloatingActionButtonThemeData(
-                      backgroundColor: Color.fromARGB(255, 255, 103, 64),
-                      extendedTextStyle: TextStyle(color: Colors.white),
-                    ),
-                    elevatedButtonTheme: ElevatedButtonThemeData(
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.all(10),
-                        primary: Color.fromARGB(255, 255, 103, 64),
-                      ),
-                    ),
-                  ),
-            home: Scaffold(
-              body: HomePageAnimator(),
-            ),
-          );
+              home: Scaffold(
+                body: FutureBuilder(
+                    future: FludexUtils().getLoginData(),
+                    builder: (context, AsyncSnapshot<LoginData?> loginData) {
+                      if (loginData.connectionState == ConnectionState.done) {
+                        if (loginData.data != null) {
+                          return Library(
+                            dataSaver: settings.data!.dataSaver,
+                          );
+                        } else {
+                          return LoginPageAnimator();
+                        }
+                      } else {
+                        return Container();
+                      }
+                    }),
+              ),
+            );
+          } else {
+            return MaterialApp(
+              home: Scaffold(
+                body: Container(),
+              ),
+            );
+          }
         });
   }
 }
@@ -71,4 +100,14 @@ MaterialColor createMaterialColor(Color color) {
     );
   });
   return MaterialColor(color.value, swatch);
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+      };
 }

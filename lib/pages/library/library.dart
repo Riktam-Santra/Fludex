@@ -1,33 +1,31 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:fludex/services/data_models/user_data/login_data.dart';
 import 'package:fludex/utils/utils.dart';
-import 'package:fludex/pages/saucenao/saucenao_page.dart';
+// import 'package:fludex/pages/saucenao/saucenao_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fludex/pages/about/aboutFludex.dart';
 import 'package:fludex/pages/search/search_page.dart';
 import 'package:fludex/pages/settings/settings_page.dart';
 import 'package:fludex/pages/search/widgets/search_result_holder_widget.dart';
-import 'package:fludex/services/controllers/animation_controllers/home_page_anim_controller.dart';
+import 'package:fludex/services/controllers/animation_controllers/login_page_anim_controller.dart';
 import 'package:mangadex_library/mangadexServerException.dart';
 
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:mangadex_library/models/common/reading_status.dart';
-import 'package:mangadex_library/models/login/Login.dart';
 import 'package:mangadex_library/models/user/logged_user_details/logged_user_details.dart';
 import 'package:mangadex_library/models/user/user_followed_manga/user_followed_manga.dart';
 import 'package:mangadex_library/models/common/data.dart' as mangadat;
 
 class Library extends StatefulWidget {
   final bool dataSaver;
-  final Token? token;
 
-  Library({this.token, required this.dataSaver});
+  Library({required this.dataSaver});
   _Library createState() => _Library();
 }
 
 class _Library extends State<Library> {
-  late Token? token;
   int gridCount = 2;
   int resultOffset = 0;
   bool gridView = false;
@@ -51,31 +49,26 @@ class _Library extends State<Library> {
   @override
   void initState() {
     super.initState();
-    if (widget.token != null) {
-      userLibrary = _getUserLibrary(
-        widget.token!,
-        (resultOffset * 10),
-      );
-      filteredMangaList = _filterManga(widget.token!);
-    }
-    userDetails = _getLoggedUserDetails(widget.token);
-    token = widget.token;
-    FludexUtils().getLightModeSetting().then((value) => {lightMode = value});
+    userLibrary = _getUserLibrary(
+      (resultOffset * 10),
+    );
+    filteredMangaList = _filterManga();
+    userDetails = _getLoggedUserDetails();
+
+    FludexUtils()
+        .getLightModeSetting()
+        .then((value) => {lightMode = value ?? true});
   }
 
-  Future<UserDetails> _getLoggedUserDetails(Token? _token) async {
-    if (widget.token != null && _token != null) {
+  Future<UserDetails> _getLoggedUserDetails() async {
+    var loginData = await FludexUtils().getLoginData();
+    if (loginData != null) {
       try {
-        var userDetails = await lib.getLoggedUserDetails(_token.session);
-
+        var userDetails = await lib.getLoggedUserDetails(loginData.session);
         return userDetails;
       } on Exception catch (e) {
-        if (e is MangadexServerException) {
-          token = (await lib.refresh(widget.token!.refresh)).token;
-          return await lib.getLoggedUserDetails(token!.session);
-        } else {
-          return Future.error('Unable to connect to the internet');
-        }
+        debugPrint(e.toString());
+        return Future.error('Unable to connect to the internet');
       }
     } else {
       return UserDetails(
@@ -94,22 +87,31 @@ class _Library extends State<Library> {
     }
   }
 
-  Future<UserFollowedManga> _getUserLibrary(Token _token, int? _offset) async {
-    var response =
-        await lib.getUserFollowedMangaResponse(_token.session, offset: _offset);
+  Future<UserDetails> dummyDetails() async {
+    return UserDetails(
+      'ok',
+      Data(
+        '',
+        '',
+        Attributes(
+          'Anonymous',
+          [],
+          0,
+        ),
+        [],
+      ),
+    );
+  }
+
+  Future<UserFollowedManga> _getUserLibrary(int? _offset) async {
+    var loginData = await FludexUtils().getLoginData();
+    var response = await lib.getUserFollowedMangaResponse(loginData!.session,
+        offset: _offset);
     try {
       return UserFollowedManga.fromJson(jsonDecode(response.body));
     } on Exception catch (e) {
-      if (e is MangadexServerException) {
-        _token = (await lib.refresh(_token.refresh)).token;
-        var _refreshedResponse =
-            await lib.getUserFollowedMangaResponse(_token.session);
-        token = _token;
-        FludexUtils().saveLoginData(_token.session, _token.refresh);
-        return UserFollowedManga.fromJson(jsonDecode(_refreshedResponse.body));
-      } else {
-        return Future.error('Unable to connect to the internet');
-      }
+      debugPrint(e.toString());
+      return Future.error('Unable to connect to the internet');
     }
   }
 
@@ -121,12 +123,13 @@ class _Library extends State<Library> {
     }
   }
 
-  Future<List<mangadat.Data>> _filterManga(Token _token) async {
+  Future<List<mangadat.Data>> _filterManga() async {
+    var loginData = await FludexUtils().getLoginData();
     List<mangadat.Data> mangaList = [];
     try {
-      var followedManga = await lib.getUserFollowedManga(_token.session);
+      var followedManga = await lib.getUserFollowedManga(loginData!.session);
       var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
-          _token.session,
+          loginData.session,
           readingStatus: checkReadingStatus(selectedValue));
       followedManga.data.forEach((element) {
         if (mangaWithStatus.statuses.containsKey(element.id)) {
@@ -138,11 +141,10 @@ class _Library extends State<Library> {
       e.info.errors.forEach((element) {
         print(element);
       });
-      token = (await lib.refresh(widget.token!.refresh)).token;
 
-      var followedManga = await lib.getUserFollowedManga(token!.session);
+      var followedManga = await lib.getUserFollowedManga(loginData!.session);
       var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
-          token!.session,
+          loginData.session,
           readingStatus: checkReadingStatus(selectedValue));
       followedManga.data.forEach((element) {
         if (mangaWithStatus.statuses.containsKey(element.id)) {
@@ -176,7 +178,7 @@ class _Library extends State<Library> {
             tooltip: 'Refresh library',
             onPressed: () {
               setState(() {
-                filteredMangaList = _filterManga(widget.token!);
+                filteredMangaList = _filterManga();
               });
             },
             icon: Icon(Icons.refresh),
@@ -190,13 +192,10 @@ class _Library extends State<Library> {
           IconButton(
             tooltip: 'Settings',
             onPressed: () async {
-              var settings = await FludexUtils().getSettings();
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettingsPage(
-                    settings: settings,
-                  ),
+                  builder: (context) => SettingsPage(),
                 ),
               );
             },
@@ -216,7 +215,7 @@ class _Library extends State<Library> {
               Container(
                 child: Center(
                   child: FutureBuilder(
-                      future: userDetails,
+                      future: _getLoggedUserDetails(),
                       builder: (context, AsyncSnapshot<UserDetails> snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
                           if (snapshot.hasError) {
@@ -303,29 +302,29 @@ class _Library extends State<Library> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          SearchPage(token: token, dataSaver: widget.dataSaver),
+                          SearchPage(dataSaver: widget.dataSaver),
                     ),
                   );
                 },
               ),
-              ListTile(
-                leading: SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: Image(
-                    image: AssetImage('data/media/SauceNAO_ico.png'),
-                    color: lightMode ? Colors.grey : Colors.white,
-                  ),
-                ),
-                title: Text('SauceNAO'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SaucenaoSearch()),
-                  );
-                },
-              ),
+              // ListTile(
+              //   leading: SizedBox(
+              //     height: 24,
+              //     width: 24,
+              //     child: Image(
+              //       image: AssetImage('data/media/SauceNAO_ico.png'),
+              //       color: lightMode ? Colors.grey : Colors.white,
+              //     ),
+              //   ),
+              //   title: Text('SauceNAO'),
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => SaucenaoSearch()),
+              //     );
+              //   },
+              // ),
               ListTile(
                 leading: Icon(
                   Icons.logout,
@@ -340,7 +339,7 @@ class _Library extends State<Library> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomePageAnimator(),
+                      builder: (context) => LoginPageAnimator(),
                     ),
                   );
                 },
@@ -369,358 +368,390 @@ class _Library extends State<Library> {
       ),
       body: Hero(
         tag: 'login_transition',
-        child: Container(
-          child: (token == null)
-              ? Center(
-                  child: SizedBox(
-                    height: 100,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(
-                          child: Text(
-                              'Please login into your mangadex account to start using the library'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                            FludexUtils().disposeLoginData();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePageAnimator(),
-                              ),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text("Logout"),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : FutureBuilder(
-                  future: userLibrary,
-                  builder: (context,
-                      AsyncSnapshot<UserFollowedManga> followedManga) {
-                    if (followedManga.connectionState == ConnectionState.done) {
-                      if (followedManga.hasError) {
-                        return Container(
-                          child: Center(
+        child: FutureBuilder(
+            future: FludexUtils().getLoginData(),
+            builder: (context, AsyncSnapshot<LoginData?> localtoken) {
+              if (localtoken.connectionState == ConnectionState.done) {
+                return Container(
+                  child: (localtoken.data == null)
+                      ? Center(
+                          child: SizedBox(
+                            height: 100,
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'Something went wrong :\'(',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(25),
+                                Expanded(
                                   child: Text(
-                                    'But you can try logging in again',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                  ),
+                                      'Please login into your mangadex account to start using the library'),
                                 ),
-                                ElevatedButton(
-                                  onPressed: () {
+                                TextButton(
+                                  onPressed: () async {
                                     Navigator.pop(context);
+                                    FludexUtils().disposeLoginData();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            LoginPageAnimator(),
+                                      ),
+                                    );
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text("Logout"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : FutureBuilder(
+                          future: userLibrary,
+                          builder: (context,
+                              AsyncSnapshot<UserFollowedManga> followedManga) {
+                            if (followedManga.connectionState ==
+                                ConnectionState.done) {
+                              if (followedManga.hasError) {
+                                return Container(
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Something went wrong :\'(',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.all(25),
+                                          child: Text(
+                                            'But you can try logging in again',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20),
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              'Login again',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20),
+                                            ),
+                                          ),
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: Color.fromARGB(
+                                                  18, 255, 255, 255)),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              } else if (followedManga.data!.data.length == 0) {
+                                return Container(
+                                  child: Center(
                                     child: Text(
-                                      'Login again',
+                                      'A way too empty library...',
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 20),
                                     ),
                                   ),
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Color.fromARGB(18, 255, 255, 255)),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      } else if (followedManga.data!.data.length == 0) {
-                        return Container(
-                          child: Center(
-                            child: Text(
-                              'A way too empty library...',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                          ),
-                        );
-                      } else {
-                        var tags = <String>[];
-                        return Column(
-                          children: [
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 20),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                      tooltip: 'Change view',
-                                      onPressed: () {
-                                        setState(() {
-                                          gridView = !gridView;
-                                        });
-                                      },
-                                      icon: Icon(Icons.grid_view)),
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Icon(Icons.filter_alt),
-                                  ),
-                                  DropdownButton(
-                                    elevation: 10,
-                                    underline: Container(),
-                                    items: dropDownMenuItems
-                                        .map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                      return DropdownMenuItem<String>(
-                                          child: Container(
-                                            margin: EdgeInsets.all(10),
-                                            child: Text(
-                                              value,
-                                              style: TextStyle(fontSize: 20),
-                                            ),
+                                );
+                              } else {
+                                var tags = <String>[];
+                                return Column(
+                                  children: [
+                                    Container(
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 20),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          IconButton(
+                                              tooltip: 'Change view',
+                                              onPressed: () {
+                                                setState(() {
+                                                  gridView = !gridView;
+                                                });
+                                              },
+                                              icon: Icon(Icons.grid_view)),
+                                          Container(
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Icon(Icons.filter_alt),
                                           ),
-                                          value: value);
-                                    }).toList(),
-                                    value: selectedValue,
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        selectedValue = newValue.toString();
-                                      });
-                                    },
-                                  )
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: (token == null)
-                                  ? Center(
-                                      child: Container(),
-                                    )
-                                  : FutureBuilder(
-                                      future: filteredMangaList,
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot<List<mangadat.Data>>
-                                              allMangaStatus) {
-                                        if (allMangaStatus.connectionState ==
-                                            ConnectionState.done) {
-                                          return allMangaStatus.data!.length ==
-                                                  0
-                                              ? Center(
-                                                  child: Text(
-                                                    "Nothing found >:3",
-                                                    style:
-                                                        TextStyle(fontSize: 24),
+                                          DropdownButton(
+                                            elevation: 10,
+                                            underline: Container(),
+                                            items: dropDownMenuItems
+                                                .map<DropdownMenuItem<String>>(
+                                                    (String value) {
+                                              return DropdownMenuItem<String>(
+                                                  child: Container(
+                                                    margin: EdgeInsets.all(10),
+                                                    child: Text(
+                                                      value,
+                                                      style: TextStyle(
+                                                          fontSize: 20),
+                                                    ),
                                                   ),
-                                                )
-                                              : SingleChildScrollView(
-                                                  child: LayoutBuilder(builder:
-                                                      (context, constraints) {
-                                                    return Container(
-                                                      child: GridView.builder(
-                                                        padding:
-                                                            EdgeInsets.zero,
-                                                        shrinkWrap: true,
-                                                        gridDelegate:
-                                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                                          mainAxisExtent: 300,
-                                                          crossAxisCount: (constraints
-                                                                      .maxWidth >
-                                                                  908)
-                                                              ? ((gridView ==
-                                                                      false)
-                                                                  ? 2
-                                                                  : 8)
-                                                              : ((constraints.maxWidth <
-                                                                              908 &&
-                                                                          gridView ==
-                                                                              true ||
-                                                                      constraints
-                                                                              .maxWidth <
-                                                                          908 ||
-                                                                      gridView ==
-                                                                          true)
-                                                                  ? 4
-                                                                  : 2),
-                                                        ),
-                                                        itemCount:
-                                                            allMangaStatus
-                                                                .data!.length,
-                                                        itemBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                index) {
-                                                          tags = [];
-                                                          for (int i = 0;
-                                                              i <
-                                                                  allMangaStatus
-                                                                      .data![
-                                                                          index]
-                                                                      .attributes
-                                                                      .tags
-                                                                      .length;
-                                                              i++) {
-                                                            tags.add(
-                                                                allMangaStatus
-                                                                    .data![
-                                                                        index]
-                                                                    .attributes
-                                                                    .tags[i]
-                                                                    .attributes
-                                                                    .name
-                                                                    .en);
-                                                          }
-                                                          return SearchResultHolder(
-                                                            gridView: gridView,
-                                                            token: token,
-                                                            mangaData:
-                                                                allMangaStatus
+                                                  value: value);
+                                            }).toList(),
+                                            value: selectedValue,
+                                            onChanged: (newValue) {
+                                              setState(() {
+                                                selectedValue =
+                                                    newValue.toString();
+                                              });
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: (localtoken.data == null)
+                                          ? Center(
+                                              child: Container(),
+                                            )
+                                          : FutureBuilder(
+                                              future: filteredMangaList,
+                                              builder: (BuildContext context,
+                                                  AsyncSnapshot<
+                                                          List<mangadat.Data>>
+                                                      allMangaStatus) {
+                                                if (allMangaStatus
+                                                        .connectionState ==
+                                                    ConnectionState.done) {
+                                                  return allMangaStatus
+                                                              .data!.length ==
+                                                          0
+                                                      ? Center(
+                                                          child: Text(
+                                                            "Nothing found >:3",
+                                                            style: TextStyle(
+                                                                fontSize: 24),
+                                                          ),
+                                                        )
+                                                      : SingleChildScrollView(
+                                                          child: LayoutBuilder(
+                                                              builder: (context,
+                                                                  constraints) {
+                                                            return Container(
+                                                              child: GridView
+                                                                  .builder(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                                shrinkWrap:
+                                                                    true,
+                                                                gridDelegate:
+                                                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                                                  mainAxisExtent:
+                                                                      300,
+                                                                  crossAxisCount: (constraints
+                                                                              .maxWidth >
+                                                                          908)
+                                                                      ? ((gridView ==
+                                                                              false)
+                                                                          ? 2
+                                                                          : 8)
+                                                                      : ((constraints.maxWidth < 908 && gridView == true ||
+                                                                              constraints.maxWidth < 908 ||
+                                                                              gridView == true)
+                                                                          ? 4
+                                                                          : 2),
+                                                                ),
+                                                                itemCount:
+                                                                    allMangaStatus
+                                                                        .data!
+                                                                        .length,
+                                                                itemBuilder:
+                                                                    (BuildContext
+                                                                            context,
+                                                                        index) {
+                                                                  tags = [];
+                                                                  for (int i =
+                                                                          0;
+                                                                      i <
+                                                                          allMangaStatus
+                                                                              .data![index]
+                                                                              .attributes
+                                                                              .tags
+                                                                              .length;
+                                                                      i++) {
+                                                                    tags.add(allMangaStatus
                                                                         .data![
-                                                                    index],
-                                                            dataSaver: widget
-                                                                .dataSaver,
+                                                                            index]
+                                                                        .attributes
+                                                                        .tags[i]
+                                                                        .attributes
+                                                                        .name
+                                                                        .en);
+                                                                  }
+                                                                  return SearchResultHolder(
+                                                                    gridView:
+                                                                        gridView,
+                                                                    mangaData:
+                                                                        allMangaStatus
+                                                                            .data![index],
+                                                                    dataSaver:
+                                                                        widget
+                                                                            .dataSaver,
+                                                                  );
+                                                                },
+                                                              ),
+                                                            );
+                                                          }),
+                                                        );
+                                                } else if (allMangaStatus
+                                                    .hasError) {
+                                                  return Center(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 100),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
+                                                              "Unable to fetch your library at the moment."),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                filteredMangaList =
+                                                                    _filterManga();
+                                                              });
+                                                            },
+                                                            child:
+                                                                Text("Retry"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return Center(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 100),
+                                                      child: Container(
+                                                        child:
+                                                            LinearProgressIndicator(),
+                                                        height: 30,
+                                                        width: 500,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: (followedManga.data!.total > 10)
+                                          ? Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                IconButton(
+                                                  color: Colors.white,
+                                                  onPressed: () {
+                                                    if (resultOffset * 10 !=
+                                                        0) {
+                                                      setState(
+                                                        () {
+                                                          resultOffset--;
+                                                          userLibrary =
+                                                              _getUserLibrary(
+                                                            (resultOffset * 10),
                                                           );
                                                         },
-                                                      ),
-                                                    );
-                                                  }),
-                                                );
-                                        } else if (allMangaStatus.hasError) {
-                                          return Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 100),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                      "Unable to fetch your library at the moment."),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        filteredMangaList =
-                                                            filteredMangaList =
-                                                                _filterManga(
-                                                                    widget
-                                                                        .token!);
-                                                      });
-                                                    },
-                                                    child: Text("Retry"),
+                                                      );
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.arrow_back,
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          return Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 100),
-                                              child: Container(
-                                                child:
-                                                    LinearProgressIndicator(),
-                                                height: 30,
-                                                width: 500,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                            ),
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: (followedManga.data!.total > 10)
-                                  ? Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        IconButton(
-                                          color: Colors.white,
-                                          onPressed: () {
-                                            if (resultOffset * 10 != 0) {
-                                              setState(
-                                                () {
-                                                  resultOffset--;
-                                                  userLibrary = _getUserLibrary(
-                                                    widget.token!,
-                                                    (resultOffset * 10),
-                                                  );
-                                                },
-                                              );
-                                            }
-                                          },
-                                          icon: Icon(
-                                            Icons.arrow_back,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8),
-                                          child: Text(
-                                            '${resultOffset + 1}',
-                                          ),
-                                        ),
-                                        IconButton(
-                                          color: Colors.white,
-                                          onPressed: () {
-                                            print(followedManga.data!.total);
-                                            if (resultOffset * 10 <
-                                                (followedManga.data!.total ~/
-                                                    10)) {
-                                              setState(() {
-                                                resultOffset++;
-                                                userLibrary = _getUserLibrary(
-                                                  widget.token!,
-                                                  (resultOffset * 10),
-                                                );
-                                              });
-                                            }
-                                          },
-                                          icon: Icon(
-                                            Icons.arrow_forward,
-                                          ),
-                                        )
-                                      ],
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Text(
+                                                    '${resultOffset + 1}',
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  color: Colors.white,
+                                                  onPressed: () {
+                                                    print(followedManga
+                                                        .data!.total);
+                                                    if (resultOffset * 10 <
+                                                        (followedManga
+                                                                .data!.total ~/
+                                                            10)) {
+                                                      setState(() {
+                                                        resultOffset++;
+                                                        userLibrary =
+                                                            _getUserLibrary(
+                                                          (resultOffset * 10),
+                                                        );
+                                                      });
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.arrow_forward,
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          : null,
                                     )
-                                  : null,
-                            )
-                          ],
-                        );
-                      }
-                    } else {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 100),
-                          child: Container(
-                            child: LinearProgressIndicator(),
-                            height: 30,
-                            width: 500,
-                          ),
+                                  ],
+                                );
+                              }
+                            } else {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 100),
+                                  child: Container(
+                                    child: LinearProgressIndicator(),
+                                    height: 30,
+                                    width: 500,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
-                      );
-                    }
-                  },
-                ),
-        ),
+                );
+              } else if (localtoken.connectionState ==
+                  ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else {
+                return Center(
+                  child: Text("Something went wrong!"),
+                );
+              }
+            }),
       ),
     );
   }

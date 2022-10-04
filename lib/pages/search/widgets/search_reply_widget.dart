@@ -10,11 +10,7 @@ import 'search_result_holder_widget.dart';
 class SearchReplyScreen extends StatefulWidget {
   final bool dataSaver;
   final String searchQuery;
-  final Token? token;
-  SearchReplyScreen(
-      {required this.searchQuery,
-      required this.token,
-      required this.dataSaver});
+  SearchReplyScreen({required this.searchQuery, required this.dataSaver});
   _SearchReplyScreen createState() => _SearchReplyScreen();
 }
 
@@ -84,7 +80,6 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
                               .tags[i].attributes.name.en);
                         }
                         return SearchResultHolder(
-                          token: widget.token,
                           mangaData: searchData.data!.data[index],
                           dataSaver: widget.dataSaver,
                         );

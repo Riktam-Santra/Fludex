@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fludex/mangaReader/aboutManga.dart';
-import 'package:fludex/utils.dart';
+import 'package:fludex/pages/about_manga/aboutManga.dart';
+import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
@@ -12,13 +12,12 @@ import 'package:mangadex_library/models/login/Login.dart';
 class SearchResultHolder extends StatefulWidget {
   final bool? gridView;
   final bool dataSaver;
-  final Token? token;
   final Data mangaData;
-  SearchResultHolder(
-      {required this.dataSaver,
-      this.gridView = false,
-      required this.mangaData,
-      required this.token});
+  SearchResultHolder({
+    required this.dataSaver,
+    this.gridView = false,
+    required this.mangaData,
+  });
   _SearchResultHolder createState() => _SearchResultHolder();
 }
 
@@ -242,7 +241,6 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => AboutManga(
-                              token: widget.token,
                               dataSaver: widget.dataSaver,
                               lightMode: lightMode,
                               mangaData: widget.mangaData,

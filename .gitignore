@@ -50,3 +50,5 @@ app.*.map.json
 data/appData/
 sampleAppData/
 data/loginData.json
+data/settings.json
+testData.json

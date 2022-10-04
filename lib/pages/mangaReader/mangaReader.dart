@@ -1,25 +1,34 @@
-import 'package:fludex/utils.dart';
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fludex/utils/utils.dart';
+import 'package:flutter/material.dart';
+import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart';
+import 'package:mangadex_library/models/aggregate/Aggregate.dart';
+import 'package:mangadex_library/models/common/data.dart';
+import 'package:mangadex_library/models/common/language_codes.dart';
 import 'package:mangadex_library/models/login/Login.dart';
 
 class MangaReader extends StatefulWidget {
-  final String mangaTitle;
-  final String mangaId;
-  final Token? token;
-  final int chapterNumber;
-  final String chapterId;
+  const MangaReader({
+    Key? key,
+    required this.mangaData,
+    required this.mangaAggregate,
+    required this.dataSaver,
+    required this.lightMode,
+    required this.translatedLanguage,
+    this.chapterNumber,
+    this.volume,
+  }) : super(key: key);
+  final LanguageCodes translatedLanguage;
+  final Data mangaData;
+  final String? chapterNumber;
+  final bool lightMode;
   final bool dataSaver;
+  final String? volume;
+  final Aggregate mangaAggregate;
 
-  MangaReader(
-      {required this.mangaTitle,
-      required this.token,
-      required this.mangaId,
-      required this.chapterNumber,
-      required this.chapterId,
-      required this.dataSaver});
-  _MangaReaderState createState() => _MangaReaderState();
+  @override
+  State<MangaReader> createState() => _MangaReaderState();
 }
 
 class _MangaReaderState extends State<MangaReader> {
@@ -27,405 +36,421 @@ class _MangaReaderState extends State<MangaReader> {
   int filterRed = 18;
   int filterGreen = 18;
   int filterBlue = 18;
+
+  late int currentVolume = 0;
+  int currentChapter = 1;
+  int currentPage = 0;
   late bool dataSaver;
-  late int chapterNumber;
   late Future<List<String>> filepaths;
-  void initState() {
-    super.initState();
-    chapterNumber = widget.chapterNumber;
-    dataSaver = widget.dataSaver;
-    filepaths = _getAllFilePaths(widget.chapterId, widget.dataSaver);
-  }
-
-  bool imgLoading = false;
-  int pageIndex = 0;
-  bool hasChangedChapter = false;
+  late int totalPages = 0;
+  Token? loginData;
+  bool isFullscreen = false;
   bool colorDialogVisible = false;
-  final _controller = ScrollController();
 
-  Future<List<String>> _getAllFilePaths(
-      String chapterId, bool isDataSaverMode) async {
-    return await FludexUtils().getAllFilePaths(chapterId, isDataSaverMode);
+  @override
+  void initState() {
+    FludexUtils().getLoginData().then((value) {
+      if (value != null) {
+        loginData = Token(value.session, value.refresh);
+      }
+    });
+    dataSaver = widget.dataSaver;
+    (widget.chapterNumber == null)
+        ? currentChapter = 1
+        : currentChapter = int.parse(widget.chapterNumber!);
+    if (widget.volume == null) {
+      currentVolume = 0;
+    } else {
+      try {
+        currentVolume = int.parse(widget.volume!);
+      } catch (e) {
+        currentVolume = 0;
+      }
+    }
+    filepaths = FludexUtils().getAllFilePaths(
+        widget.mangaAggregate.volumes[currentVolume]
+            .chapters["$currentChapter"]!.id,
+        widget.dataSaver);
+    super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
-    return new FutureBuilder(
-      future: filepaths,
-      builder: (context, AsyncSnapshot<List<String>?> data) {
-        if (data.hasData) {
-          return Scaffold(
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  colorDialogVisible
-                      ? colorDialogVisible = false
-                      : colorDialogVisible = true;
-                  print(colorDialogVisible);
-                });
-              },
-              child: Icon(Icons.filter_b_and_w),
-              tooltip: "Color Filters",
-            ),
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              title: Text(widget.mangaTitle),
-            ),
-            body: Stack(children: [
-              SingleChildScrollView(
-                controller: _controller,
-                child: Column(
-                  children: [
-                    Container(
-                      height: 75,
-                      width: double.infinity,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Align(
-                            alignment: Alignment.center,
-                            child: Center(
-                              child: Row(
-                                children: [
-                                  Container(
-                                    child: IconButton(
-                                      icon: Icon(Icons.skip_previous),
-                                      onPressed: () {
-                                        if (chapterNumber != 0) {
-                                          setState(
-                                            () {
-                                              chapterNumber--;
-                                            },
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    padding:
-                                        EdgeInsets.only(left: 8.0, right: 8.0),
-                                    child: Text(
-                                      'Chapter ' + (chapterNumber).toString(),
-                                    ),
-                                  ),
-                                  Container(
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.skip_next,
-                                      ),
-                                      onPressed: () async {
-                                        setState(() {
-                                          hasChangedChapter = true;
-                                        });
-                                        try {
-                                          if (widget.token != null) {
-                                            await markChapterRead(
-                                              widget.token!.session,
-                                              await FludexUtils().getChapterID(
-                                                  widget.mangaId,
-                                                  chapterNumber,
-                                                  1),
-                                            );
-                                          }
-                                          chapterNumber++;
-                                          setState(() {
-                                            pageIndex = 0;
-                                          });
-                                          var newChapId = await FludexUtils()
-                                              .getChapterID(widget.mangaId,
-                                                  chapterNumber, 1);
-                                          filepaths = _getAllFilePaths(
-                                              newChapId, widget.dataSaver);
-                                        } catch (e) {
-                                          print(e);
-                                        }
-                                        setState(() {
-                                          hasChangedChapter = false;
-                                        });
-
-                                        print('Marked chapter as read');
-                                        setState(() {
-                                          hasChangedChapter = false;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
+    print('Volume give: ${widget.volume}');
+    print('Chapter number given: ${widget.chapterNumber}');
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.mangaData.attributes.title.en),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: isFullscreen
+                  ? IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isFullscreen = false;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.fullscreen_exit,
                       ),
+                      tooltip: 'Exit Fullscreen',
+                    )
+                  : IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isFullscreen = true;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.fullscreen,
+                      ),
+                      tooltip: 'Fullscreen',
                     ),
-                    Container(
-                      child: hasChangedChapter
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
+            )
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              colorDialogVisible
+                  ? colorDialogVisible = false
+                  : colorDialogVisible = true;
+              print(colorDialogVisible);
+            });
+          },
+          child: Icon(
+            Icons.filter_b_and_w,
+            color: Colors.white,
+          ),
+          tooltip: "Color Filters",
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: IconButton(
+                      onPressed: () {
+                        if (currentChapter != 1) {
+                          setState(() {
+                            currentChapter -= 1;
+                            currentPage = 0;
+                          });
+                        }
+                      },
+                      icon: Icon(Icons.skip_previous_rounded)),
+                ),
+                Text('Chapter $currentChapter'),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: IconButton(
+                      onPressed: () async {
+                        if (loginData != null) {
+                          try {
+                            await markChapterReadOrUnRead(
+                                widget.mangaData.id, loginData!.session,
+                                chapterIdsRead: [
+                                  widget.mangaAggregate.volumes[currentVolume]
+                                      .chapters[currentChapter]!.id,
+                                ]);
+                            print('marked chapter as read.');
+                          } catch (e) {
+                            if (e is MangadexServerException) {
+                              if (e.info.errors[0].status == 401) {
+                                var refreshed =
+                                    await refresh(loginData!.refresh);
+                                if (refreshed.result == 'ok') {
+                                  setState(() {
+                                    loginData = refreshed.token;
+                                  });
+                                }
+                              }
+                            }
+                          }
+                        }
+                        if (currentChapter <
+                            widget.mangaAggregate.volumes[currentVolume]
+                                .chapters.length) {
+                          setState(() {
+                            currentChapter += 1;
+                            currentPage = 0;
+                          });
+                        }
+                      },
+                      icon: Icon(Icons.skip_next_rounded)),
+                ),
+              ],
+            ),
+            Expanded(
+              child: FutureBuilder(
+                  future: filepaths,
+                  builder: (context, AsyncSnapshot<List<String>> urls) {
+                    if (urls.connectionState == ConnectionState.done) {
+                      totalPages = urls.data!.length;
+                      return GestureDetector(
+                        onTap: () {
+                          if (currentPage < urls.data!.length - 1) {
+                            setState(() {
+                              currentPage += 1;
+                            });
+                          }
+                        },
+                        onDoubleTap: () {
+                          if (currentPage != 0) {
+                            setState(() {
+                              currentPage -= 1;
+                            });
+                          }
+                        },
+                        child: Container(
+                          foregroundDecoration: BoxDecoration(
+                            color: Color.fromRGBO(filterRed, filterGreen,
+                                filterBlue, opacity / 100),
+                          ),
+                          child: Stack(
+                            children: [
+                              isFullscreen
+                                  ? SingleChildScrollView(
+                                      child: Center(
+                                        child: CachedNetworkImage(
+                                          imageUrl: urls.data![currentPage],
+                                          fit: BoxFit.fitWidth,
+                                          alignment: Alignment.center,
+                                          filterQuality: FilterQuality.high,
+                                          progressIndicatorBuilder: (context,
+                                                  url, downloadProgress) =>
+                                              CircularProgressIndicator(
+                                                  value: downloadProgress
+                                                      .progress),
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: InteractiveViewer(
+                                        alignPanAxis: true,
+                                        clipBehavior: Clip.none,
+                                        child: CachedNetworkImage(
+                                          imageUrl: urls.data![currentPage],
+                                          fit: BoxFit.fitWidth,
+                                          alignment: Alignment.center,
+                                          filterQuality: FilterQuality.high,
+                                          progressIndicatorBuilder: (context,
+                                                  url, downloadProgress) =>
+                                              CircularProgressIndicator(
+                                                  value: downloadProgress
+                                                      .progress),
+                                        ),
+                                      ),
+                                    ),
+                              Center(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Spacer(),
+                                    Container(
+                                      margin: EdgeInsets.all(10),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 10),
+                                      decoration: BoxDecoration(
+                                          color: Theme.of(context).primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(50)),
+                                      child: Text(
+                                        '${currentPage + 1}/${urls.data!.length}',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )
-                          : Container(
-                              foregroundDecoration: BoxDecoration(
-                                color: Color.fromRGBO(filterRed, filterGreen,
-                                    filterBlue, opacity / 100),
-                              ), //brightness Control
-                              child: Center(
-                                child: InkWell(
-                                  child: CachedNetworkImage(
-                                    imageUrl: data.data![pageIndex],
-                                    placeholder: (BuildContext context, value) {
-                                      return Container(
-                                        child: Center(
-                                          child: SizedBox(
-                                            height: 1000,
-                                            child: Center(
-                                              child: SizedBox(
-                                                height: 200,
-                                                width: 200,
-                                                child:
-                                                    CircularProgressIndicator(),
+                              colorDialogVisible
+                                  ? Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 200, right: 200),
+                                        child: AnimatedContainer(
+                                          duration: Duration(microseconds: 250),
+                                          curve: Curves.easeIn,
+                                          child: Card(
+                                            elevation: 10,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(15.0),
+                                              child: ListView(
+                                                shrinkWrap: true,
+                                                children: [
+                                                  Text(
+                                                    "Color filters",
+                                                    style:
+                                                        TextStyle(fontSize: 30),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  Text(
+                                                    "Brightness / Opacity",
+                                                    style:
+                                                        TextStyle(fontSize: 20),
+                                                  ),
+                                                  ListTile(
+                                                    leading: Icon(
+                                                        Icons.brightness_3),
+                                                    // title: StatefulBuilder(
+                                                    //   builder: (BuildContext context,
+                                                    //       StateSetter setState) {
+                                                    //     return Slider(
+                                                    //       value: opacity * 10,
+                                                    //       onChanged: (value) => setState(() {
+                                                    //         opacity = value / 10;
+                                                    //       }),
+                                                    //       min: 0,
+                                                    //       max: 100,
+                                                    //     );
+                                                    //   },
+                                                    // ),
+                                                    title: Slider(
+                                                      value: opacity,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          opacity = value;
+                                                        });
+                                                      },
+                                                      min: 0,
+                                                      max: 100,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "Filter Colors",
+                                                    style:
+                                                        TextStyle(fontSize: 20),
+                                                  ),
+                                                  ListTile(
+                                                    leading: Text(
+                                                      "R",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 30),
+                                                    ),
+                                                    title: Slider(
+                                                      value:
+                                                          filterRed.toDouble(),
+                                                      onChanged: (value) =>
+                                                          setState(() {
+                                                        filterRed =
+                                                            value.toInt();
+                                                      }),
+                                                      min: 0,
+                                                      max: 255,
+                                                    ),
+                                                  ),
+                                                  ListTile(
+                                                    leading: Text(
+                                                      "G",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 30),
+                                                    ),
+                                                    title: Slider(
+                                                      value: filterGreen
+                                                          .toDouble(),
+                                                      onChanged: (value) =>
+                                                          setState(() {
+                                                        filterGreen =
+                                                            value.toInt();
+                                                      }),
+                                                      min: 0,
+                                                      max: 255,
+                                                    ),
+                                                  ),
+                                                  ListTile(
+                                                    leading: Text(
+                                                      "B",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 30),
+                                                    ),
+                                                    title: Slider(
+                                                      value:
+                                                          filterBlue.toDouble(),
+                                                      onChanged: (value) =>
+                                                          setState(() {
+                                                        filterBlue =
+                                                            value.toInt();
+                                                      }),
+                                                      min: 0,
+                                                      max: 255,
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      TextButton(
+                                                        child: Text(
+                                                          "Reset",
+                                                          style: TextStyle(
+                                                              fontSize: 20),
+                                                        ),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            opacity = 0.0;
+                                                            filterRed = 18;
+                                                            filterGreen = 18;
+                                                            filterBlue = 18;
+                                                          });
+                                                          print(
+                                                              colorDialogVisible);
+                                                        },
+                                                      ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      TextButton(
+                                                        child: Text(
+                                                          "Close",
+                                                          style: TextStyle(
+                                                              fontSize: 20),
+                                                        ),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            colorDialogVisible =
+                                                                false;
+                                                          });
+                                                          print(
+                                                              colorDialogVisible);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
                                               ),
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                    errorWidget: (context, String a, b) {
-                                      return Container(
-                                        child: Center(
-                                          child: Text("Unable to load image"),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  onDoubleTap: () async {
-                                    if (pageIndex != 0) {
-                                      imgLoading = true;
-                                      pageIndex--;
-                                      imgLoading = false;
-                                    } else if (chapterNumber != 1 &&
-                                        pageIndex == 0) {
-                                      setState(() {
-                                        hasChangedChapter = true;
-                                        chapterNumber--;
-                                      });
-                                      var newChapId = await FludexUtils()
-                                          .getChapterID(
-                                              widget.mangaId, chapterNumber, 1);
-                                      filepaths = _getAllFilePaths(
-                                          newChapId, widget.dataSaver);
-                                      setState(() {
-                                        pageIndex = 0;
-                                        hasChangedChapter = false;
-                                      });
-                                    }
-                                  },
-                                  onTap: () async {
-                                    if (data.data!.length != pageIndex + 1) {
-                                      setState(() {
-                                        imgLoading = true;
-                                        pageIndex++;
-                                        imgLoading = false;
-                                      });
-                                    } else if (data.data!.length ==
-                                        pageIndex + 1) {
-                                      setState(() {
-                                        hasChangedChapter = true;
-                                        chapterNumber++;
-                                      });
-                                      if (widget.token != null) {
-                                        markChapterRead(
-                                            widget.token!.session,
-                                            await FludexUtils().getChapterID(
-                                                widget.mangaId,
-                                                chapterNumber,
-                                                1));
-                                      }
-                                      setState(() {
-                                        pageIndex = 0;
-                                        hasChangedChapter = false;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
-                            ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text(
-                          'Page ${(pageIndex + 1).toString()}/${data.data!.length}',
-                          style: TextStyle(),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              colorDialogVisible
-                  ? Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 200, right: 200),
-                        child: AnimatedContainer(
-                          duration: Duration(microseconds: 250),
-                          curve: Curves.easeIn,
-                          child: Card(
-                            elevation: 10,
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: ListView(
-                                shrinkWrap: true,
-                                children: [
-                                  Text(
-                                    "Color filters",
-                                    style: TextStyle(fontSize: 30),
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Text(
-                                    "Brightness / Opacity",
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  ListTile(
-                                    leading: Icon(Icons.brightness_3),
-                                    // title: StatefulBuilder(
-                                    //   builder: (BuildContext context,
-                                    //       StateSetter setState) {
-                                    //     return Slider(
-                                    //       value: opacity * 10,
-                                    //       onChanged: (value) => setState(() {
-                                    //         opacity = value / 10;
-                                    //       }),
-                                    //       min: 0,
-                                    //       max: 100,
-                                    //     );
-                                    //   },
-                                    // ),
-                                    title: Slider(
-                                      value: opacity,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          opacity = value;
-                                        });
-                                      },
-                                      min: 0,
-                                      max: 100,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Filter Colors",
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  ListTile(
-                                    leading: Text(
-                                      "R",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30),
-                                    ),
-                                    title: Slider(
-                                      value: filterRed.toDouble(),
-                                      onChanged: (value) => setState(() {
-                                        filterRed = value.toInt();
-                                      }),
-                                      min: 0,
-                                      max: 255,
-                                    ),
-                                  ),
-                                  ListTile(
-                                    leading: Text(
-                                      "G",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30),
-                                    ),
-                                    title: Slider(
-                                      value: filterGreen.toDouble(),
-                                      onChanged: (value) => setState(() {
-                                        filterGreen = value.toInt();
-                                      }),
-                                      min: 0,
-                                      max: 255,
-                                    ),
-                                  ),
-                                  ListTile(
-                                    leading: Text(
-                                      "B",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30),
-                                    ),
-                                    title: Slider(
-                                      value: filterBlue.toDouble(),
-                                      onChanged: (value) => setState(() {
-                                        filterBlue = value.toInt();
-                                      }),
-                                      min: 0,
-                                      max: 255,
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      TextButton(
-                                        child: Text(
-                                          "Reset",
-                                          style: TextStyle(fontSize: 20),
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            opacity = 0.0;
-                                            filterRed = 18;
-                                            filterGreen = 18;
-                                            filterBlue = 18;
-                                          });
-                                          print(colorDialogVisible);
-                                        },
                                       ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      TextButton(
-                                        child: Text(
-                                          "Close",
-                                          style: TextStyle(fontSize: 20),
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            colorDialogVisible = false;
-                                          });
-                                          print(colorDialogVisible);
-                                        },
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
+                                    )
+                                  : Container(),
+                            ],
                           ),
                         ),
-                      ),
-                    )
-                  : Container(),
-            ]),
-          );
-        } else {
-          return Center(
-            child: Container(
-              height: 100,
-              width: 100,
-              child: CircularProgressIndicator(),
+                      );
+                    } else if (urls.connectionState == ConnectionState.done) {
+                      return CircularProgressIndicator();
+                    } else {
+                      return Container();
+                    }
+                  }),
             ),
-          );
-        }
-      },
-    );
+          ],
+        ));
   }
 }

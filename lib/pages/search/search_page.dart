@@ -3,9 +3,8 @@ import 'package:mangadex_library/models/login/Login.dart';
 import 'widgets/search_reply_widget.dart';
 
 class SearchPage extends StatefulWidget {
-  final Token? token;
   final bool dataSaver;
-  SearchPage({required this.token, required this.dataSaver});
+  SearchPage({required this.dataSaver});
   _SearchPageState createState() => _SearchPageState();
 }
 
@@ -99,7 +98,6 @@ class _SearchPageState extends State<SearchPage> {
                   child: hasTyped
                       ? SearchReplyScreen(
                           searchQuery: searchValue,
-                          token: widget.token,
                           dataSaver: widget.dataSaver,
                         )
                       : Container(),

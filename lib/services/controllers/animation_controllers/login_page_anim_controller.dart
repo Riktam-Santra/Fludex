@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import 'home_page.dart';
+import '../../../pages/login/login_page.dart';
 
-class HomePageAnimator extends StatefulWidget {
-  const HomePageAnimator({Key? key}) : super(key: key);
+class LoginPageAnimator extends StatefulWidget {
+  const LoginPageAnimator({Key? key}) : super(key: key);
 
   @override
-  _HomePageAnimatorState createState() => _HomePageAnimatorState();
+  _LoginPageAnimatorState createState() => _LoginPageAnimatorState();
 }
 
-class _HomePageAnimatorState extends State<HomePageAnimator>
+class _LoginPageAnimatorState extends State<LoginPageAnimator>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
@@ -31,7 +31,7 @@ class _HomePageAnimatorState extends State<HomePageAnimator>
 
   @override
   Widget build(BuildContext context) {
-    return HomePage(
+    return LoginPage(
       controller: _controller,
     );
   }

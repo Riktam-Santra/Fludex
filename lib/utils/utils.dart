@@ -9,56 +9,83 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class FludexUtils {
-  Future<String> getTokenIfFileExists() async {
-    var file = File('data/appData/loginData.json');
-    if (await file.exists()) {
-      try {
-        var contents = await file.readAsString();
-        var jsonData = LoginData.fromJson(jsonDecode(contents));
-        return jsonData.session;
-      } catch (e) {
-        return '';
-      }
-    } else {
-      return '';
-    }
-  }
-
-  Future<Settings> getSettings() async {
-    var file = await File('data/appData/settings.json').create(recursive: true);
-    var contents = await file.readAsString();
-    if (contents == '') {
-      await file.writeAsString(
-        jsonEncode(
-          Settings(lightMode: true, dataSaver: false),
-        ),
-      );
-    }
-    var jsonData = Settings.fromJson(jsonDecode(contents));
-    return jsonData;
-  }
-
-  Future<bool> getLightModeSetting() async {
+  Future<LoginData?> getLoginData() async {
+    var file =
+        await File('data/appData/loginData.json').create(recursive: true);
     try {
-      var settings = await getSettings();
-      return settings.lightMode;
-    } on Exception {
-      await FludexUtils().saveSettings(true, false);
-      var settings = await getSettings();
-      return settings.lightMode;
+      var contents = await file.readAsString();
+      if (contents == '') {
+        return null;
+      } else {
+        try {
+          var data = LoginData.fromJson(jsonDecode(contents));
+          if ((DateTime.now().millisecondsSinceEpoch - data.timestamp) >=
+              840000) {
+            debugPrint(
+                'The saved login data seems to be older than 14 minutes of being requested, refreshing...');
+            var newToken = await refresh(data.refresh);
+            await saveLoginData(newToken.token.session, newToken.token.refresh);
+            debugPrint('done!');
+            var newLoginData = await getLoginData();
+            return newLoginData;
+          } else {
+            return data;
+          }
+        } on Exception catch (e) {
+          print(e);
+          return null;
+        }
+      }
+    } catch (e) {
+      print(e);
+      return null;
     }
   }
 
-  void saveLoginData(String session, String refresh) async {
-    var user = LoginData(session, refresh);
+  Future<void> saveLoginData(String session, String refresh) async {
+    var timestamp = DateTime.now().millisecondsSinceEpoch;
+    var user = LoginData(session, refresh, timestamp);
     var encodedJson = jsonEncode(user);
-    var file = File('data/loginData.json');
+    var file =
+        await File('data/appData/loginData.json').create(recursive: true);
     await file.writeAsString(encodedJson);
   }
 
+  Future<Settings?> getSettings() async {
+    var file = await File('data/appData/settings.json').create(recursive: true);
+    try {
+      var contents = await file.readAsString();
+      if (contents == '') {
+        await file.writeAsString(
+          jsonEncode(
+            Settings(lightMode: true, dataSaver: false),
+          ),
+        );
+      }
+      return Settings.fromJson(jsonDecode(contents));
+    } on Exception catch (e) {
+      print(e);
+      throw Exception(e);
+    }
+  }
+
+  Future<bool?> getLightModeSetting() async {
+    try {
+      var settings = await getSettings();
+      return settings?.lightMode;
+    } on Exception catch (e) {
+      //await FludexUtils().saveSettings(true, false);
+      // var settings = await getSettings();
+      // return settings?.lightMode;
+      throw Exception(e);
+    }
+  }
+
   void disposeLoginData() async {
-    var file = File('data/loginData.json');
-    await file.writeAsString('');
+    var file = File('data/appData/loginData.json');
+    if (await file.exists()) {
+      await file.writeAsString('');
+    }
   }
 
   Future<void> saveSettings(bool lightMode, bool dataSaver) async {
@@ -68,15 +95,15 @@ class FludexUtils {
     await file.writeAsString(encodedJson);
   }
 
-  void refreshAndSaveData(String session, String refreshdd) async {
+  Future<void> refreshAndSaveData(String session, String refreshdd) async {
     var dataResponse = await getDataResponse(refreshdd);
     print(dataResponse.body);
     var data = l.Login.fromJson(jsonDecode(dataResponse.body));
     print(data.result);
     try {
-      saveLoginData(data.token.session, data.token.refresh);
+      await saveLoginData(data.token.session, data.token.refresh);
     } catch (e) {
-      saveLoginData(session, refreshdd);
+      await saveLoginData(session, refreshdd);
     }
   }
 

@@ -1,23 +1,23 @@
 import 'package:fludex/pages/library/library.dart';
-import 'package:fludex/utils.dart';
+import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'home_page_enter_animation.dart';
+import 'login_page_enter_animation.dart';
 
-class HomePage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   final AnimationController controller;
-  HomePage({Key? key, required this.controller}) : super(key: key);
+  LoginPage({Key? key, required this.controller}) : super(key: key);
 
   @override
-  _HomePageState createState() =>
-      _HomePageState(controller: controller, lightMode: true);
+  _LoginPageState createState() =>
+      _LoginPageState(controller: controller, lightMode: true);
 }
 
-class _HomePageState extends State<HomePage> {
-  _HomePageState({required AnimationController controller, required lightMode})
+class _LoginPageState extends State<LoginPage> {
+  _LoginPageState({required AnimationController controller, required lightMode})
       : animation = HomePageEnterAnimation(controller);
 
   bool animationDone = false;
@@ -119,8 +119,15 @@ class _HomePageState extends State<HomePage> {
                                                     var loginData =
                                                         await lib.login(
                                                             username, password);
+
                                                     if (loginData.result ==
                                                         'ok') {
+                                                      await FludexUtils()
+                                                          .saveLoginData(
+                                                              loginData.token
+                                                                  .session,
+                                                              loginData.token
+                                                                  .refresh);
                                                       animation.controller
                                                           .reverse()
                                                           .whenComplete(() => {
@@ -130,8 +137,6 @@ class _HomePageState extends State<HomePage> {
                                                                     builder:
                                                                         (context) =>
                                                                             Library(
-                                                                      token: loginData
-                                                                          .token,
                                                                       dataSaver:
                                                                           true,
                                                                     ),
@@ -206,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                                                           BorderRadius.circular(
                                                               50),
                                                     ),
-                                                    primary:
+                                                    backgroundColor:
                                                         const Color.fromARGB(
                                                             255, 255, 103, 64),
                                                   ),
@@ -244,6 +249,14 @@ class _HomePageState extends State<HomePage> {
                                                                   await lib.login(
                                                                       username,
                                                                       password);
+                                                              await FludexUtils()
+                                                                  .saveLoginData(
+                                                                      loginData
+                                                                          .token
+                                                                          .session,
+                                                                      loginData
+                                                                          .token
+                                                                          .refresh);
                                                               if (loginData
                                                                       .result ==
                                                                   'ok') {
@@ -256,7 +269,6 @@ class _HomePageState extends State<HomePage> {
                                                                                 context,
                                                                                 MaterialPageRoute(
                                                                                   builder: (context) => Library(
-                                                                                    token: loginData.token,
                                                                                     dataSaver: true,
                                                                                   ),
                                                                                 ),
@@ -304,8 +316,10 @@ class _HomePageState extends State<HomePage> {
                                                                     (context) =>
                                                                         Library(
                                                                   dataSaver:
-                                                                      settings
-                                                                          .dataSaver,
+                                                                      (settings ==
+                                                                              null)
+                                                                          ? true
+                                                                          : false,
                                                                 ),
                                                               ),
                                                             )
