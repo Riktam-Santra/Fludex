@@ -92,3 +92,7 @@
 - changed class name 'readManga.dart' to 'mangaReader.dart'.
 
 - removed 'background.dart' class.
+
+## 0.2.1
+- fixed a bug where the app stopped working when loading the library
+- fixed a bug where the manga reader messed up the volume indexes for certain mangas

@@ -42,7 +42,7 @@ class _Library extends State<Library> {
 
   String selectedValue = 'All';
 
-  late Future<UserFollowedManga> userLibrary;
+  late Future<UserFollowedManga?> userLibrary;
   late Future<List<mangadat.Data>> filteredMangaList;
   late Future<UserDetails> userDetails;
 
@@ -103,15 +103,17 @@ class _Library extends State<Library> {
     );
   }
 
-  Future<UserFollowedManga> _getUserLibrary(int? _offset) async {
+  Future<UserFollowedManga?> _getUserLibrary(int? _offset) async {
     var loginData = await FludexUtils().getLoginData();
-    var response = await lib.getUserFollowedMangaResponse(loginData!.session,
-        offset: _offset);
-    try {
-      return UserFollowedManga.fromJson(jsonDecode(response.body));
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-      return Future.error('Unable to connect to the internet');
+    if (loginData != null) {
+      var response = await lib.getUserFollowedMangaResponse(loginData.session,
+          offset: _offset);
+      try {
+        return UserFollowedManga.fromJson(jsonDecode(response.body));
+      } on Exception catch (e) {
+        debugPrint(e.toString());
+        return Future.error('Unable to connect to the internet');
+      }
     }
   }
 
@@ -127,34 +129,36 @@ class _Library extends State<Library> {
     var loginData = await FludexUtils().getLoginData();
     List<mangadat.Data> mangaList = [];
     try {
-      var followedManga = await lib.getUserFollowedManga(loginData!.session);
-      var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
-          loginData.session,
-          readingStatus: checkReadingStatus(selectedValue));
-      followedManga.data.forEach((element) {
-        if (mangaWithStatus.statuses.containsKey(element.id)) {
-          mangaList.add(element);
-        }
-      });
-      return mangaList;
+      if (loginData != null) {
+        var followedManga = await lib.getUserFollowedManga(loginData.session);
+        var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
+            loginData.session,
+            readingStatus: checkReadingStatus(selectedValue));
+        followedManga.data.forEach((element) {
+          if (mangaWithStatus.statuses.containsKey(element.id)) {
+            mangaList.add(element);
+          }
+        });
+      }
     } on MangadexServerException catch (e) {
       e.info.errors.forEach((element) {
         print(element);
       });
 
-      var followedManga = await lib.getUserFollowedManga(loginData!.session);
-      var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
-          loginData.session,
-          readingStatus: checkReadingStatus(selectedValue));
-      followedManga.data.forEach((element) {
-        if (mangaWithStatus.statuses.containsKey(element.id)) {
-          mangaList.add(element);
-        }
-      });
-      return mangaList;
+      // var followedManga = await lib.getUserFollowedManga(loginData!.session);
+      // var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
+      //     loginData.session,
+      //     readingStatus: checkReadingStatus(selectedValue));
+      // followedManga.data.forEach((element) {
+      //   if (mangaWithStatus.statuses.containsKey(element.id)) {
+      //     mangaList.add(element);
+      //   }
+      // });
+      // return mangaList;
     } on SocketException {
       return Future.error(Exception('Unable to connect to the internet'));
     }
+    return mangaList;
   }
 
   Widget build(BuildContext context) {
@@ -410,7 +414,7 @@ class _Library extends State<Library> {
                       : FutureBuilder(
                           future: userLibrary,
                           builder: (context,
-                              AsyncSnapshot<UserFollowedManga> followedManga) {
+                              AsyncSnapshot<UserFollowedManga?> followedManga) {
                             if (followedManga.connectionState ==
                                 ConnectionState.done) {
                               if (followedManga.hasError) {
