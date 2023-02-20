@@ -96,3 +96,7 @@
 ## 0.2.1
 - fixed a bug where the app stopped working when loading the library
 - fixed a bug where the manga reader messed up the volume indexes for certain mangas
+
+## 0.2.2
+- fixed a bug where some mangas failed to load up.
+- moved a few functions to separate dart files to organize things

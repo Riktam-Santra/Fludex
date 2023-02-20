@@ -70,7 +70,7 @@ class _MangaReaderState extends State<MangaReader> {
       }
     }
 
-    var requiredChapter = '';
+    var requiredChapter = "1";
     print('chapterID: ' + widget.chapterId);
 
     var volumes = widget.mangaAggregate.volumes;

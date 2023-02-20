@@ -1,19 +1,13 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:fludex/services/data_models/user_data/login_data.dart';
-import 'package:fludex/utils/utils.dart';
-// import 'package:fludex/pages/saucenao/saucenao_page.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fludex/pages/about/aboutFludex.dart';
-import 'package:fludex/pages/search/search_page.dart';
+import 'package:fludex/pages/library/widgets/custom_app_bar.dart';
+import 'package:fludex/services/api/mangadex/library_functions.dart';
+import 'package:fludex/services/data_models/user_data/login_data.dart';
+import 'package:fludex/utils/utils.dart';
 import 'package:fludex/pages/settings/settings_page.dart';
 import 'package:fludex/pages/search/widgets/search_result_holder_widget.dart';
 import 'package:fludex/services/controllers/animation_controllers/login_page_anim_controller.dart';
-import 'package:mangadex_library/mangadexServerException.dart';
 
-import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/models/common/reading_status.dart';
 import 'package:mangadex_library/models/user/logged_user_details/logged_user_details.dart';
 import 'package:mangadex_library/models/user/user_followed_manga/user_followed_manga.dart';
 import 'package:mangadex_library/models/common/data.dart' as mangadat;
@@ -49,42 +43,15 @@ class _Library extends State<Library> {
   @override
   void initState() {
     super.initState();
-    userLibrary = _getUserLibrary(
+    userLibrary = LibraryFunctions.getUserLibrary(
       (resultOffset * 10),
     );
-    filteredMangaList = _filterManga();
-    userDetails = _getLoggedUserDetails();
+    filteredMangaList = LibraryFunctions.filterManga(selectedValue);
+    userDetails = LibraryFunctions.getLoggedUserDetails();
 
     FludexUtils()
         .getLightModeSetting()
         .then((value) => {lightMode = value ?? true});
-  }
-
-  Future<UserDetails> _getLoggedUserDetails() async {
-    var loginData = await FludexUtils().getLoginData();
-    if (loginData != null) {
-      try {
-        var userDetails = await lib.getLoggedUserDetails(loginData.session);
-        return userDetails;
-      } on Exception catch (e) {
-        debugPrint(e.toString());
-        return Future.error('Unable to connect to the internet');
-      }
-    } else {
-      return UserDetails(
-        'ok',
-        Data(
-          '',
-          '',
-          Attributes(
-            'Anonymous',
-            [],
-            0,
-          ),
-          [],
-        ),
-      );
-    }
   }
 
   Future<UserDetails> dummyDetails() async {
@@ -101,64 +68,6 @@ class _Library extends State<Library> {
         [],
       ),
     );
-  }
-
-  Future<UserFollowedManga?> _getUserLibrary(int? _offset) async {
-    var loginData = await FludexUtils().getLoginData();
-    if (loginData != null) {
-      var response = await lib.getUserFollowedMangaResponse(loginData.session,
-          offset: _offset);
-      try {
-        return UserFollowedManga.fromJson(jsonDecode(response.body));
-      } on Exception catch (e) {
-        debugPrint(e.toString());
-        return Future.error('Unable to connect to the internet');
-      }
-    }
-  }
-
-  ReadingStatus? checkReadingStatus(String status) {
-    if (status.toLowerCase() == 'all') {
-      return null;
-    } else {
-      return FludexUtils.statusStringToEnum(status.toLowerCase());
-    }
-  }
-
-  Future<List<mangadat.Data>> _filterManga() async {
-    var loginData = await FludexUtils().getLoginData();
-    List<mangadat.Data> mangaList = [];
-    try {
-      if (loginData != null) {
-        var followedManga = await lib.getUserFollowedManga(loginData.session);
-        var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
-            loginData.session,
-            readingStatus: checkReadingStatus(selectedValue));
-        followedManga.data.forEach((element) {
-          if (mangaWithStatus.statuses.containsKey(element.id)) {
-            mangaList.add(element);
-          }
-        });
-      }
-    } on MangadexServerException catch (e) {
-      e.info.errors.forEach((element) {
-        print(element);
-      });
-
-      // var followedManga = await lib.getUserFollowedManga(loginData!.session);
-      // var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
-      //     loginData.session,
-      //     readingStatus: checkReadingStatus(selectedValue));
-      // followedManga.data.forEach((element) {
-      //   if (mangaWithStatus.statuses.containsKey(element.id)) {
-      //     mangaList.add(element);
-      //   }
-      // });
-      // return mangaList;
-    } on SocketException {
-      return Future.error(Exception('Unable to connect to the internet'));
-    }
-    return mangaList;
   }
 
   Widget build(BuildContext context) {
@@ -182,7 +91,7 @@ class _Library extends State<Library> {
             tooltip: 'Refresh library',
             onPressed: () {
               setState(() {
-                filteredMangaList = _filterManga();
+                filteredMangaList = LibraryFunctions.filterManga(selectedValue);
               });
             },
             icon: Icon(Icons.refresh),
@@ -212,164 +121,7 @@ class _Library extends State<Library> {
           'Library',
         ),
       ),
-      drawer: Drawer(
-        child: Container(
-          child: ListView(
-            children: [
-              Container(
-                child: Center(
-                  child: FutureBuilder(
-                      future: _getLoggedUserDetails(),
-                      builder: (context, AsyncSnapshot<UserDetails> snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Unable to load data, please check your internet",
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      setState(() {});
-                                    },
-                                    child: Text("Retry"),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Column(
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.all(10),
-                                  padding: EdgeInsets.all(20),
-                                  height: 150,
-                                  child: Center(
-                                    child: Text(
-                                      snapshot.data!.data.attributes.username
-                                          .characters.first
-                                          .toUpperCase(),
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 70),
-                                    ),
-                                  ),
-                                  decoration: BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 103, 64),
-                                      shape: BoxShape.circle),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  snapshot.data!.data.attributes.username,
-                                  style: TextStyle(fontSize: 17),
-                                )
-                              ],
-                            );
-                          }
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      }),
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.library_books,
-                ),
-                title: Text(
-                  'Library',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {});
-                },
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.search,
-                ),
-                title: Text(
-                  'Search Manga',
-                  style: TextStyle(fontSize: 16),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          SearchPage(dataSaver: widget.dataSaver),
-                    ),
-                  );
-                },
-              ),
-              // ListTile(
-              //   leading: SizedBox(
-              //     height: 24,
-              //     width: 24,
-              //     child: Image(
-              //       image: AssetImage('data/media/SauceNAO_ico.png'),
-              //       color: lightMode ? Colors.grey : Colors.white,
-              //     ),
-              //   ),
-              //   title: Text('SauceNAO'),
-              //   onTap: () {
-              //     Navigator.pop(context);
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(builder: (context) => SaucenaoSearch()),
-              //     );
-              //   },
-              // ),
-              ListTile(
-                leading: Icon(
-                  Icons.logout,
-                ),
-                title: Text(
-                  'Logout',
-                  style: TextStyle(fontSize: 16),
-                ),
-                onTap: () async {
-                  Navigator.pop(context);
-                  FludexUtils().disposeLoginData();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPageAnimator(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.info,
-                ),
-                title: Text(
-                  'About Fludex',
-                  style: TextStyle(fontSize: 16),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AboutFludex(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+      drawer: CustomAppBar(dataSaver: widget.dataSaver),
       body: Hero(
         tag: 'login_transition',
         child: FutureBuilder(
@@ -638,7 +390,9 @@ class _Library extends State<Library> {
                                                             onPressed: () {
                                                               setState(() {
                                                                 filteredMangaList =
-                                                                    _filterManga();
+                                                                    LibraryFunctions
+                                                                        .filterManga(
+                                                                            selectedValue);
                                                               });
                                                             },
                                                             child:
@@ -685,7 +439,8 @@ class _Library extends State<Library> {
                                                         () {
                                                           resultOffset--;
                                                           userLibrary =
-                                                              _getUserLibrary(
+                                                              LibraryFunctions
+                                                                  .getUserLibrary(
                                                             (resultOffset * 10),
                                                           );
                                                         },
@@ -715,7 +470,8 @@ class _Library extends State<Library> {
                                                       setState(() {
                                                         resultOffset++;
                                                         userLibrary =
-                                                            _getUserLibrary(
+                                                            LibraryFunctions
+                                                                .getUserLibrary(
                                                           (resultOffset * 10),
                                                         );
                                                       });
