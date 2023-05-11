@@ -4,16 +4,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fludex/services/data_models/user_data/login_data.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadexServerException.dart';
-import 'package:mangadex_library/models/aggregate/Aggregate.dart';
-import 'package:mangadex_library/models/chapter/ChapterData.dart' as ch;
+import 'package:mangadex_library/models/aggregate/aggregate.dart';
+import 'package:mangadex_library/models/chapter/chapter_data.dart' as ch;
 import 'package:mangadex_library/mangadex_library.dart';
-import 'package:mangadex_library/models/chapter/readChapters.dart';
-import 'package:mangadex_library/models/common/language_codes.dart';
-import 'package:mangadex_library/models/common/mangaReadingStatus.dart';
-import 'package:mangadex_library/models/common/reading_status.dart';
+import 'package:mangadex_library/models/chapter/read_chapters.dart';
+import 'package:mangadex_library/enums/language_codes.dart';
+import 'package:mangadex_library/models/common/manga_reading_status.dart';
+import 'package:mangadex_library/enums/reading_status.dart';
 import 'package:mangadex_library/models/common/tags.dart';
 import 'package:mangadex_library/models/common/data.dart';
-import 'package:mangadex_library/models/login/Login.dart';
+import 'package:mangadex_library/models/login/login.dart';
 
 import '../mangaReader/mangaReader.dart';
 import '../../utils/utils.dart';
@@ -64,7 +64,7 @@ class _AboutMangaState extends State<AboutManga> {
   int _chapterPageOffset = 0;
   //int _desiredInputChapterNumber = 0;
   Future<ReadChapters?> _getDummyReadChapterList() async {
-    return ReadChapters(result: 'ok', data: []);
+    return ReadChapters('ok', []);
   }
 
   Future<MangaReadingStatus?> _getMangaReadingStatus(
@@ -72,7 +72,7 @@ class _AboutMangaState extends State<AboutManga> {
     if (token != null) {
       try {
         var data =
-            await getMangaReadingStatus(token.session, widget.mangaData.id);
+            await getMangaReadingStatus(token.session!, widget.mangaData.id!);
         return data;
       } on MangadexServerException catch (e) {
         return Future.error(
@@ -96,7 +96,7 @@ class _AboutMangaState extends State<AboutManga> {
   Future<ReadChapters?> _getReadChapters(Token? token, String mangaId) {
     if (token != null) {
       try {
-        var data = getAllReadChapters(token.session, widget.mangaData.id);
+        var data = getAllReadChapters(token.session!, widget.mangaData.id!);
         return data;
       } on MangadexServerException catch (e) {
         return Future.error(
@@ -157,11 +157,11 @@ class _AboutMangaState extends State<AboutManga> {
     List<Widget> _widgets = [];
     if (_tags.length > 10) {
       for (int i = 0; i < 10; i++) {
-        _widgets.add(_tagContainer(_tags[i].attributes.name.en, lightMode));
+        _widgets.add(_tagContainer(_tags[i].attributes!.name!.en!, lightMode));
       }
     } else {
       for (int i = 0; i < _tags.length; i++) {
-        _widgets.add(_tagContainer(_tags[i].attributes.name.en, lightMode));
+        _widgets.add(_tagContainer(_tags[i].attributes!.name!.en!, lightMode));
       }
     }
 
@@ -230,8 +230,8 @@ class _AboutMangaState extends State<AboutManga> {
 
   @override
   void initState() {
-    coverArtUrl = _getCoverArtUrl(widget.mangaData.id, 512);
-    mangaAggregate = getMangaAggregate(widget.mangaData.id,
+    coverArtUrl = _getCoverArtUrl(widget.mangaData.id!, 512);
+    mangaAggregate = getMangaAggregate(widget.mangaData.id!,
         translatedLanguages:
             parseStringToTranslatedLangEnum(translatedLangStartValue));
 
@@ -240,8 +240,12 @@ class _AboutMangaState extends State<AboutManga> {
 
   Future<List<String>> _getCoverArtUrl(String mangaId, int res) async {
     try {
-      var data = await getCoverArtUrl([widget.mangaData.id], res: 512);
-      return data;
+      var data = await getCoverArt(
+        [widget.mangaData.id!],
+      );
+      return [
+        'https://uploads.mangadex.org/covers/$mangaId/${data.data![0].attributes!.fileName!}'
+      ];
     } on MangadexServerException catch (e) {
       return Future.error(
           "Mangadex server exception: ${e.info.errors.toString()}");
@@ -259,11 +263,11 @@ class _AboutMangaState extends State<AboutManga> {
         builder: (context, AsyncSnapshot<LoginData?> loginData) {
           if (loginData.connectionState == ConnectionState.done) {
             if (loginData.data != null) {
-              mangaReadingStatus = _getMangaReadingStatus(widget.mangaData.id,
+              mangaReadingStatus = _getMangaReadingStatus(widget.mangaData.id!,
                   Token(loginData.data!.session, loginData.data!.refresh));
               readChapterList = _getReadChapters(
                   Token(loginData.data!.session, loginData.data!.refresh),
-                  widget.mangaData.id);
+                  widget.mangaData.id!);
             } else {
               readChapterList = _getDummyReadChapterList();
             }
@@ -393,9 +397,9 @@ class _AboutMangaState extends State<AboutManga> {
                                                           child: Text(
                                                             widget
                                                                 .mangaData
-                                                                .attributes
-                                                                .title
-                                                                .en,
+                                                                .attributes!
+                                                                .title!
+                                                                .en!,
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
@@ -415,8 +419,8 @@ class _AboutMangaState extends State<AboutManga> {
                                                               children: tagWidgets(
                                                                   widget
                                                                       .mangaData
-                                                                      .attributes
-                                                                      .tags,
+                                                                      .attributes!
+                                                                      .tags!,
                                                                   appLightMode),
                                                             ),
                                                           ),
@@ -432,9 +436,9 @@ class _AboutMangaState extends State<AboutManga> {
                                                               child: Text(
                                                                 widget
                                                                     .mangaData
-                                                                    .attributes
-                                                                    .description
-                                                                    .en,
+                                                                    .attributes!
+                                                                    .description!
+                                                                    .en!,
                                                                 style:
                                                                     TextStyle(),
                                                               ),
@@ -446,20 +450,20 @@ class _AboutMangaState extends State<AboutManga> {
                                                             FludexUtils.ratingContainer(
                                                                 widget
                                                                     .mangaData
-                                                                    .attributes
-                                                                    .contentRating,
+                                                                    .attributes!
+                                                                    .contentRating!,
                                                                 appLightMode),
                                                             FludexUtils.statusContainer(
                                                                 widget
                                                                     .mangaData
-                                                                    .attributes
-                                                                    .status,
+                                                                    .attributes!
+                                                                    .status!,
                                                                 appLightMode),
                                                             FludexUtils.demographicContainer(
                                                                 widget
                                                                     .mangaData
-                                                                    .attributes
-                                                                    .publicationDemographic,
+                                                                    .attributes!
+                                                                    .publicationDemographic!,
                                                                 appLightMode),
                                                           ],
                                                         ),
@@ -471,8 +475,8 @@ class _AboutMangaState extends State<AboutManga> {
                                                             'Year of Release: ' +
                                                                 getYear(widget
                                                                     .mangaData
-                                                                    .attributes
-                                                                    .year),
+                                                                    .attributes!
+                                                                    .year!),
                                                           ),
                                                         ),
                                                         Padding(
@@ -492,7 +496,7 @@ class _AboutMangaState extends State<AboutManga> {
                                                                           .session,
                                                                       widget
                                                                           .mangaData
-                                                                          .id),
+                                                                          .id!),
                                                                   builder: (context,
                                                                       AsyncSnapshot<
                                                                               bool>
@@ -531,14 +535,14 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                           iconEnabledColor: Colors.white,
                                                                                           underline: Container(),
                                                                                           dropdownColor: Color.fromARGB(255, 255, 103, 64),
-                                                                                          value: parseReadingStatusToString(mangaReadingStatus.data!.status),
+                                                                                          value: parseReadingStatusToString(mangaReadingStatus.data!.status!),
                                                                                           items: readingStatusOptions.map((e) {
                                                                                             print(e);
                                                                                             return DropdownMenuItem(child: Text(e), value: e);
                                                                                           }).toList(),
                                                                                           style: TextStyle(fontSize: 24),
                                                                                           onChanged: (newValue) async {
-                                                                                            await setMangaReadingStatus(loginData.data!.session, widget.mangaData.id, parseStringToReadingStatusEnum(newValue.toString()));
+                                                                                            await setMangaReadingStatus(loginData.data!.session, widget.mangaData.id!, parseStringToReadingStatusEnum(newValue.toString()));
                                                                                             setState(() {});
                                                                                           },
                                                                                         );
@@ -552,7 +556,7 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                   IconButton(
                                                                                     color: Colors.white,
                                                                                     onPressed: () async {
-                                                                                      await unfollowManga(loginData.data!.session, widget.mangaData.id);
+                                                                                      await unfollowManga(loginData.data!.session, widget.mangaData.id!);
                                                                                       print('Unfollowed manga ${widget.mangaData.id}');
                                                                                       setState(() {
                                                                                         isFollowed = false;
@@ -575,7 +579,7 @@ class _AboutMangaState extends State<AboutManga> {
                                                                             onPressed:
                                                                                 () async {
                                                                               try {
-                                                                                await followManga(loginData.data!.session, widget.mangaData.id);
+                                                                                await followManga(loginData.data!.session, widget.mangaData.id!);
                                                                               } on MangadexServerException catch (e) {
                                                                                 debugPrint(
                                                                                   e.info.errors.toString(),
@@ -713,7 +717,7 @@ class _AboutMangaState extends State<AboutManga> {
                                                               future:
                                                                   _getChapterData(
                                                                 widget.mangaData
-                                                                    .id,
+                                                                    .id!,
                                                                 offset:
                                                                     _chapterPageOffset *
                                                                         10,
@@ -852,14 +856,14 @@ class _AboutMangaState extends State<AboutManga> {
                                                                             // ),
                                                                             ListView.builder(
                                                                                 shrinkWrap: true,
-                                                                                itemCount: chapterData.data!.data.length,
+                                                                                itemCount: chapterData.data!.data!.length,
                                                                                 itemBuilder: (context, index) {
                                                                                   return (loginData.data == null)
                                                                                       ? Padding(
                                                                                           padding: const EdgeInsets.only(left: 8, right: 8),
                                                                                           child: ListTile(
                                                                                             title: Text(
-                                                                                              'Chapter ' + chapterData.data!.data[index].attributes.chapter,
+                                                                                              'Chapter ' + chapterData.data!.data![index].attributes!.chapter!,
                                                                                               style: TextStyle(fontSize: 17),
                                                                                             ),
                                                                                             subtitle: Padding(
@@ -867,14 +871,14 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                               child: Row(
                                                                                                 children: [
                                                                                                   Text(
-                                                                                                    'Volume ' + chapterData.data!.data[index].attributes.volume,
+                                                                                                    'Volume ' + chapterData.data!.data![index].attributes!.volume!,
                                                                                                     style: TextStyle(),
                                                                                                   ),
                                                                                                   SizedBox(
                                                                                                     width: 10,
                                                                                                   ),
                                                                                                   Text(
-                                                                                                    'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
+                                                                                                    'Language: ' + chapterData.data!.data![index].attributes!.transdLanguage!,
                                                                                                   ),
                                                                                                 ],
                                                                                               ),
@@ -889,8 +893,8 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                                   builder: (context) => MangaReader(
                                                                                                     mangaAggregate: aggregate.data!,
                                                                                                     mangaData: widget.mangaData,
-                                                                                                    chapterId: chapterData.data!.data[index].id,
-                                                                                                    chapterNumber: chapterData.data!.data[index].attributes.chapter,
+                                                                                                    chapterId: chapterData.data!.data![index].id!,
+                                                                                                    chapterNumber: chapterData.data!.data![index].attributes!.chapter,
                                                                                                     dataSaver: widget.dataSaver,
                                                                                                     lightMode: widget.lightMode,
                                                                                                     translatedLanguage: (parseStringToTranslatedLangEnum(translatedLangStartValue) ?? [LanguageCodes.en])[0],
@@ -919,12 +923,12 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                                   print(e);
                                                                                                 });
                                                                                                 return Opacity(
-                                                                                                  opacity: (readChapters.data == null) ? 1 : (readChapters.data!.data.contains(chapterData.data!.data[index].id) ? 0.5 : 1.0),
+                                                                                                  opacity: (readChapters.data == null) ? 1 : (readChapters.data!.data.contains(chapterData.data!.data![index].id) ? 0.5 : 1.0),
                                                                                                   child: Padding(
                                                                                                     padding: const EdgeInsets.only(left: 8, right: 8),
                                                                                                     child: ListTile(
                                                                                                       title: Text(
-                                                                                                        'Chapter ' + chapterData.data!.data[index].attributes.chapter,
+                                                                                                        'Chapter ' + chapterData.data!.data![index].attributes!.chapter!,
                                                                                                         style: TextStyle(fontSize: 17),
                                                                                                       ),
                                                                                                       subtitle: Column(
@@ -935,14 +939,14 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                                             child: Row(
                                                                                                               children: [
                                                                                                                 Text(
-                                                                                                                  'Volume ' + chapterData.data!.data[index].attributes.volume,
+                                                                                                                  'Volume ' + chapterData.data!.data![index].attributes!.volume!,
                                                                                                                   style: TextStyle(),
                                                                                                                 ),
                                                                                                                 SizedBox(
                                                                                                                   width: 10,
                                                                                                                 ),
                                                                                                                 Text(
-                                                                                                                  'Language: ' + chapterData.data!.data[index].attributes.translatedLanguage,
+                                                                                                                  'Language: ' + chapterData.data!.data![index].attributes!.transdLanguage!,
                                                                                                                 ),
                                                                                                               ],
                                                                                                             ),
@@ -959,21 +963,21 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                                                   ),
                                                                                                                   onTap: () async {
                                                                                                                     try {
-                                                                                                                      var result = await markChapterReadOrUnRead(widget.mangaData.id, loginData.data!.session, chapterIdsRead: [
-                                                                                                                        chapterData.data!.data[index].id,
+                                                                                                                      var result = await markChapterReadOrUnRead(widget.mangaData.id!, loginData.data!.session, chapterIdsRead: [
+                                                                                                                        chapterData.data!.data![index].id!,
                                                                                                                       ]);
 
                                                                                                                       if (result.result == 'ok') {
-                                                                                                                        print('Marked ${chapterData.data!.data[index].id}');
+                                                                                                                        print('Marked ${chapterData.data!.data![index].id}');
                                                                                                                       } else {
-                                                                                                                        print('Something went wrong while marking ${chapterData.data!.data[index].id} as unread');
+                                                                                                                        print('Something went wrong while marking ${chapterData.data!.data![index].id} as unread');
                                                                                                                       }
                                                                                                                     } on MangadexServerException catch (e) {
                                                                                                                       print(e.info.errors);
                                                                                                                     }
                                                                                                                   },
                                                                                                                 )
-                                                                                                              : readChapters.data!.data.contains(chapterData.data!.data[index].id)
+                                                                                                              : readChapters.data!.data.contains(chapterData.data!.data![index].id)
                                                                                                                   ? PopupMenuItem(
                                                                                                                       child: ListTile(
                                                                                                                         leading: Icon(Icons.check),
@@ -981,14 +985,14 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                                                       ),
                                                                                                                       onTap: () async {
                                                                                                                         try {
-                                                                                                                          var result = await markChapterReadOrUnRead(widget.mangaData.id, loginData.data!.session, chapterIdsUnread: [
-                                                                                                                            chapterData.data!.data[index].id,
+                                                                                                                          var result = await markChapterReadOrUnRead(widget.mangaData.id!, loginData.data!.session, chapterIdsUnread: [
+                                                                                                                            chapterData.data!.data![index].id!,
                                                                                                                           ]);
                                                                                                                           setState(() {});
                                                                                                                           if (result.result == 'ok') {
-                                                                                                                            print('Marked ${chapterData.data!.data[index].id}');
+                                                                                                                            print('Marked ${chapterData.data!.data![index].id}');
                                                                                                                           } else {
-                                                                                                                            print('Something went wrong while marking ${chapterData.data!.data[index].id} as unread');
+                                                                                                                            print('Something went wrong while marking ${chapterData.data!.data![index].id} as unread');
                                                                                                                             // var refreshed = await refresh(loginData.data!.refresh);
                                                                                                                             // loginData = refreshed.token;
                                                                                                                             // await markChapterReadOrUnRead(widget.mangaData.id, loginData!.session, chapterIdsUnread: [
@@ -1006,12 +1010,12 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                                                         title: Text("Mark as read"),
                                                                                                                       ),
                                                                                                                       onTap: () async {
-                                                                                                                        var result = await markChapterReadOrUnRead(widget.mangaData.id, loginData.data!.session, chapterIdsRead: [chapterData.data!.data[index].id]);
+                                                                                                                        var result = await markChapterReadOrUnRead(widget.mangaData.id!, loginData.data!.session, chapterIdsRead: [chapterData.data!.data![index].id!]);
                                                                                                                         setState(() {});
                                                                                                                         if (result.result == 'ok') {
-                                                                                                                          print('Marked ${chapterData.data!.data[index].id}');
+                                                                                                                          print('Marked ${chapterData.data!.data![index].id}');
                                                                                                                         } else {
-                                                                                                                          print('Something went wrong while marking ${chapterData.data!.data[index].id} as read');
+                                                                                                                          print('Something went wrong while marking ${chapterData.data!.data![index].id} as read');
                                                                                                                         }
                                                                                                                       },
                                                                                                                     ),
@@ -1026,9 +1030,9 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                                           MaterialPageRoute(
                                                                                                             builder: (context) => MangaReader(
                                                                                                               mangaData: widget.mangaData,
-                                                                                                              chapterId: chapterData.data!.data[index].id,
-                                                                                                              chapterNumber: chapterData.data!.data[index].attributes.chapter,
-                                                                                                              volume: chapterData.data!.data[index].attributes.volume,
+                                                                                                              chapterId: chapterData.data!.data![index].id!,
+                                                                                                              chapterNumber: chapterData.data!.data![index].attributes!.chapter,
+                                                                                                              volume: chapterData.data!.data![index].attributes!.volume,
                                                                                                               mangaAggregate: aggregate.data!,
                                                                                                               dataSaver: widget.dataSaver,
                                                                                                               lightMode: widget.lightMode,
@@ -1079,7 +1083,7 @@ class _AboutMangaState extends State<AboutManga> {
                                                                                 IconButton(
                                                                                   onPressed: () {
                                                                                     print(chapterData.data!.total);
-                                                                                    if (_chapterPageOffset * 10 < chapterData.data!.total) {
+                                                                                    if (_chapterPageOffset * 10 < chapterData.data!.total!) {
                                                                                       setState(() {
                                                                                         _chapterPageOffset++;
                                                                                       });

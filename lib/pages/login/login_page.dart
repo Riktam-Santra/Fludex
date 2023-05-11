@@ -124,10 +124,10 @@ class _LoginPageState extends State<LoginPage> {
                                                         'ok') {
                                                       await FludexUtils()
                                                           .saveLoginData(
-                                                              loginData.token
-                                                                  .session,
-                                                              loginData.token
-                                                                  .refresh);
+                                                              loginData.token!
+                                                                  .session!,
+                                                              loginData.token!
+                                                                  .refresh!);
                                                       animation.controller
                                                           .reverse()
                                                           .whenComplete(() => {
@@ -252,11 +252,11 @@ class _LoginPageState extends State<LoginPage> {
                                                               await FludexUtils()
                                                                   .saveLoginData(
                                                                       loginData
-                                                                          .token
-                                                                          .session,
+                                                                          .token!
+                                                                          .session!,
                                                                       loginData
-                                                                          .token
-                                                                          .refresh);
+                                                                          .token!
+                                                                          .refresh!);
                                                               if (loginData
                                                                       .result ==
                                                                   'ok') {

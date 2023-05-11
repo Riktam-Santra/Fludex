@@ -6,7 +6,6 @@ import 'package:fludex/services/data_models/settings_data/settings.dart';
 import 'package:fludex/services/data_models/user_data/login_data.dart';
 import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/models/login/Login.dart';
 
 void main() {
   runApp(MainPage());

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/models/login/Login.dart';
 import 'widgets/search_reply_widget.dart';
 
 class SearchPage extends StatefulWidget {

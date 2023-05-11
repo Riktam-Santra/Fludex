@@ -6,8 +6,8 @@ import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
+import 'package:mangadex_library/utils.dart';
 import 'package:mangadex_library/models/common/data.dart';
-import 'package:mangadex_library/models/login/Login.dart';
 
 class SearchResultHolder extends StatefulWidget {
   final bool? gridView;
@@ -28,14 +28,19 @@ class _SearchResultHolder extends State<SearchResultHolder> {
 
   @override
   void initState() {
-    coverArtUrl = _getCoverArtUrl(widget.mangaData.id, 256);
+    coverArtUrl = _getCoverArtUrl(widget.mangaData.id!, 256);
     super.initState();
   }
 
   Future<List<String>> _getCoverArtUrl(String mangaId, int res) async {
     try {
-      var artUrlData = await lib.getCoverArtUrl([mangaId], res: 256);
-      return artUrlData;
+      var artUrlData = await lib.getCoverArt(
+        [mangaId],
+      );
+
+      return [
+        'https://uploads.mangadex.org/covers/$mangaId/${artUrlData.data![0].attributes!.fileName}'
+      ];
     } on SocketException {
       return Future.error("Unable to connect to the internet");
     } on MangadexServerException catch (e) {
@@ -54,7 +59,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
           if (coverUrl.connectionState == ConnectionState.done) {
             if (coverUrl.data != null) {
               List<Widget> tagWidgets = <Widget>[];
-              var requiredTagList = widget.mangaData.attributes.tags.take(4);
+              var requiredTagList = widget.mangaData.attributes!.tags!.take(4);
               for (int i = 0; i < requiredTagList.length; i++) {
                 tagWidgets.add(
                   Container(
@@ -72,7 +77,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                       right: 10,
                     ),
                     child: Text(
-                      widget.mangaData.attributes.tags[i].attributes.name.en,
+                      widget
+                          .mangaData.attributes!.tags![i].attributes!.name!.en!,
                       style: TextStyle(
                         color: lightMode ? Colors.black : Colors.white,
                       ),
@@ -131,8 +137,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                             child: Container(
                                               margin: EdgeInsets.all(5),
                                               child: Text(
-                                                widget.mangaData.attributes
-                                                    .title.en,
+                                                widget.mangaData.attributes!
+                                                    .title!.en!,
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 2,
                                                 style: TextStyle(
@@ -174,8 +180,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                           Padding(
                                             padding: const EdgeInsets.all(5.0),
                                             child: Text(
-                                              widget.mangaData.attributes.title
-                                                  .en,
+                                              widget.mangaData.attributes!
+                                                  .title!.en!,
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                               style: TextStyle(
@@ -201,8 +207,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                           ),
                                           Container(
                                             child: Text(
-                                              widget.mangaData.attributes
-                                                  .description.en,
+                                              widget.mangaData.attributes!
+                                                  .description!.en!,
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 4,
                                             ),
@@ -215,16 +221,16 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                             child: Row(
                                               children: [
                                                 FludexUtils.statusContainer(
-                                                    widget.mangaData.attributes
-                                                        .status,
+                                                    widget.mangaData.attributes!
+                                                        .status!,
                                                     lightMode),
                                                 FludexUtils.demographicContainer(
-                                                    widget.mangaData.attributes
-                                                        .publicationDemographic,
+                                                    widget.mangaData.attributes!
+                                                        .publicationDemographic!,
                                                     lightMode),
                                                 FludexUtils.ratingContainer(
-                                                    widget.mangaData.attributes
-                                                        .contentRating,
+                                                    widget.mangaData.attributes!
+                                                        .contentRating!,
                                                     lightMode),
                                               ],
                                             ),

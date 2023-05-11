@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/models/login/Login.dart';
-import 'package:mangadex_library/models/search/Search.dart';
+import 'package:mangadex_library/models/search/search.dart';
 import 'search_result_holder_widget.dart';
 
 class SearchReplyScreen extends StatefulWidget {
@@ -61,26 +60,26 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
           } else {
             var tags = <String>[];
             return Container(
-              child: searchData.data!.data.length != 0
+              child: searchData.data!.data!.length != 0
                   ? GridView.builder(
                       shrinkWrap: true,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         mainAxisExtent: 300,
                         crossAxisCount: 2,
                       ),
-                      itemCount: searchData.data!.data.length,
+                      itemCount: searchData.data!.data!.length,
                       itemBuilder: (BuildContext context, index) {
                         tags = [];
                         for (int i = 0;
                             i <
-                                searchData
-                                    .data!.data[index].attributes.tags.length;
+                                searchData.data!.data![index].attributes!.tags!
+                                    .length;
                             i++) {
-                          tags.add(searchData.data!.data[index].attributes
-                              .tags[i].attributes.name.en);
+                          tags.add(searchData.data!.data![index].attributes!
+                              .tags![i].attributes!.name!.en!);
                         }
                         return SearchResultHolder(
-                          mangaData: searchData.data!.data[index],
+                          mangaData: searchData.data!.data![index],
                           dataSaver: widget.dataSaver,
                         );
                       },

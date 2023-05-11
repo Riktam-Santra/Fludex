@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fludex/services/data_models/settings_data/settings.dart';
-import 'package:mangadex_library/models/common/reading_status.dart';
-import 'package:mangadex_library/models/login/Login.dart' as l;
+import 'package:mangadex_library/enums/reading_status.dart';
+import 'package:mangadex_library/models/login/login.dart' as l;
 import 'package:mangadex_library/mangadex_library.dart';
 import 'package:fludex/services/data_models/user_data/login_data.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +24,8 @@ class FludexUtils {
             debugPrint(
                 'The saved login data seems to be older than 14 minutes of being requested, refreshing...');
             var newToken = await refresh(data.refresh);
-            await saveLoginData(newToken.token.session, newToken.token.refresh);
+            await saveLoginData(
+                newToken.token!.session!, newToken.token!.refresh!);
             debugPrint('done!');
             var newLoginData = await getLoginData();
             return newLoginData;
@@ -101,7 +102,7 @@ class FludexUtils {
     var data = l.Login.fromJson(jsonDecode(dataResponse.body));
     print(data.result);
     try {
-      await saveLoginData(data.token.session, data.token.refresh);
+      await saveLoginData(data.token!.session!, data.token!.refresh!);
     } catch (e) {
       await saveLoginData(session, refreshdd);
     }
@@ -115,25 +116,25 @@ class FludexUtils {
   Future<List<String>> getAllFilePaths(
       String chapterId, bool isDataSaverMode) async {
     var urls = <String>[];
-    var chapterData = await getChapterDataByChapterId(chapterId);
+    var chapterData = await getBaseUrl(chapterId);
     if (isDataSaverMode) {
-      for (String filename in chapterData.chapter.dataSaver) {
+      for (String filename in chapterData.chapter!.dataSaver!) {
         urls.add(
           constructPageUrl(
-            chapterData.baseUrl,
+            chapterData.baseUrl!,
             isDataSaverMode,
-            chapterData.chapter.hash,
+            chapterData.chapter!.hash!,
             filename,
           ),
         );
       }
     } else {
-      for (String filename in chapterData.chapter.data) {
+      for (String filename in chapterData.chapter!.data!) {
         urls.add(
           constructPageUrl(
-            chapterData.baseUrl,
+            chapterData.baseUrl!,
             isDataSaverMode,
-            chapterData.chapter.hash,
+            chapterData.chapter!.hash!,
             filename,
           ),
         );
@@ -146,7 +147,7 @@ class FludexUtils {
       String mangaId, int? chapterNum, int? limit) async {
     var _chapterId =
         await getChapters(mangaId, offset: (chapterNum! - 1), limit: limit);
-    return _chapterId.data[0].id;
+    return _chapterId.data![0].id!;
   }
 
   static Container statusContainer(String status, bool lightMode) {

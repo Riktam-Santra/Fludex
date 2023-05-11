@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mangadex_library/mangadex_library.dart';
 import 'package:mangadex_library/models/common/data.dart';
-import 'package:mangadex_library/models/login/Login.dart';
-import 'package:mangadex_library/models/chapter/ChapterData.dart' as ch;
+import 'package:mangadex_library/models/login/login.dart';
+import 'package:mangadex_library/models/chapter/chapter_data.dart' as ch;
 
 class MangaReader extends StatefulWidget {
   final Data mangaData;
@@ -36,7 +36,7 @@ class _MangaReaderState extends State<MangaReader> {
     chapterNumber = widget.chapterNumber;
     dataSaver = widget.dataSaver;
     filepaths =
-        FludexUtils().getAllFilePaths(widget.chapterData.id, widget.dataSaver);
+        FludexUtils().getAllFilePaths(widget.chapterData.id!, widget.dataSaver);
   }
 
   bool imgLoading = false;
@@ -75,7 +75,7 @@ class _MangaReaderState extends State<MangaReader> {
                   Navigator.pop(context);
                 },
               ),
-              title: Text(widget.mangaData.attributes.title.en),
+              title: Text(widget.mangaData.attributes!.title!.en!),
             ),
             body: Stack(children: [
               SingleChildScrollView(
@@ -126,16 +126,18 @@ class _MangaReaderState extends State<MangaReader> {
                                         try {
                                           if (widget.token != null) {
                                             await markChapterRead(
-                                              widget.token!.session,
+                                              widget.token!.session!,
                                               await FludexUtils().getChapterID(
-                                                  widget.mangaData.id,
+                                                  widget.mangaData.id!,
                                                   chapterNumber,
                                                   1),
                                             );
                                           }
                                           var newChapId = await FludexUtils()
-                                              .getChapterID(widget.mangaData.id,
-                                                  chapterNumber, 1);
+                                              .getChapterID(
+                                                  widget.mangaData.id!,
+                                                  chapterNumber,
+                                                  1);
                                           setState(() {
                                             pageIndex = 0;
                                             filepaths = FludexUtils()
@@ -217,7 +219,7 @@ class _MangaReaderState extends State<MangaReader> {
                                         chapterNumber--;
                                       });
                                       var newChapId = await FludexUtils()
-                                          .getChapterID(widget.mangaData.id,
+                                          .getChapterID(widget.mangaData.id!,
                                               chapterNumber, 1);
                                       filepaths = FludexUtils().getAllFilePaths(
                                           newChapId, widget.dataSaver);
@@ -242,9 +244,9 @@ class _MangaReaderState extends State<MangaReader> {
                                       });
                                       if (widget.token != null) {
                                         markChapterRead(
-                                            widget.token!.session,
+                                            widget.token!.session!,
                                             await FludexUtils().getChapterID(
-                                                widget.mangaData.id,
+                                                widget.mangaData.id!,
                                                 chapterNumber,
                                                 1));
                                       }

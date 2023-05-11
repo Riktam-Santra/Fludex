@@ -1,4 +1,4 @@
-import 'package:mangadex_library/models/common/reading_status.dart';
+import 'package:mangadex_library/enums/reading_status.dart';
 
 import '../../../utils/utils.dart';
 

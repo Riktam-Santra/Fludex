@@ -56,18 +56,18 @@ class _Library extends State<Library> {
 
   Future<UserDetails> dummyDetails() async {
     return UserDetails(
-      'ok',
-      Data(
-        '',
-        '',
-        Attributes(
-          'Anonymous',
+        'ok',
+        Data(
+          '',
+          '',
+          Attributes(
+            'Anonymous',
+            [],
+            0,
+          ),
           [],
-          0,
         ),
-        [],
-      ),
-    );
+        '');
   }
 
   Widget build(BuildContext context) {
@@ -212,7 +212,8 @@ class _Library extends State<Library> {
                                     ),
                                   ),
                                 );
-                              } else if (followedManga.data!.data.length == 0) {
+                              } else if (followedManga.data!.data!.length ==
+                                  0) {
                                 return Container(
                                   child: Center(
                                     child: Text(
@@ -341,18 +342,19 @@ class _Library extends State<Library> {
                                                                       i <
                                                                           allMangaStatus
                                                                               .data![index]
-                                                                              .attributes
-                                                                              .tags
+                                                                              .attributes!
+                                                                              .tags!
                                                                               .length;
                                                                       i++) {
                                                                     tags.add(allMangaStatus
                                                                         .data![
                                                                             index]
-                                                                        .attributes
-                                                                        .tags[i]
-                                                                        .attributes
-                                                                        .name
-                                                                        .en);
+                                                                        .attributes!
+                                                                        .tags![
+                                                                            i]
+                                                                        .attributes!
+                                                                        .name!
+                                                                        .en!);
                                                                   }
                                                                   return SearchResultHolder(
                                                                     gridView:
@@ -425,7 +427,7 @@ class _Library extends State<Library> {
                                     ),
                                     Align(
                                       alignment: Alignment.bottomCenter,
-                                      child: (followedManga.data!.total > 10)
+                                      child: (followedManga.data!.total! > 10)
                                           ? Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -465,7 +467,7 @@ class _Library extends State<Library> {
                                                         .data!.total);
                                                     if (resultOffset * 10 <
                                                         (followedManga
-                                                                .data!.total ~/
+                                                                .data!.total! ~/
                                                             10)) {
                                                       setState(() {
                                                         resultOffset++;

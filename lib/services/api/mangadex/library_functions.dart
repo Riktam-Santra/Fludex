@@ -24,18 +24,18 @@ class LibraryFunctions {
       }
     } else {
       return UserDetails(
-        'ok',
-        Data(
-          '',
-          '',
-          Attributes(
-            'Anonymous',
+          'ok',
+          Data(
+            '',
+            '',
+            Attributes(
+              'Anonymous',
+              [],
+              0,
+            ),
             [],
-            0,
           ),
-          [],
-        ),
-      );
+          '');
     }
   }
 
@@ -64,14 +64,14 @@ class LibraryFunctions {
             loginData.session,
             readingStatus:
                 ReadingStatusFunctions.checkReadingStatus(selectedValue));
-        followedManga.data.forEach((element) {
-          if (mangaWithStatus.statuses.containsKey(element.id)) {
+        followedManga.data!.forEach((element) {
+          if (mangaWithStatus.statuses!.containsKey(element.id)) {
             mangaList.add(element);
           }
         });
       }
     } on MangadexServerException catch (e) {
-      e.info.errors.forEach((element) {
+      e.info.errors!.forEach((element) {
         print(element);
       });
 

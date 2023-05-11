@@ -3,10 +3,10 @@ import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:mangadex_library/mangadexServerException.dart';
 import 'package:mangadex_library/mangadex_library.dart';
-import 'package:mangadex_library/models/aggregate/Aggregate.dart';
+import 'package:mangadex_library/models/aggregate/aggregate.dart';
 import 'package:mangadex_library/models/common/data.dart';
-import 'package:mangadex_library/models/common/language_codes.dart';
-import 'package:mangadex_library/models/login/Login.dart';
+import 'package:mangadex_library/enums/language_codes.dart';
+import 'package:mangadex_library/models/login/login.dart';
 
 class MangaReader extends StatefulWidget {
   const MangaReader({
@@ -75,20 +75,20 @@ class _MangaReaderState extends State<MangaReader> {
 
     var volumes = widget.mangaAggregate.volumes;
     var volumeIndex = 0;
-    volumes.asMap().forEach((key, value) {
+    volumes!.forEach((key, value) {
       if (value.volume == widget.volume) {
-        volumeIndex = key;
+        volumeIndex = key as int;
       }
     });
-    volumes.forEach((element) {
-      if (element.volume == widget.volume) {
-        print('element.volume was: ${element.volume}: ${widget.volume}');
-        element.chapters.forEach((key, value) {
+    volumes.forEach((element, volume) {
+      if (element == widget.volume) {
+        print('element.volume was: $element: ${widget.volume}');
+        volume.chapters!.forEach((key, value) {
           print('current value of key is : $key');
-          if (widget.mangaAggregate.volumes[volumeIndex].chapters[key]!.id ==
+          if (widget.mangaAggregate.volumes![volumeIndex]!.chapters![key]!.id ==
               widget.chapterId) {
             print(
-                '$key : ${widget.mangaAggregate.volumes[volumeIndex].chapters[key]!.id}');
+                '$key : ${widget.mangaAggregate.volumes![volumeIndex]!.chapters![key]!.id}');
             requiredChapter = key;
           }
         });
@@ -105,8 +105,8 @@ class _MangaReaderState extends State<MangaReader> {
     // });
 
     filepaths = FludexUtils().getAllFilePaths(
-        widget.mangaAggregate.volumes[volumeIndex].chapters["$requiredChapter"]!
-            .id,
+        widget.mangaAggregate.volumes![volumeIndex]!
+            .chapters!["$requiredChapter"]!.id!,
         widget.dataSaver);
     super.initState();
   }
@@ -117,7 +117,7 @@ class _MangaReaderState extends State<MangaReader> {
     print('Chapter number given: ${widget.chapterNumber}');
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.mangaData.attributes.title.en),
+          title: Text(widget.mangaData.attributes!.title!.en!),
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -178,8 +178,8 @@ class _MangaReaderState extends State<MangaReader> {
                           setState(() {
                             currentChapter -= 1;
                             filepaths = FludexUtils().getAllFilePaths(
-                                widget.mangaAggregate.volumes[currentVolume]
-                                    .chapters["$currentChapter"]!.id,
+                                widget.mangaAggregate.volumes![currentVolume]!
+                                    .chapters!["$currentChapter"]!.id!,
                                 widget.dataSaver);
                             currentPage = 0;
                           });
@@ -195,10 +195,10 @@ class _MangaReaderState extends State<MangaReader> {
                         if (loginData != null) {
                           try {
                             await markChapterReadOrUnRead(
-                                widget.mangaData.id, loginData!.session,
+                                widget.mangaData.id!, loginData!.session!,
                                 chapterIdsRead: [
-                                  widget.mangaAggregate.volumes[currentVolume]
-                                      .chapters[currentChapter]!.id,
+                                  widget.mangaAggregate.volumes![currentVolume]!
+                                      .chapters![currentChapter]!.id!,
                                 ]);
                             print('marked chapter as read.');
                           } catch (e) {
@@ -217,13 +217,13 @@ class _MangaReaderState extends State<MangaReader> {
                           }
                         }
                         if (currentChapter <
-                            widget.mangaAggregate.volumes[currentVolume]
-                                .chapters.length) {
+                            widget.mangaAggregate.volumes![currentVolume]!
+                                .chapters!.length) {
                           setState(() {
                             currentChapter += 1;
                             filepaths = FludexUtils().getAllFilePaths(
-                                widget.mangaAggregate.volumes[currentVolume]
-                                    .chapters["$currentChapter"]!.id,
+                                widget.mangaAggregate.volumes![currentVolume]!
+                                    .chapters!["$currentChapter"]!.id!,
                                 widget.dataSaver);
                             currentPage = 0;
                           });

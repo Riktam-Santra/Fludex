@@ -58,7 +58,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                                 height: 150,
                                 child: Center(
                                   child: Text(
-                                    snapshot.data!.data.attributes.username
+                                    snapshot.data!.data!.attributes!.username!
                                         .characters.first
                                         .toUpperCase(),
                                     style: TextStyle(
@@ -73,7 +73,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                                 height: 10,
                               ),
                               Text(
-                                snapshot.data!.data.attributes.username,
+                                snapshot.data!.data!.attributes!.username!,
                                 style: TextStyle(fontSize: 17),
                               )
                             ],
