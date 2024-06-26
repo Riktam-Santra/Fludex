@@ -1,0 +1,3 @@
+import 'package:mangadex_library/mangadex_library.dart';
+
+final mangadexClient = MangadexPersonalClient(clientId: clientId, clientSecret: clientSecret)

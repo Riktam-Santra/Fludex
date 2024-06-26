@@ -1,14 +1,12 @@
+import 'package:fludex/services/api/mangadex/api.dart';
 import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:mangadex_library/mangadex_library.dart';
-import 'package:mangadex_library/models/common/data.dart';
-import 'package:mangadex_library/models/login/login.dart';
-import 'package:mangadex_library/models/chapter/chapter_data.dart' as ch;
+import 'package:mangadex_library/mangadex_client.dart';
 
 class MangaReader extends StatefulWidget {
-  final Data mangaData;
-  final ch.Data chapterData;
+  final SearchData mangaData;
+  final InternalChapterData chapterData;
   final Token? token;
   final int chapterNumber;
   final bool dataSaver;
@@ -125,12 +123,17 @@ class _MangaReaderState extends State<MangaReader> {
                                         });
                                         try {
                                           if (widget.token != null) {
-                                            await markChapterRead(
-                                              widget.token!.session!,
-                                              await FludexUtils().getChapterID(
-                                                  widget.mangaData.id!,
-                                                  chapterNumber,
-                                                  1),
+                                            await mangadexClient
+                                                .markChapterReadOrUnRead(
+                                              widget.mangaData.id!,
+                                              widget.token!.accessToken,
+                                              chapterIdsRead: [
+                                                await FludexUtils()
+                                                    .getChapterID(
+                                                        widget.mangaData.id!,
+                                                        chapterNumber,
+                                                        1),
+                                              ],
                                             );
                                           }
                                           var newChapId = await FludexUtils()
@@ -243,12 +246,17 @@ class _MangaReaderState extends State<MangaReader> {
                                         chapterNumber++;
                                       });
                                       if (widget.token != null) {
-                                        markChapterRead(
-                                            widget.token!.session!,
+                                        await mangadexClient
+                                            .markChapterReadOrUnRead(
+                                          widget.mangaData.id!,
+                                          widget.token!.accessToken,
+                                          chapterIdsRead: [
                                             await FludexUtils().getChapterID(
                                                 widget.mangaData.id!,
                                                 chapterNumber,
-                                                1));
+                                                1),
+                                          ],
+                                        );
                                       }
                                       setState(() {
                                         pageIndex = 0;

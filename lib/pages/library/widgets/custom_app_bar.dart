@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/models/user/logged_user_details/logged_user_details.dart';
+import 'package:mangadex_library/mangadex_client.dart';
 
 import '../../../services/api/mangadex/library_functions.dart';
 import '../../../services/controllers/animation_controllers/login_page_anim_controller.dart';

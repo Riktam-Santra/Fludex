@@ -16,7 +16,7 @@ class SaucenaoHandler {
       this.numres,
       this.dedupe,
       this.hide});
-  Future<http.Response> _fetchResponse() async {
+  Future<http.Response> fetchResponse() async {
     var url = "https://saucenao.com/search.php?api_key=$apiKey";
     final outputType =
         (this.outputType == null) ? '' : '&output_type=${this.outputType}';

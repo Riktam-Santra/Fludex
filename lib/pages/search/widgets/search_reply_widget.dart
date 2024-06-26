@@ -1,9 +1,8 @@
 import 'dart:io';
 
+import 'package:fludex/services/api/mangadex/api.dart';
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/mangadexServerException.dart';
-import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/models/search/search.dart';
+import 'package:mangadex_library/mangadex_client.dart';
 import 'search_result_holder_widget.dart';
 
 class SearchReplyScreen extends StatefulWidget {
@@ -24,7 +23,10 @@ class _SearchReplyScreen extends State<SearchReplyScreen> {
 
   Future<Search> _search({required String query}) async {
     try {
-      var data = await lib.search(query: query);
+      var data = await mangadexClient.search(
+        query: query,
+        contentRating: [ContentRating.safe],
+      );
       return data;
     } on MangadexServerException catch (e) {
       return Future.error(

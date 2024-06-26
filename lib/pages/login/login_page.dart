@@ -1,7 +1,7 @@
 import 'package:fludex/pages/library/library.dart';
+import 'package:fludex/services/api/mangadex/api.dart';
 import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/mangadex_library.dart' as lib;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
         builder: (context, child) {
           return Center(
             child: SizedBox(
-              height: 500,
+              height: 550,
               width: 500,
               child: Stack(
                 children: [
@@ -116,41 +116,42 @@ class _LoginPageState extends State<LoginPage> {
                                                         .reverse();
                                                   });
                                                   try {
-                                                    var loginData =
-                                                        await lib.login(
-                                                            username, password);
+                                                    await mangadexClient.login(
+                                                        username, password);
 
-                                                    if (loginData.result ==
-                                                        'ok') {
-                                                      await FludexUtils()
-                                                          .saveLoginData(
-                                                              loginData.token!
-                                                                  .session!,
-                                                              loginData.token!
-                                                                  .refresh!);
-                                                      animation.controller
-                                                          .reverse()
-                                                          .whenComplete(() => {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            Library(
-                                                                      dataSaver:
-                                                                          true,
-                                                                    ),
+                                                    // if (loginData.result ==
+                                                    //     'ok') {
+                                                    await FludexUtils()
+                                                        .saveLoginData(
+                                                            mangadexClient
+                                                                .token!
+                                                                .accessToken,
+                                                            mangadexClient
+                                                                .token!
+                                                                .refreshToken);
+                                                    animation.controller
+                                                        .reverse()
+                                                        .whenComplete(() => {
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          Library(
+                                                                    dataSaver:
+                                                                        true,
                                                                   ),
-                                                                )
-                                                              });
-                                                    } else {
-                                                      setState(() {
-                                                        animation.controller
-                                                            .forward();
-                                                        loginText =
-                                                            'Username or Password incorrect.';
-                                                      });
-                                                    }
+                                                                ),
+                                                              )
+                                                            });
+                                                    // } else {
+                                                    //   setState(() {
+                                                    //     animation.controller
+                                                    //         .forward();
+                                                    //     loginText =
+                                                    //         'Username or Password incorrect.';
+                                                    //   });
+                                                    // }
                                                   } catch (e) {
                                                     setState(() {
                                                       loginText =
@@ -173,18 +174,21 @@ class _LoginPageState extends State<LoginPage> {
                                               children: [
                                                 Text("Don't have an account? "),
                                                 TextButton(
-                                                    onPressed: () async {
-                                                      const url =
-                                                          'https://mangadex.org/account/signup';
-                                                      if (await canLaunchUrlString(
-                                                          url)) {
-                                                        await launchUrl(
-                                                            Uri.parse(url));
-                                                      } else {
-                                                        throw 'Could not launch $url';
-                                                      }
-                                                    },
-                                                    child: Text("Create one!"))
+                                                  onPressed: () async {
+                                                    const url =
+                                                        'https://mangadex.org/account/signup';
+                                                    if (await canLaunchUrlString(
+                                                        url)) {
+                                                      await launchUrl(
+                                                          Uri.parse(url));
+                                                    } else {
+                                                      throw 'Could not launch $url';
+                                                    }
+                                                  },
+                                                  child: Text(
+                                                    "Create one!",
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -200,66 +204,56 @@ class _LoginPageState extends State<LoginPage> {
                                                     BorderRadius.circular(50),
                                               ),
                                               child: Opacity(
-                                                opacity: animation
-                                                    .loginButtonOpacity.value,
-                                                child: ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                    ),
-                                                    backgroundColor:
-                                                        const Color.fromARGB(
-                                                            255, 255, 103, 64),
-                                                  ),
-                                                  child: const Padding(
-                                                    padding: EdgeInsets.only(
-                                                        top: 10, bottom: 10),
-                                                    child: Text(
-                                                      "Login",
-                                                      style: TextStyle(
-                                                        fontSize: 24,
+                                                  opacity: animation
+                                                      .loginButtonOpacity.value,
+                                                  child: FilledButton(
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 10, bottom: 10),
+                                                      child: Text(
+                                                        "Login",
+                                                        style: TextStyle(
+                                                            fontSize: 24,
+                                                            color:
+                                                                Colors.white),
                                                       ),
                                                     ),
-                                                  ),
-                                                  onPressed: animation
-                                                          .loginButtonOpacity
-                                                          .isCompleted
-                                                      ? () async {
-                                                          if (password == '' &&
-                                                                  username ==
-                                                                      '' ||
-                                                              password == '' ||
-                                                              username == '') {
-                                                            setState(() {
-                                                              loginText =
-                                                                  'username or password empty';
-                                                            });
-                                                          } else {
-                                                            setState(() {
-                                                              animation
-                                                                  .controller
-                                                                  .reverse();
-                                                            });
-                                                            try {
-                                                              var loginData =
-                                                                  await lib.login(
-                                                                      username,
-                                                                      password);
-                                                              await FludexUtils()
-                                                                  .saveLoginData(
-                                                                      loginData
-                                                                          .token!
-                                                                          .session!,
-                                                                      loginData
-                                                                          .token!
-                                                                          .refresh!);
-                                                              if (loginData
-                                                                      .result ==
-                                                                  'ok') {
+                                                    onPressed: animation
+                                                            .loginButtonOpacity
+                                                            .isCompleted
+                                                        ? () async {
+                                                            if (password == '' &&
+                                                                    username ==
+                                                                        '' ||
+                                                                password ==
+                                                                    '' ||
+                                                                username ==
+                                                                    '') {
+                                                              setState(() {
+                                                                loginText =
+                                                                    'username or password empty';
+                                                              });
+                                                            } else {
+                                                              setState(() {
+                                                                animation
+                                                                    .controller
+                                                                    .reverse();
+                                                              });
+                                                              try {
+                                                                await mangadexClient
+                                                                    .login(
+                                                                        username,
+                                                                        password);
+                                                                await FludexUtils().saveLoginData(
+                                                                    mangadexClient
+                                                                        .token!
+                                                                        .accessToken,
+                                                                    mangadexClient
+                                                                        .token!
+                                                                        .refreshToken);
+                                                                // if (loginData
+                                                                //         .result ==
+                                                                //     'ok') {
                                                                 animation
                                                                     .controller
                                                                     .reverse()
@@ -274,29 +268,28 @@ class _LoginPageState extends State<LoginPage> {
                                                                                 ),
                                                                               )
                                                                             });
-                                                              } else {
+                                                                // } else {
+                                                                //   setState(() {
+                                                                //     animation
+                                                                //         .controller
+                                                                //         .forward();
+                                                                //     loginText =
+                                                                //         'Username or Password incorrect.';
+                                                                //   });
+                                                                // }
+                                                              } catch (e) {
                                                                 setState(() {
+                                                                  loginText =
+                                                                      "Something went wrong while connecting :(";
                                                                   animation
                                                                       .controller
                                                                       .forward();
-                                                                  loginText =
-                                                                      'Username or Password incorrect.';
                                                                 });
                                                               }
-                                                            } catch (e) {
-                                                              setState(() {
-                                                                loginText =
-                                                                    "Something went wrong while connecting :(";
-                                                                animation
-                                                                    .controller
-                                                                    .forward();
-                                                              });
                                                             }
                                                           }
-                                                        }
-                                                      : null,
-                                                ),
-                                              ),
+                                                        : null,
+                                                  )),
                                             ),
                                           ),
                                         ),

@@ -64,7 +64,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           'Data saver',
                         ),
                         trailing: Switch(
-                          value: settings.data!.dataSaver,
+                          value: settings.data == null
+                              ? false
+                              : settings.data!.dataSaver,
                           onChanged: (value) {
                             setState(() {
                               dataSaver = value;
@@ -81,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           'Light mode',
                         ),
                         trailing: Switch(
-                          value: settings.data!.lightMode,
+                          value: lightMode,
                           onChanged: (value) {
                             setState(() {
                               lightMode = value;

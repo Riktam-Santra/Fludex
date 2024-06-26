@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fludex/services/data_models/settings_data/settings.dart';
-import 'package:mangadex_library/enums/reading_status.dart';
-import 'package:mangadex_library/models/login/login.dart' as l;
-import 'package:mangadex_library/mangadex_library.dart';
+import 'package:mangadex_library/mangadex_client.dart';
 import 'package:fludex/services/data_models/user_data/login_data.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+
+import '../services/api/mangadex/api.dart';
 
 class FludexUtils {
   Future<LoginData?> getLoginData() async {
@@ -23,9 +22,9 @@ class FludexUtils {
               840000) {
             debugPrint(
                 'The saved login data seems to be older than 14 minutes of being requested, refreshing...');
-            var newToken = await refresh(data.refresh);
-            await saveLoginData(
-                newToken.token!.session!, newToken.token!.refresh!);
+            await mangadexClient.refresh(data.refresh);
+            await saveLoginData(mangadexClient.token!.accessToken,
+                mangadexClient.token!.refreshToken);
             debugPrint('done!');
             var newLoginData = await getLoginData();
             return newLoginData;
@@ -97,30 +96,23 @@ class FludexUtils {
   }
 
   Future<void> refreshAndSaveData(String session, String refreshdd) async {
-    var dataResponse = await getDataResponse(refreshdd);
-    print(dataResponse.body);
-    var data = l.Login.fromJson(jsonDecode(dataResponse.body));
-    print(data.result);
+    await mangadexClient.refresh(refreshdd);
     try {
-      await saveLoginData(data.token!.session!, data.token!.refresh!);
+      await saveLoginData(mangadexClient.token!.accessToken,
+          mangadexClient.token!.refreshToken);
     } catch (e) {
       await saveLoginData(session, refreshdd);
     }
   }
 
-  Future<http.Response> getDataResponse(String refresh) async {
-    var dataResponse = getRefreshResponse(refresh);
-    return dataResponse;
-  }
-
   Future<List<String>> getAllFilePaths(
       String chapterId, bool isDataSaverMode) async {
     var urls = <String>[];
-    var chapterData = await getBaseUrl(chapterId);
+    var chapterData = await mangadexClient.getBaseUrl(chapterId);
     if (isDataSaverMode) {
       for (String filename in chapterData.chapter!.dataSaver!) {
         urls.add(
-          constructPageUrl(
+          mangadexClient.constructPageUrl(
             chapterData.baseUrl!,
             isDataSaverMode,
             chapterData.chapter!.hash!,
@@ -131,7 +123,7 @@ class FludexUtils {
     } else {
       for (String filename in chapterData.chapter!.data!) {
         urls.add(
-          constructPageUrl(
+          mangadexClient.constructPageUrl(
             chapterData.baseUrl!,
             isDataSaverMode,
             chapterData.chapter!.hash!,
@@ -145,8 +137,8 @@ class FludexUtils {
 
   Future<String> getChapterID(
       String mangaId, int? chapterNum, int? limit) async {
-    var _chapterId =
-        await getChapters(mangaId, offset: (chapterNum! - 1), limit: limit);
+    var _chapterId = await mangadexClient.getChapters(mangaId,
+        offset: (chapterNum! - 1), limit: limit);
     return _chapterId.data![0].id!;
   }
 
@@ -226,7 +218,7 @@ class FludexUtils {
     }
   }
 
-  static Container demographicContainer(String demographic, bool lightMode) {
+  static Container demographicContainer(String? demographic, bool lightMode) {
     if (demographic == 'shounen') {
       return Container(
         decoration: lightMode

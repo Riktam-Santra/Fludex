@@ -1,12 +1,10 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fludex/services/api/mangadex/api.dart';
 import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/mangadexServerException.dart';
-import 'package:mangadex_library/mangadex_library.dart';
-import 'package:mangadex_library/models/aggregate/aggregate.dart';
-import 'package:mangadex_library/models/common/data.dart';
-import 'package:mangadex_library/enums/language_codes.dart';
-import 'package:mangadex_library/models/login/login.dart';
+import 'package:mangadex_library/mangadex_client.dart';
 
 class MangaReader extends StatefulWidget {
   const MangaReader({
@@ -21,7 +19,7 @@ class MangaReader extends StatefulWidget {
     this.volume,
   }) : super(key: key);
   final LanguageCodes translatedLanguage;
-  final Data mangaData;
+  final SearchData mangaData;
   final String? chapterNumber;
   final bool lightMode;
   final bool dataSaver;
@@ -40,7 +38,7 @@ class _MangaReaderState extends State<MangaReader> {
   int filterBlue = 18;
 
   late int currentVolume = 0;
-  int currentChapter = 1;
+  double currentChapter = 1;
   int currentPage = 0;
   late bool dataSaver;
   late Future<List<String>> filepaths;
@@ -53,13 +51,13 @@ class _MangaReaderState extends State<MangaReader> {
   void initState() {
     FludexUtils().getLoginData().then((value) {
       if (value != null) {
-        loginData = Token(value.session, value.refresh);
+        loginData = Token(value.session, 0, 0, value.refresh);
       }
     });
     dataSaver = widget.dataSaver;
     (widget.chapterNumber == null)
         ? currentChapter = 1
-        : currentChapter = int.parse(widget.chapterNumber!);
+        : currentChapter = double.parse(widget.chapterNumber!);
     if (widget.volume == null) {
       currentVolume = 0;
     } else {
@@ -74,10 +72,10 @@ class _MangaReaderState extends State<MangaReader> {
     print('chapterID: ' + widget.chapterId);
 
     var volumes = widget.mangaAggregate.volumes;
-    var volumeIndex = 0;
+    var volumeIndex = "";
     volumes!.forEach((key, value) {
       if (value.volume == widget.volume) {
-        volumeIndex = key as int;
+        volumeIndex = key;
       }
     });
     volumes.forEach((element, volume) {
@@ -103,7 +101,8 @@ class _MangaReaderState extends State<MangaReader> {
     //     requiredChapter = key;
     //   }
     // });
-
+    log(widget.mangaAggregate.volumes![volumeIndex]!
+        .chapters!["$requiredChapter"]!.id!);
     filepaths = FludexUtils().getAllFilePaths(
         widget.mangaAggregate.volumes![volumeIndex]!
             .chapters!["$requiredChapter"]!.id!,
@@ -194,8 +193,8 @@ class _MangaReaderState extends State<MangaReader> {
                       onPressed: () async {
                         if (loginData != null) {
                           try {
-                            await markChapterReadOrUnRead(
-                                widget.mangaData.id!, loginData!.session!,
+                            await mangadexClient.markChapterReadOrUnRead(
+                                widget.mangaData.id!, loginData!.accessToken,
                                 chapterIdsRead: [
                                   widget.mangaAggregate.volumes![currentVolume]!
                                       .chapters![currentChapter]!.id!,
@@ -279,7 +278,6 @@ class _MangaReaderState extends State<MangaReader> {
                                     )
                                   : Center(
                                       child: InteractiveViewer(
-                                        alignPanAxis: true,
                                         clipBehavior: Clip.none,
                                         child: CachedNetworkImage(
                                           imageUrl: urls.data![currentPage],

@@ -1,13 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fludex/services/api/mangadex/api.dart';
 import 'package:fludex/services/api/mangadex/reading_status_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/mangadexServerException.dart';
-import 'package:mangadex_library/models/user/logged_user_details/logged_user_details.dart';
-import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/models/user/user_followed_manga/user_followed_manga.dart';
-import 'package:mangadex_library/models/common/data.dart' as mangadat;
+import 'package:mangadex_library/mangadex_client.dart';
 
 import '../../../utils/utils.dart';
 
@@ -16,7 +13,8 @@ class LibraryFunctions {
     var loginData = await FludexUtils().getLoginData();
     if (loginData != null) {
       try {
-        var userDetails = await lib.getLoggedUserDetails(loginData.session);
+        var userDetails =
+            await mangadexClient.getLoggedUserDetails(loginData.session);
         return userDetails;
       } on Exception catch (e) {
         debugPrint(e.toString());
@@ -25,10 +23,10 @@ class LibraryFunctions {
     } else {
       return UserDetails(
           'ok',
-          Data(
+          UserDetailsData(
             '',
             '',
-            Attributes(
+            UserDetailsAttributes(
               'Anonymous',
               [],
               0,
@@ -42,8 +40,8 @@ class LibraryFunctions {
   static Future<UserFollowedManga?> getUserLibrary(int? _offset) async {
     var loginData = await FludexUtils().getLoginData();
     if (loginData != null) {
-      var response = await lib.getUserFollowedMangaResponse(loginData.session,
-          offset: _offset);
+      var response = await mangadexClient
+          .getUserFollowedMangaResponse(loginData.session, offset: _offset);
       try {
         return UserFollowedManga.fromJson(jsonDecode(response.body));
       } on Exception catch (e) {
@@ -54,13 +52,14 @@ class LibraryFunctions {
     return null;
   }
 
-  static Future<List<mangadat.Data>> filterManga(String selectedValue) async {
+  static Future<List<SearchData>> filterManga(String selectedValue) async {
     var loginData = await FludexUtils().getLoginData();
-    List<mangadat.Data> mangaList = [];
+    List<SearchData> mangaList = [];
     try {
       if (loginData != null) {
-        var followedManga = await lib.getUserFollowedManga(loginData.session);
-        var mangaWithStatus = await lib.getAllUserMangaReadingStatus(
+        var followedManga =
+            await mangadexClient.getUserFollowedManga(loginData.session);
+        var mangaWithStatus = await mangadexClient.getAllUserMangaReadingStatus(
             loginData.session,
             readingStatus:
                 ReadingStatusFunctions.checkReadingStatus(selectedValue));

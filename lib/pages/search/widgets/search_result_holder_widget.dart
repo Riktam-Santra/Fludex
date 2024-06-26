@@ -2,17 +2,15 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fludex/pages/about_manga/aboutManga.dart';
+import 'package:fludex/services/api/mangadex/api.dart';
 import 'package:fludex/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:mangadex_library/mangadexServerException.dart';
-import 'package:mangadex_library/mangadex_library.dart' as lib;
-import 'package:mangadex_library/utils.dart';
-import 'package:mangadex_library/models/common/data.dart';
+import 'package:mangadex_library/mangadex_client.dart';
 
 class SearchResultHolder extends StatefulWidget {
   final bool? gridView;
   final bool dataSaver;
-  final Data mangaData;
+  final SearchData mangaData;
   SearchResultHolder({
     required this.dataSaver,
     this.gridView = false,
@@ -34,7 +32,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
 
   Future<List<String>> _getCoverArtUrl(String mangaId, int res) async {
     try {
-      var artUrlData = await lib.getCoverArt(
+      var artUrlData = await mangadexClient.getCoverArt(
         [mangaId],
       );
 
@@ -143,7 +141,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                                 maxLines: 2,
                                                 style: TextStyle(
                                                     color: Colors.white),
-                                                textScaleFactor: 1.15,
+                                                textScaler:
+                                                    TextScaler.linear(1.15),
                                               ),
                                             ),
                                           ),
@@ -208,7 +207,8 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                           Container(
                                             child: Text(
                                               widget.mangaData.attributes!
-                                                  .description!.en!,
+                                                      .description!.en ??
+                                                  '',
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 4,
                                             ),
@@ -226,7 +226,7 @@ class _SearchResultHolder extends State<SearchResultHolder> {
                                                     lightMode),
                                                 FludexUtils.demographicContainer(
                                                     widget.mangaData.attributes!
-                                                        .publicationDemographic!,
+                                                        .publicationDemographic,
                                                     lightMode),
                                                 FludexUtils.ratingContainer(
                                                     widget.mangaData.attributes!

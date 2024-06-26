@@ -52,3 +52,9 @@ sampleAppData/
 data/loginData.json
 data/settings.json
 testData.json
+/lib/services/api/mangadex/api.dart
+/linux/*
+/ios/*
+/windows/*
+/web/*
+/android/*

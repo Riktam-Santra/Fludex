@@ -20,37 +20,19 @@ class MainPage extends StatelessWidget {
         future: FludexUtils().getSettings(),
         builder: (context, AsyncSnapshot<Settings?> settings) {
           if (settings.connectionState == ConnectionState.done) {
+            ColorScheme colorSeed = ColorScheme.fromSeed(
+                seedColor: Color.fromARGB(255, 255, 103, 64));
             return MaterialApp(
               scrollBehavior: MyCustomScrollBehavior(),
               debugShowCheckedModeBanner: false,
-              theme: ((settings.data == null) ? true : settings.data!.lightMode)
-                  ? ThemeData(
-                      primaryColor: Color.fromARGB(255, 255, 103, 64),
-                      primarySwatch: createMaterialColor(
-                        Color(0xFFFF6740),
-                      ),
-                    )
-                  : ThemeData.dark().copyWith(
-                      textButtonTheme: TextButtonThemeData(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Color.fromARGB(255, 255, 103, 64),
-                        ),
-                      ),
-                      primaryColor: Color.fromARGB(255, 255, 103, 64),
-                      progressIndicatorTheme: ProgressIndicatorThemeData(
-                        color: Color.fromARGB(255, 255, 103, 64),
-                      ),
-                      floatingActionButtonTheme: FloatingActionButtonThemeData(
-                        backgroundColor: Color.fromARGB(255, 255, 103, 64),
-                        extendedTextStyle: TextStyle(color: Colors.white),
-                      ),
-                      elevatedButtonTheme: ElevatedButtonThemeData(
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.all(10),
-                          backgroundColor: Color.fromARGB(255, 255, 103, 64),
-                        ),
-                      ),
-                    ),
+              theme: ThemeData(
+                colorScheme: colorSeed,
+                brightness: (settings.data == null)
+                    ? Brightness.light
+                    : settings.data!.lightMode
+                        ? Brightness.light
+                        : Brightness.dark,
+              ),
               home: Scaffold(
                 body: FutureBuilder(
                     future: FludexUtils().getLoginData(),

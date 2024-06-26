@@ -7,10 +7,7 @@ import 'package:fludex/utils/utils.dart';
 import 'package:fludex/pages/settings/settings_page.dart';
 import 'package:fludex/pages/search/widgets/search_result_holder_widget.dart';
 import 'package:fludex/services/controllers/animation_controllers/login_page_anim_controller.dart';
-
-import 'package:mangadex_library/models/user/logged_user_details/logged_user_details.dart';
-import 'package:mangadex_library/models/user/user_followed_manga/user_followed_manga.dart';
-import 'package:mangadex_library/models/common/data.dart' as mangadat;
+import 'package:mangadex_library/mangadex_client.dart';
 
 class Library extends StatefulWidget {
   final bool dataSaver;
@@ -37,7 +34,7 @@ class _Library extends State<Library> {
   String selectedValue = 'All';
 
   late Future<UserFollowedManga?> userLibrary;
-  late Future<List<mangadat.Data>> filteredMangaList;
+  late Future<List<SearchData>> filteredMangaList;
   late Future<UserDetails> userDetails;
 
   @override
@@ -57,10 +54,10 @@ class _Library extends State<Library> {
   Future<UserDetails> dummyDetails() async {
     return UserDetails(
         'ok',
-        Data(
+        UserDetailsData(
           '',
           '',
-          Attributes(
+          UserDetailsAttributes(
             'Anonymous',
             [],
             0,
@@ -284,7 +281,7 @@ class _Library extends State<Library> {
                                               future: filteredMangaList,
                                               builder: (BuildContext context,
                                                   AsyncSnapshot<
-                                                          List<mangadat.Data>>
+                                                          List<SearchData>>
                                                       allMangaStatus) {
                                                 if (allMangaStatus
                                                         .connectionState ==
