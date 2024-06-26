@@ -100,3 +100,7 @@
 ## 0.2.2
 - fixed a bug where some mangas failed to load up.
 - moved a few functions to separate dart files to organize things
+
+## 0.3.0
+- bumped pubspec to use flutter sdk version >= 3.0.0
+- bumped mangadex_library version to ^2.0.5
